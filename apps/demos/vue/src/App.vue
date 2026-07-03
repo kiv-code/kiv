@@ -7,11 +7,10 @@ import { createDefaultVueRegistry } from "@kiv/vue";
 import { ref } from "vue";
 import { demoDocument } from "./demo-document";
 
-// Boot the engine — registers nodes + generates CSS variables
 const engine = createEngine({ nodes: [...ALL_NODES] });
 const vueRegistry = createDefaultVueRegistry();
 
-// Inject CSS variables into <head> so tokens resolve in the canvas
+// Inject CSS variables into <head>
 const styleEl = document.createElement("style");
 styleEl.textContent = engine.css();
 document.head.appendChild(styleEl);
@@ -25,48 +24,32 @@ function onDocumentUpdate(updated: KivDocument) {
 
 <template>
 	<div class="demo">
-		<header class="demo__header">
-			<span class="demo__logo">⚡ Kiv</span>
-			<span class="demo__subtitle">Vue Demo — Visual Experience Engine</span>
-		</header>
-		<div class="demo__editor">
-			<KivEditor
-				:document="doc"
-				:registry="engine.registry"
-				:vue-registry="vueRegistry"
-				@update:document="onDocumentUpdate"
-			/>
-		</div>
+		<KivEditor
+			:document="doc"
+			:registry="engine.registry"
+			:vue-registry="vueRegistry"
+			title="Kiv Demo"
+			@update:document="onDocumentUpdate"
+		/>
 	</div>
 </template>
 
 <style>
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+html,
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background: #0f1117;
+}
 .demo {
+	height: 100vh;
 	display: flex;
 	flex-direction: column;
-	height: 100vh;
-	font-family: ui-sans-serif, system-ui, sans-serif;
-}
-.demo__header {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 10px 16px;
-	background: #0f172a;
-	color: #f8fafc;
-	font-size: 0.9rem;
-	flex-shrink: 0;
-}
-.demo__logo {
-	font-weight: 700;
-	font-size: 1rem;
-}
-.demo__subtitle {
-	color: #94a3b8;
-	font-size: 0.8rem;
-}
-.demo__editor {
-	flex: 1;
-	overflow: hidden;
 }
 </style>

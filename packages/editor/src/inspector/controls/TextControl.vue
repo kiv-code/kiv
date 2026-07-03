@@ -1,16 +1,18 @@
 <script setup lang="ts">
-const props = defineProps<{ label: string; modelValue?: string }>();
-const emit = defineEmits<{ "update:modelValue": [value: string] }>();
+defineProps<{ label: string; modelValue?: string }>();
+defineEmits<{ "update:modelValue": [value: string] }>();
 </script>
 
 <template>
-	<label class="kiv-field">
-		<span class="kiv-field__label">{{ props.label }}</span>
+	<label class="flex flex-col gap-1.5">
+		<span class="text-[10px] font-semibold uppercase tracking-widest" style="color: var(--color-text-secondary)">
+			{{ label }}
+		</span>
 		<input
 			type="text"
-			class="kiv-field__input"
+			class="kiv-input"
 			:value="modelValue ?? ''"
-			@input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+			@input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
 		/>
 	</label>
 </template>

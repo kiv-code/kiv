@@ -2,15 +2,16 @@ import type { KivNode } from "@kiv/engine";
 import { resolveNode } from "@kiv/engine";
 import type { ComputedRef } from "vue";
 import { computed, inject } from "vue";
-import { KIV_CONTEXT_KEY } from "../context";
 import type { KivRenderContext } from "../context";
+import { KIV_CONTEXT_KEY } from "../context";
 
 function unwrapCtx(
 	raw: KivRenderContext | ComputedRef<KivRenderContext> | undefined,
 ): KivRenderContext | undefined {
 	if (!raw) return undefined;
 	// ComputedRef has a `value` property and an effect symbol
-	if ("value" in raw && "effect" in raw) return (raw as ComputedRef<KivRenderContext>).value;
+	if ("value" in raw && "effect" in raw)
+		return (raw as ComputedRef<KivRenderContext>).value;
 	return raw as KivRenderContext;
 }
 

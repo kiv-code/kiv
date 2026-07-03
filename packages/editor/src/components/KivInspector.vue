@@ -49,12 +49,21 @@ const groupedFields = computed(() => {
 <template>
 	<aside class="kiv-inspector">
 		<div class="kiv-inspector__header">Inspector</div>
+
 		<div v-if="!store?.selected.value" class="kiv-inspector__empty">
-			Select a node to inspect
+			<div class="kiv-inspector__empty-icon">
+				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+					<rect x="3" y="3" width="18" height="18" rx="2"/>
+					<path d="M3 9h18M9 21V9"/>
+				</svg>
+			</div>
+			<p>Select a node to inspect</p>
 		</div>
+
 		<template v-else>
-			<div class="kiv-inspector__node-type">
+			<div class="kiv-inspector__node-header">
 				<span class="kiv-inspector__node-badge">{{ store.selected.value.type }}</span>
+				<span class="kiv-inspector__node-id">#{{ store.selected.value.id }}</span>
 			</div>
 			<div class="kiv-inspector__groups">
 				<details
@@ -63,7 +72,12 @@ const groupedFields = computed(() => {
 					class="kiv-inspector__group"
 					open
 				>
-					<summary class="kiv-inspector__group-title">{{ group.name }}</summary>
+					<summary class="kiv-inspector__group-title">
+						<svg class="kiv-inspector__chevron" width="10" height="10" viewBox="0 0 10 10" fill="none">
+							<path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						{{ group.name }}
+					</summary>
 					<div class="kiv-inspector__group-fields">
 						<FieldControl
 							v-for="field in group.fields"
@@ -85,79 +99,104 @@ const groupedFields = computed(() => {
 	width: 260px;
 	min-width: 260px;
 	flex-shrink: 0;
-	border-left: 1px solid #e5e7eb;
+	border-left: 1px solid #1e2130;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	background: #fff;
+	background: #16181f;
+	color: #e2e8f0;
 }
 .kiv-inspector__header {
 	padding: 8px 12px;
-	font-size: 0.7rem;
+	font-size: 0.65rem;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: #6b7280;
-	border-bottom: 1px solid #e5e7eb;
-	background: #f9fafb;
+	letter-spacing: 0.1em;
+	color: var(--color-text-secondary);
+	border-bottom: 1px solid #1e2130;
+	background: #16181f;
 }
 .kiv-inspector__empty {
-	padding: 24px 12px;
-	color: #9ca3af;
-	font-size: 0.8rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 40px 16px;
+	color: var(--color-text-muted);
+	font-size: 0.78rem;
 	text-align: center;
 }
-.kiv-inspector__node-type {
+.kiv-inspector__empty-icon { color: var(--color-border); }
+.kiv-inspector__empty p { margin: 0; }
+
+.kiv-inspector__node-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	padding: 8px 12px;
-	border-bottom: 1px solid #e5e7eb;
-	background: #f9fafb;
+	border-bottom: 1px solid #1e2130;
+	background: #13151c;
 }
 .kiv-inspector__node-badge {
 	display: inline-block;
 	padding: 2px 8px;
-	background: #1d4ed8;
-	color: #fff;
+	background: rgba(99, 102, 241, 0.2);
+	color: #a5b4fc;
 	border-radius: 4px;
-	font-size: 0.75rem;
-	font-weight: 600;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
 }
+.kiv-inspector__node-id {
+	color: var(--color-text-muted);
+	font-size: 0.65rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .kiv-inspector__groups {
 	flex: 1;
 	overflow-y: auto;
 }
+.kiv-inspector__groups::-webkit-scrollbar { width: 3px; }
+.kiv-inspector__groups::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
 .kiv-inspector__group {
-	border-bottom: 1px solid #e5e7eb;
+	border-bottom: 1px solid #1a1d2a;
 }
+
 .kiv-inspector__group-title {
 	padding: 6px 12px;
-	font-size: 0.7rem;
+	font-size: 0.65rem;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	color: #6b7280;
+	letter-spacing: 0.08em;
+	color: var(--color-text-secondary);
 	cursor: pointer;
 	user-select: none;
-	background: #f9fafb;
+	background: #13151c;
 	list-style: none;
 	display: flex;
 	align-items: center;
-	gap: 4px;
+	gap: 6px;
+	transition: color 0.1s;
 }
-.kiv-inspector__group-title::-webkit-details-marker {
-	display: none;
-}
-.kiv-inspector__group-title::before {
-	content: "›";
-	display: inline-block;
+.kiv-inspector__group-title:hover { color: var(--color-text-primary); }
+.kiv-inspector__group-title::-webkit-details-marker { display: none; }
+
+.kiv-inspector__chevron {
+	flex-shrink: 0;
+	color: var(--color-border);
 	transition: transform 0.15s;
-	font-size: 1rem;
-	color: #9ca3af;
 }
-details[open] .kiv-inspector__group-title::before {
+details[open] .kiv-inspector__chevron {
 	transform: rotate(90deg);
 }
+
 .kiv-inspector__group-fields {
-	padding: 8px 12px;
+	padding: 10px 12px;
 	display: flex;
 	flex-direction: column;
 	gap: 10px;

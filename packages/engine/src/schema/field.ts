@@ -27,4 +27,6 @@ export interface FieldDescriptor<T = unknown> {
 	responsive?: boolean;
 	/** Opciones, solo para control 'select'. */
 	options?: ReadonlyArray<{ label: string; value: T }>;
+	/** Si true, el campo puede editarse inline en el canvas (click directo sobre el nodo). */
+	inline?: boolean;
 }

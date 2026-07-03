@@ -61,7 +61,11 @@ export const demoDocument: KivDocument = {
 													{
 														id: "hero-buttons",
 														type: "stack",
-														props: { direction: "horizontal", gap: "md" },
+														props: {
+															direction: "horizontal",
+															gap: "md",
+															align: "center",
+														},
 														slots: {
 															default: [
 																{
@@ -98,7 +102,7 @@ export const demoDocument: KivDocument = {
 					},
 				},
 
-				// Features section
+				// Features section — grid collapses to 1 col on mobile
 				{
 					id: "features",
 					type: "section",
@@ -135,7 +139,12 @@ export const demoDocument: KivDocument = {
 													{
 														id: "features-grid",
 														type: "grid",
-														props: { columns: "3", gap: "lg" },
+														// 1 col mobile → 3 col desktop
+														props: {
+															columns: "1",
+															lgColumns: "3",
+															gap: "lg",
+														},
 														slots: {
 															default: [
 																{
@@ -145,22 +154,34 @@ export const demoDocument: KivDocument = {
 																	slots: {
 																		default: [
 																			{
-																				id: "feature-1-heading",
-																				type: "heading",
+																				id: "f1-stack",
+																				type: "stack",
 																				props: {
-																					text: "Headless",
-																					level: "3",
-																					color: "#1d4ed8",
+																					direction: "vertical",
+																					gap: "sm",
 																				},
-																			},
-																			{
-																				id: "feature-1-text",
-																				type: "text",
-																				props: {
-																					content:
-																						"Framework-agnostic core. Use Vue, React, or any renderer.",
-																					size: "base",
-																					color: "#475569",
+																				slots: {
+																					default: [
+																						{
+																							id: "feature-1-heading",
+																							type: "heading",
+																							props: {
+																								text: "Headless",
+																								level: "3",
+																								color: "#1d4ed8",
+																							},
+																						},
+																						{
+																							id: "feature-1-text",
+																							type: "text",
+																							props: {
+																								content:
+																									"Framework-agnostic core. Use Vue, React, or any renderer.",
+																								size: "base",
+																								color: "#475569",
+																							},
+																						},
+																					],
 																				},
 																			},
 																		],
@@ -173,22 +194,34 @@ export const demoDocument: KivDocument = {
 																	slots: {
 																		default: [
 																			{
-																				id: "feature-2-heading",
-																				type: "heading",
+																				id: "f2-stack",
+																				type: "stack",
 																				props: {
-																					text: "JSON-Driven",
-																					level: "3",
-																					color: "#1d4ed8",
+																					direction: "vertical",
+																					gap: "sm",
 																				},
-																			},
-																			{
-																				id: "feature-2-text",
-																				type: "text",
-																				props: {
-																					content:
-																						"Your document is pure JSON. Store it anywhere, version it, migrate it.",
-																					size: "base",
-																					color: "#475569",
+																				slots: {
+																					default: [
+																						{
+																							id: "feature-2-heading",
+																							type: "heading",
+																							props: {
+																								text: "JSON-Driven",
+																								level: "3",
+																								color: "#1d4ed8",
+																							},
+																						},
+																						{
+																							id: "feature-2-text",
+																							type: "text",
+																							props: {
+																								content:
+																									"Your document is pure JSON. Store it anywhere, version it, migrate it.",
+																								size: "base",
+																								color: "#475569",
+																							},
+																						},
+																					],
 																				},
 																			},
 																		],
@@ -201,22 +234,34 @@ export const demoDocument: KivDocument = {
 																	slots: {
 																		default: [
 																			{
-																				id: "feature-3-heading",
-																				type: "heading",
+																				id: "f3-stack",
+																				type: "stack",
 																				props: {
-																					text: "Plugin-Based",
-																					level: "3",
-																					color: "#1d4ed8",
+																					direction: "vertical",
+																					gap: "sm",
 																				},
-																			},
-																			{
-																				id: "feature-3-text",
-																				type: "text",
-																				props: {
-																					content:
-																						"Extend the engine with plugins. Analytics, forms, modals — never touch the core.",
-																					size: "base",
-																					color: "#475569",
+																				slots: {
+																					default: [
+																						{
+																							id: "feature-3-heading",
+																							type: "heading",
+																							props: {
+																								text: "Plugin-Based",
+																								level: "3",
+																								color: "#1d4ed8",
+																							},
+																						},
+																						{
+																							id: "feature-3-text",
+																							type: "text",
+																							props: {
+																								content:
+																									"Extend the engine with plugins. Analytics, forms, modals — never touch the core.",
+																								size: "base",
+																								color: "#475569",
+																							},
+																						},
+																					],
 																				},
 																			},
 																		],

@@ -1,16 +1,18 @@
 <script setup lang="ts">
-const props = defineProps<{ label: string; modelValue?: string }>();
-const emit = defineEmits<{ "update:modelValue": [value: string] }>();
+defineProps<{ label: string; modelValue?: string }>();
+defineEmits<{ "update:modelValue": [value: string] }>();
 </script>
 
 <template>
-	<label class="kiv-field">
-		<span class="kiv-field__label">{{ props.label }}</span>
+	<label class="flex flex-col gap-1.5">
+		<span class="text-[10px] font-semibold uppercase tracking-widest" style="color: var(--color-text-secondary)">
+			{{ label }}
+		</span>
 		<textarea
-			class="kiv-field__textarea"
-			:value="modelValue ?? ''"
 			rows="3"
-			@input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
+			class="kiv-input resize-y"
+			:value="modelValue ?? ''"
+			@input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
 		/>
 	</label>
 </template>

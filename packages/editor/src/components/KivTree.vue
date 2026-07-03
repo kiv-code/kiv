@@ -1,98 +1,31 @@
 <script setup lang="ts">
-import type { KivNode } from "@kiv/engine";
-import { inject, ref } from "vue";
+import { inject } from "vue";
 import { EDITOR_STORE_KEY } from "../store/context";
-import { getNodeIcon } from "../utils/node-icons";
 import KivTreeNode from "./KivTreeNode.vue";
 
 const store = inject(EDITOR_STORE_KEY);
-const showPalette = ref(false);
-
-interface PaletteItem {
-	type: string;
-	label: string;
-	defaultSlot: string;
-	category: "layout" | "content" | "media";
-}
-
-const PALETTE: PaletteItem[] = [
-	{
-		type: "section",
-		label: "Section",
-		defaultSlot: "default",
-		category: "layout",
-	},
-	{
-		type: "container",
-		label: "Container",
-		defaultSlot: "default",
-		category: "layout",
-	},
-	{ type: "stack", label: "Stack", defaultSlot: "default", category: "layout" },
-	{ type: "grid", label: "Grid", defaultSlot: "default", category: "layout" },
-	{ type: "heading", label: "Heading", defaultSlot: "", category: "content" },
-	{ type: "text", label: "Text", defaultSlot: "", category: "content" },
-	{ type: "button", label: "Button", defaultSlot: "", category: "content" },
-	{ type: "image", label: "Image", defaultSlot: "", category: "media" },
-];
-
-function addNode(item: PaletteItem) {
-	if (!store) return;
-	const parent = store.selected.value ?? store.document.value.root;
-	// Find a valid slot — use the first available slot from the parent's slots or "default"
-	const slots = Object.keys(parent.slots ?? {});
-	const slotName = slots[0] ?? "default";
-
-	const newNode: KivNode = {
-		id: `${item.type}-${Math.random().toString(36).slice(2, 7)}`,
-		type: item.type,
-		props: {},
-		slots: item.defaultSlot ? { default: [] } : undefined,
-	};
-
-	store.addNode(parent.id, slotName, newNode);
-	store.select(newNode.id);
-	showPalette.value = false;
-}
-
-const CATEGORY_LABELS: Record<string, string> = {
-	layout: "Layout",
-	content: "Content",
-	media: "Media",
-};
-
-const categories = ["layout", "content", "media"] as const;
+const emit = defineEmits<{ openPalette: [] }>();
 </script>
 
 <template>
 	<aside class="kiv-tree">
-		<div class="kiv-tree__header">Structure</div>
+		<div class="kiv-tree__header">
+			<span>Structure</span>
+		</div>
 		<div v-if="store" class="kiv-tree__body">
 			<KivTreeNode :node="store.document.value.root" :depth="0" />
 		</div>
-		<div class="kiv-tree__palette-bar">
+		<div class="kiv-tree__footer">
 			<button
 				type="button"
 				class="kiv-tree__add-btn"
-				@click="showPalette = !showPalette"
+				@click="emit('openPalette')"
 			>
-				<span>+</span> Add node
+				<svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+					<path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+				</svg>
+				Add node
 			</button>
-		</div>
-		<div v-if="showPalette" class="kiv-tree__palette">
-			<div v-for="cat in categories" :key="cat" class="kiv-palette__group">
-				<div class="kiv-palette__cat-label">{{ CATEGORY_LABELS[cat] }}</div>
-				<button
-					v-for="item in PALETTE.filter((p) => p.category === cat)"
-					:key="item.type"
-					type="button"
-					class="kiv-palette__item"
-					@click="addNode(item)"
-				>
-					<span class="kiv-palette__icon">{{ getNodeIcon(item.type) }}</span>
-					<span>{{ item.label }}</span>
-				</button>
-			</div>
 		</div>
 	</aside>
 </template>
@@ -102,90 +35,56 @@ const categories = ["layout", "content", "media"] as const;
 	width: 220px;
 	min-width: 220px;
 	flex-shrink: 0;
-	border-right: 1px solid #e5e7eb;
+	border-right: 1px solid #1e2130;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	background: #fff;
+	background: #16181f;
 }
 .kiv-tree__header {
 	padding: 8px 12px;
-	font-size: 0.7rem;
+	font-size: 0.65rem;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: #6b7280;
-	border-bottom: 1px solid #e5e7eb;
-	background: #f9fafb;
+	letter-spacing: 0.1em;
+	color: var(--color-text-secondary);
+	border-bottom: 1px solid #1e2130;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
 .kiv-tree__body {
 	flex: 1;
 	overflow-y: auto;
 	padding: 4px 0;
 }
-.kiv-tree__palette-bar {
-	border-top: 1px solid #e5e7eb;
+.kiv-tree__body::-webkit-scrollbar { width: 3px; }
+.kiv-tree__body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+.kiv-tree__footer {
+	border-top: 1px solid #1e2130;
 	padding: 6px 8px;
-	background: #f9fafb;
 }
 .kiv-tree__add-btn {
 	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 4px;
+	gap: 5px;
 	padding: 5px 8px;
-	border: 1px dashed #d1d5db;
-	border-radius: 4px;
+	border: 1px dashed var(--color-border);
+	border-radius: 5px;
 	background: transparent;
-	color: #6b7280;
-	font-size: 0.78rem;
-	cursor: pointer;
-}
-.kiv-tree__add-btn:hover {
-	background: #f3f4f6;
-	border-color: #9ca3af;
-	color: #374151;
-}
-.kiv-tree__palette {
-	border-top: 1px solid #e5e7eb;
-	background: #fff;
-	overflow-y: auto;
-	max-height: 240px;
-}
-.kiv-palette__group {
-	padding: 4px 0;
-}
-.kiv-palette__cat-label {
-	padding: 4px 12px 2px;
-	font-size: 0.65rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	color: #9ca3af;
-}
-.kiv-palette__item {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	width: 100%;
-	padding: 5px 12px;
-	background: none;
-	border: none;
-	cursor: pointer;
-	font-size: 0.8rem;
-	color: #374151;
-	text-align: left;
-}
-.kiv-palette__item:hover {
-	background: #f3f4f6;
-	color: #111827;
-}
-.kiv-palette__icon {
-	width: 16px;
-	text-align: center;
-	flex-shrink: 0;
+	color: var(--color-text-muted);
 	font-size: 0.75rem;
-	color: #6b7280;
+	font-family: inherit;
+	cursor: pointer;
+	transition: border-color 0.12s, color 0.12s, background 0.12s;
 }
+.kiv-tree__add-btn:hover,
+.kiv-tree__add-btn.active {
+	border-color: #6366f1;
+	color: #a5b4fc;
+	background: rgba(99, 102, 241, 0.08);
+}
+
 </style>

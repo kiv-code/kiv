@@ -1,0 +1,27 @@
+{
+	"name": "@kiv/plugin-analytics",
+	"version": "0.0.0",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "unbuild",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@kiv/engine": "workspace:*"
+	},
+	"devDependencies": {
+		"typescript": "^6.0.3",
+		"unbuild": "^3.6.1",
+		"vitest": "^4.1.9"
+	}
+}

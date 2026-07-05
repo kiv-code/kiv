@@ -7,9 +7,11 @@ import {
 	type ButtonVariantStyle,
 } from "@kiv/nodes";
 import { computed, inject } from "vue";
+import { KIV_BUS_KEY } from "../bus";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
 
 const props = defineProps<{
+	nodeId?: string;
 	label?: string;
 	href?: string;
 	target?: string;
@@ -23,6 +25,7 @@ const props = defineProps<{
 }>();
 
 const isEditorMode = inject(KIV_EDITOR_MODE_KEY, false);
+const bus = inject(KIV_BUS_KEY, null);
 
 const resolvedHref = computed(() =>
 	isEditorMode ? undefined : (props.href ?? "#"),
@@ -71,7 +74,30 @@ const buttonStyle = computed(() => ({
 }));
 
 function onClick(e: MouseEvent) {
-	if (isEditorMode) e.preventDefault();
+	if (isEditorMode) {
+		e.preventDefault();
+		return;
+	}
+	// Runtime: emit through the engine bus if one was provided.
+	bus?.emit("button.clicked", {
+		nodeId: props.nodeId,
+		label: props.label,
+		href: props.href,
+	});
+
+	// Anchor navigation: smooth-scroll to the target node ourselves.
+	// The renderer stamps each node with id="<nodeId>", so href="#hero"
+	// finds the element and scrolls to it — works inside scroll containers,
+	// where the browser's native hash jump can be unreliable.
+	if (props.linkType === "anchor") {
+		const raw = props.href ?? "";
+		const targetId = raw.startsWith("#") ? raw.slice(1) : raw;
+		e.preventDefault();
+		if (targetId) {
+			const el = document.getElementById(targetId);
+			el?.scrollIntoView({ behavior: "smooth", block: "start" });
+		}
+	}
 }
 </script>
 

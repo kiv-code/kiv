@@ -119,25 +119,31 @@ pnpm biome check --write . && pnpm typecheck && pnpm test
 - @kiv/editor — builder visual (canvas, inspector auto-generado, tree, DnD, preview).
 - @kiv/nodes-interactive, @kiv/plugin-* — packs opcionales, NUNCA en el core ni base.
 
-## Estado actual (core @kiv/engine)
-Completado:
+## Estado actual
+Core @kiv/engine — COMPLETO (todos los pilares implementados + tests):
 - 1.1 Tipos base: KivNode, KivDocument, Responsive<T>, Localizable<T>, Breakpoint
 - 1.2 Field descriptor sobre Zod: defineNode, f.*, InferProps
 - 1.3 Registry de nodos
 - 1.4 Resolver (ejes responsive + locale, mobile-first)
 - 1.5 Theme engine (tokens → CSS variables, --kiv-*)
+- 1.6 Event Bus tipado: createEventBus, emit/on/once/off/clear, wildcard por
+  namespace (`node.*`) y global (`*`). En src/events/. (SÍ existe — 13 tests.)
 - 1.7 i18n config: validateI18nConfig + buildLocaleFallbackChain (src/i18n/)
 - 1.8 Migraciones scaffold: migrateDocument + CURRENT_SCHEMA_VERSION (src/migrations/)
+- 1.9 Plugin System: KivPlugin { name, install(ctx) }, engine.use(plugin),
+  PluginContext da acceso a bus/registry/theme/i18n. En src/plugin/.
+- 1.10 createEngine({ theme, i18n, plugins, nodes }) → KivEngine
+  { bus, registry, theme, i18n, use, css, resolve }. En src/engine/.
 
-Pendiente para CERRAR el core (antes de renderers/nodos):
-- 1.6 Event Bus tipado (emit/on, wildcard por namespace). Pilar event-driven.
-  OJO: estaba marcado como hecho por error; NO existe en el código todavía.
-- 1.9 Plugin System: engine.use(plugin), ciclo de vida, acceso a bus/registry/theme.
-- 1.10 createEngine({ theme, locales, plugins, nodes }): API compuesta de entrada.
+Fases 2–4 — COMPLETADAS:
+- @kiv/nodes: 10 nodos base + escalas de estilo compartidas (src/scales.ts,
+  fuente única para todos los renderers — ver Reglas de arquitectura).
+- @kiv/vue: <KivRenderer> + los 10 componentes de nodo, consumen las escalas.
+- @kiv/editor: canvas, inspector, tree con DnD, paleta, i18n en vivo,
+  light/dark, ID editable. Demo multi-locale (en/es/fr) en apps/demos/vue.
 
-Roadmap (orden decidido):
-- Fase 2: @kiv/nodes (10 nodos base) PRIMERO — definiciones puras, para que el
-  renderer tenga algo real que registrar y testear.
-- Fase 3: @kiv/vue (renderer runtime, <KivRenderer> + componentes de los nodos).
-- Fase 4: @kiv/editor (canvas, inspector auto-generado desde schema, tree, DnD, preview).
-- Fase 5+: @kiv/react, packs interactivos, plugins (analytics/forms/…), docs site.
+Pendiente:
+- @kiv/react: segundo renderer (mismo contrato, mismas escalas de @kiv/nodes).
+  Es la prueba real del diseño multi-framework.
+- Persistencia end-to-end de ejemplo (guardar/cargar JSON, probar migrateDocument).
+- Packs interactivos (@kiv/nodes-interactive), plugins (analytics/forms/…), docs site.

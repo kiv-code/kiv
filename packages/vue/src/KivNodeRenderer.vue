@@ -41,6 +41,7 @@ const slotEntries = computed(() => Object.entries(props.node.slots ?? {}));
 		:is="component"
 		v-if="component"
 		v-bind="resolved.props"
+		:id="resolved.id"
 		:node-id="resolved.id"
 		:data-kiv-node-id="resolved.id"
 	>

@@ -12,6 +12,7 @@
 		"@kiv/editor": "workspace:*",
 		"@kiv/engine": "workspace:*",
 		"@kiv/nodes": "workspace:*",
+		"@kiv/plugin-analytics": "workspace:*",
 		"@kiv/vue": "workspace:*",
 		"vue": "^3.5.17"
 	},

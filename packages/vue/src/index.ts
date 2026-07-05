@@ -1,3 +1,4 @@
+export { KIV_BUS_KEY } from "./bus";
 export { useKivNode } from "./composables/useKivNode";
 export { createDefaultVueRegistry } from "./defaultRegistry";
 export { KIV_EDITOR_MODE_KEY } from "./editor-mode";

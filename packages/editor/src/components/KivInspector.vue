@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { Breakpoint, FieldDescriptor, Registry } from "@kiv/engine";
+import type {
+	Breakpoint,
+	FieldDescriptor,
+	KivNode,
+	Registry,
+} from "@kiv/engine";
 import { computed, inject, ref, watch } from "vue";
 import FieldControl from "../inspector/FieldControl.vue";
 import { EDITOR_STORE_KEY } from "../store/context";
@@ -82,6 +87,7 @@ const GROUP_ORDER = [
 	"Overlay",
 	"Effects",
 	"Border",
+	"Colors",
 	"Link",
 	"Style",
 	"General",
@@ -90,6 +96,16 @@ const GROUP_ORDER = [
 interface GroupedField {
 	key: string;
 	descriptor: FieldDescriptor;
+}
+
+// Evaluates a field's showIf condition against the node's current props.
+// Returns true (visible) when there's no condition or it matches.
+function isFieldVisible(node: KivNode, descriptor: FieldDescriptor): boolean {
+	const cond = descriptor.showIf;
+	if (!cond) return true;
+	const current = node.props[cond.field];
+	const expected = Array.isArray(cond.equals) ? cond.equals : [cond.equals];
+	return expected.includes(String(current ?? ""));
 }
 
 const groupedFields = computed(() => {
@@ -101,6 +117,7 @@ const groupedFields = computed(() => {
 	const groups = new Map<string, GroupedField[]>();
 
 	for (const [key, descriptor] of Object.entries(compiled.fields)) {
+		if (!isFieldVisible(node, descriptor)) continue; // respect showIf
 		const g = descriptor.group ?? "General";
 		if (!groups.has(g)) groups.set(g, []);
 		groups.get(g)?.push({ key, descriptor });

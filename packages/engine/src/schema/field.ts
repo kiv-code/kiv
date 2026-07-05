@@ -29,4 +29,11 @@ export interface FieldDescriptor<T = unknown> {
 	options?: ReadonlyArray<{ label: string; value: T }>;
 	/** Si true, el campo puede editarse inline en el canvas (click directo sobre el nodo). */
 	inline?: boolean;
+	/**
+	 * Visibilidad condicional en el inspector: el campo solo se muestra si el
+	 * prop `field` del nodo es igual a alguno de `equals`. Permite formularios
+	 * dinámicos (e.g. mostrar campos de gradiente solo si backgroundType=gradient).
+	 * No afecta al render ni al JSON — es puramente una pista para el inspector.
+	 */
+	showIf?: { field: string; equals: string | string[] };
 }

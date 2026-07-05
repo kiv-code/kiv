@@ -8,6 +8,7 @@ interface BaseOptions<T> {
 	localizable?: boolean;
 	responsive?: boolean;
 	inline?: boolean;
+	showIf?: { field: string; equals: string | string[] };
 }
 
 function text(opts: BaseOptions<string> = {}): FieldDescriptor<string> {

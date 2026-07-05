@@ -2,8 +2,11 @@ import type { ThemeTokens } from "./types";
 
 export const defaultTheme: ThemeTokens = {
 	colors: {
-		primary: "#3b82f6",
-		secondary: "#64748b",
+		primary: "#6366f1",
+		"primary-foreground": "#ffffff",
+		secondary: "#334155",
+		"secondary-foreground": "#f1f5f9",
+		accent: "#6366f1",
 		background: "#ffffff",
 		foreground: "#0f172a",
 		muted: "#f1f5f9",

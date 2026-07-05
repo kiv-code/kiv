@@ -123,7 +123,16 @@ export const HEADING_LEVEL_SIZE: Record<string, number> = {
 	"6": 16,
 };
 
-/** Button variant styles — shared so Vue and React buttons look identical. */
+/**
+ * Button variant styles — shared so Vue and React buttons look identical.
+ *
+ * Colors reference theme CSS variables (var(--kiv-color-*)) with a hardcoded
+ * fallback, so:
+ *   - if the consumer injects the theme (engine.css()), buttons take THEIR
+ *     brand color automatically — change the theme once, all buttons update;
+ *   - if no theme is present, the fallback keeps buttons looking right.
+ * A per-button custom color (see ButtonNode) overrides these entirely.
+ */
 export interface ButtonVariantStyle {
 	background: string;
 	color: string;
@@ -132,28 +141,28 @@ export interface ButtonVariantStyle {
 }
 export const BUTTON_VARIANT: Record<string, ButtonVariantStyle> = {
 	primary: {
-		background: "#6366f1",
-		color: "#ffffff",
+		background: "var(--kiv-color-primary, #6366f1)",
+		color: "var(--kiv-color-primary-foreground, #ffffff)",
 		border: "2px solid transparent",
 	},
 	secondary: {
-		background: "#334155",
-		color: "#f1f5f9",
+		background: "var(--kiv-color-secondary, #334155)",
+		color: "var(--kiv-color-secondary-foreground, #f1f5f9)",
 		border: "2px solid transparent",
 	},
 	ghost: {
 		background: "transparent",
-		color: "#6366f1",
+		color: "var(--kiv-color-primary, #6366f1)",
 		border: "2px solid transparent",
 	},
 	outline: {
 		background: "transparent",
-		color: "#6366f1",
-		border: "2px solid #6366f1",
+		color: "var(--kiv-color-primary, #6366f1)",
+		border: "2px solid var(--kiv-color-primary, #6366f1)",
 	},
 	link: {
 		background: "transparent",
-		color: "#6366f1",
+		color: "var(--kiv-color-primary, #6366f1)",
 		border: "2px solid transparent",
 		textDecoration: "underline",
 	},

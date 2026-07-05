@@ -17,7 +17,7 @@ describe("resolveTheme", () => {
 describe("themeToCssVars", () => {
 	it("convierte tokens en CSS variables con prefijo --kiv-", () => {
 		const vars = themeToCssVars(resolveTheme());
-		expect(vars["--kiv-color-primary"]).toBe("#3b82f6");
+		expect(vars["--kiv-color-primary"]).toBe("#6366f1");
 		expect(vars["--kiv-spacing-md"]).toBe("1rem");
 		expect(vars["--kiv-font-family-sans"]).toContain("system-ui");
 	});

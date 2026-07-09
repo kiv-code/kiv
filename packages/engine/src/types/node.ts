@@ -1,3 +1,5 @@
+import type { Responsive } from "./values";
+
 export interface KivNode {
 	/** Identificador único dentro del documento. */
 	id: string;
@@ -9,4 +11,8 @@ export interface KivNode {
 	slots?: Record<string, KivNode[]>;
 	/** Datos de plugins. NO afecta al render. */
 	meta?: Record<string, unknown>;
+	/** Si true, el editor bloquea la selección/edición/drag de este nodo. */
+	locked?: boolean;
+	/** Visibilidad del nodo, opcionalmente por breakpoint. Por defecto visible. */
+	visible?: Responsive<boolean>;
 }

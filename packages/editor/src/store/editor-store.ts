@@ -1,15 +1,6 @@
 import type { Breakpoint, KivDocument, KivNode, Registry } from "@kiv/engine";
+import { EditorEngine } from "@kiv/engine";
 import { computed, ref } from "vue";
-import {
-	addNode,
-	cloneDocument,
-	duplicateNode,
-	moveNode,
-	nodeIdExists,
-	removeNode,
-	renameNode,
-	updateNodeProps,
-} from "../utils/document-ops";
 
 const HISTORY_LIMIT = 50;
 
@@ -44,30 +35,37 @@ export interface EditorStore {
 	redo(): void;
 }
 
+/** Vue wrapper around the framework-agnostic `EditorEngine` — bridges its bus into Vue refs. */
 export function useEditorStore(
 	initialDocument: KivDocument,
 	_registry: Registry,
 ): EditorStore {
-	const past = ref<KivDocument[]>([]);
-	const present = ref<KivDocument>(cloneDocument(initialDocument));
-	const future = ref<KivDocument[]>([]);
+	const engine = new EditorEngine(initialDocument, {
+		historyLimit: HISTORY_LIMIT,
+	});
+
+	const document = ref<KivDocument>(engine.document);
+	const canUndo = ref(engine.canUndo);
+	const canRedo = ref(engine.canRedo);
 	const selectedId = ref<string | null>(null);
 	const breakpoint = ref<Breakpoint>("base");
 	const locale = ref<string>(initialDocument.i18n?.default ?? "en");
 
-	function commit(next: KivDocument) {
-		past.value = [
-			...past.value.slice(-(HISTORY_LIMIT - 1)),
-			cloneDocument(present.value),
-		];
-		future.value = [];
-		present.value = next;
-	}
+	engine.bus.on("history.changed", (state) => {
+		document.value = engine.document;
+		canUndo.value = state.canUndo;
+		canRedo.value = state.canRedo;
+	});
+
+	engine.bus.on("selection.changed", (state) => {
+		selectedId.value = state.ids[0] ?? null;
+	});
 
 	const selected = computed<KivNode | null>(() => {
-		if (!selectedId.value) return null;
+		const id = selectedId.value;
+		if (!id) return null;
 		function find(node: KivNode): KivNode | null {
-			if (node.id === selectedId.value) return node;
+			if (node.id === id) return node;
 			for (const children of Object.values(node.slots ?? {})) {
 				for (const child of children) {
 					const found = find(child);
@@ -76,14 +74,12 @@ export function useEditorStore(
 			}
 			return null;
 		}
-		return find(present.value.root);
+		return find(document.value.root);
 	});
 
-	const canUndo = computed(() => past.value.length > 0);
-	const canRedo = computed(() => future.value.length > 0);
-
 	function select(id: string | null) {
-		selectedId.value = id;
+		if (id === null) engine.selection.clear();
+		else engine.selection.select(id);
 	}
 
 	function setBreakpoint(bp: Breakpoint) {
@@ -95,24 +91,15 @@ export function useEditorStore(
 	}
 
 	function updateProps(id: string, patch: Record<string, unknown>) {
-		commit(updateNodeProps(present.value, id, patch));
+		engine.updateNodeProps(id, patch);
 	}
 
 	function rename(id: string, newId: string) {
-		const trimmed = newId.trim();
-		if (!trimmed || trimmed === id) return;
-		if (nodeIdExists(present.value, trimmed)) return; // collision — reject
-		commit(renameNode(present.value, id, trimmed));
-		// Keep the renamed node selected
-		if (selectedId.value === id) selectedId.value = trimmed;
+		engine.renameNode(id, newId);
 	}
 
-	// True if `id` is free to use (or is the currently selected node's own id)
 	function canUseId(id: string): boolean {
-		const trimmed = id.trim();
-		if (!trimmed) return false;
-		if (trimmed === selectedId.value) return true;
-		return !nodeIdExists(present.value, trimmed);
+		return engine.canUseId(id, selectedId.value ?? undefined);
 	}
 
 	function add(
@@ -121,16 +108,15 @@ export function useEditorStore(
 		node: KivNode,
 		index?: number,
 	) {
-		commit(addNode(present.value, parentId, slotName, node, index));
+		engine.addNode({ parentId, slot: slotName, node, index });
 	}
 
 	function remove(id: string) {
-		if (selectedId.value === id) selectedId.value = null;
-		commit(removeNode(present.value, id));
+		engine.removeNode(id);
 	}
 
 	function duplicate(id: string) {
-		commit(duplicateNode(present.value, id));
+		engine.duplicateNode(id);
 	}
 
 	function move(
@@ -139,35 +125,19 @@ export function useEditorStore(
 		targetSlot: string,
 		targetIndex: number,
 	) {
-		commit(
-			moveNode(present.value, id, targetParentId, targetSlot, targetIndex),
-		);
+		engine.moveNode({ id, targetParentId, targetSlot, targetIndex });
 	}
 
 	function undo() {
-		const prev = past.value[past.value.length - 1];
-		if (!prev) return;
-		future.value = [
-			cloneDocument(present.value),
-			...future.value.slice(0, HISTORY_LIMIT - 1),
-		];
-		past.value = past.value.slice(0, -1);
-		present.value = prev;
+		engine.undo();
 	}
 
 	function redo() {
-		const next = future.value[0];
-		if (!next) return;
-		past.value = [
-			...past.value.slice(-(HISTORY_LIMIT - 1)),
-			cloneDocument(present.value),
-		];
-		future.value = future.value.slice(1);
-		present.value = next;
+		engine.redo();
 	}
 
 	return {
-		document: present,
+		document,
 		selected,
 		canUndo,
 		canRedo,

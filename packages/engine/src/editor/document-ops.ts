@@ -1,6 +1,6 @@
-import type { KivDocument, KivNode } from "@kiv/engine";
+import type { KivDocument, KivNode } from "../types";
 
-/** Finds a node by id, returns it and its parent context. */
+/** A node found within a document, together with its parent context. */
 export interface NodeLocation {
 	node: KivNode;
 	parent: KivNode | null;
@@ -36,6 +36,11 @@ export function nodeIdExists(doc: KivDocument, id: string): boolean {
 	return findNode(doc, id) !== null;
 }
 
+/** Deep-clones a KivDocument (structure only — no functions). */
+export function cloneDocument(doc: KivDocument): KivDocument {
+	return JSON.parse(JSON.stringify(doc)) as KivDocument;
+}
+
 /**
  * Renames a node's id. Returns a new document.
  * No-op if the new id is empty, unchanged, or already taken by another node.
@@ -47,17 +52,12 @@ export function renameNode(
 ): KivDocument {
 	const trimmed = newId.trim();
 	if (!trimmed || trimmed === id) return doc;
-	if (nodeIdExists(doc, trimmed)) return doc; // collision — reject
+	if (nodeIdExists(doc, trimmed)) return doc;
 	const next = cloneDocument(doc);
 	const loc = findNode(next, id);
 	if (!loc) return next;
 	loc.node.id = trimmed;
 	return next;
-}
-
-/** Deep-clones a KivDocument (structure only — no functions). */
-export function cloneDocument(doc: KivDocument): KivDocument {
-	return JSON.parse(JSON.stringify(doc)) as KivDocument;
 }
 
 /** Updates props of a node by id. Returns a new document (immutable). */
@@ -105,7 +105,7 @@ export function removeNode(doc: KivDocument, id: string): KivDocument {
 	return next;
 }
 
-/** Deep-clones a node tree and reassigns all ids with a suffix to avoid collisions. */
+/** Deep-clones a node tree, appending a suffix to every id to avoid collisions. */
 function reIdNode(node: KivNode, suffix: string): KivNode {
 	const newSlots: Record<string, KivNode[]> = {};
 	for (const [slot, children] of Object.entries(node.slots ?? {})) {

@@ -1,5 +1,27 @@
 export const version = "0.0.0";
 export {
+	type AddNodeInput,
+	addNode,
+	cloneDocument,
+	type DocumentMutations,
+	duplicateNode,
+	EditorEngine,
+	type EditorEngineOptions,
+	findNode,
+	HistoryManager,
+	type HistoryMeta,
+	type HistoryOptions,
+	type MoveNodeInput,
+	moveNode,
+	type NodeLocation,
+	nodeIdExists,
+	removeNode,
+	renameNode,
+	type SelectionListener,
+	SelectionState,
+	updateNodeProps,
+} from "./editor";
+export {
 	type CreateEngineOptions,
 	createEngine,
 	type KivEngine,

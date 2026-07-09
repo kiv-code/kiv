@@ -1,149 +1,291 @@
 # @kiv/engine — Visual Experience Engine
 
-## Qué es
-Motor visual **headless, JSON-driven, plugin-based** para construir experiencias
-visuales modernas. NO es solo un page builder ni un CMS: es el núcleo reutilizable
-sobre el que se construyen múltiples productos SIN modificar el core.
+Headless, JSON-driven, plugin-based page builder engine.
+Framework-agnostic core. Vue renderer (stable). React renderer (pending).
+MIT License. Open source from day one.
 
-Productos que deben poder construirse sobre el mismo motor:
+---
+
+## What This Is
+
+@kiv/engine is a **reusable page builder framework** that any application can embed.
+It is NOT tied to any CMS, framework, or backend. It provides:
+
+- A **headless engine** that produces/resolves JSON documents
+- A **schema system** for defining typed nodes with validation
+- A **registry** for node types and renderer components
+- A **resolver** for responsive (mobile-first) and localization axes
+- A **theme system** with design tokens → CSS variables
+- An **event bus** with wildcards and typed events
+- A **plugin system** with hooks for editor, media, and services
+- A **Vue 3 renderer** with recursive node rendering
+- A **Vue 3 editor** with canvas, tree, inspector, undo/redo, DnD
+
+Products that can be built on this engine:
 Landing Builder, CMS Visual, Event Builder, Form Builder, Email Builder,
 Documentation/Knowledge Base Builder, Marketing Builder, Customer Portal Builder.
 
-Monorepo pnpm + Turborepo. Marca: Kivcode. Licencia MIT. Open Source desde el día 1.
+---
 
-## Finalidad y filosofía (la estrella polar)
-El motor es agnóstico de framework y de backend. El renderer se implementa por
-framework (Vue primero, React después); el core solo produce/resuelve JSON.
+## Architecture Rules (NEVER violate)
 
-Debe ser: Headless · JSON-Driven · Plugin-Based · Type-Safe · Extensible ·
-Responsive-First · Localization-First · Event-Driven · Framework-Friendly.
+### Dependency Flow (strict unidirectional)
+```
+@kiv/engine (core, knows nothing about frameworks/DOM)
+  ← @kiv/nodes (pure definitions, no components)
+    ← @kiv/vue (Vue 3 renderer)
+      ← @kiv/editor (Vue 3 editor UI)
+    ← @kiv/react (React renderer — shares same nodes)
+```
 
-Compatibilidad objetivo (SIN depender de ninguno): Vue 3, Vite, Nuxt, Inertia, Laravel.
-Los renderers React/otros consumen el mismo core y los mismos @kiv/nodes.
+### Golden Rules
+1. **@kiv/engine NEVER imports Vue, React, or any UI framework.** Its only dependency is `@vue/reactivity` (for the event bus). If you need the DOM or a component framework inside engine, STOP — you are in the wrong package.
+2. **@kiv/nodes are pure definitions** (schema + defaults, NO components). Each renderer provides its own components.
+3. **The stable public API is the JSON document shape** (KivDocument + schemaVersion), not the TypeScript interface.
+4. **Styling is token-constrained.** Nodes reference theme tokens via `tokenRef()` (`var(--kiv-*)`) or resolve through shared scales (`SPACING["lg"]` → `"32px"`). No raw CSS values in node props.
+5. **Responsive and localization are SEPARATE axes** (`Responsive<T>` and `Localizable<T>`), not a matrix. The resolver chains them: responsive first, then locale.
+6. **Event-driven.** The bus is the communication backbone. Emitting a new event type NEVER requires core changes.
+7. **Plugin-based.** Adding a node or integration must NEVER require touching @kiv/engine. That is the architecture exam.
+8. **Consumers extend, they don't modify.** kmjkevents and other apps register custom nodes, provide services, implement MediaProvider, and write plugins. They never edit @kiv/engine source files.
 
-El core NUNCA conoce: bases de datos, APIs, Laravel, Inertia, auth, roles,
-permisos, tenants, ni modelo de negocio. Persistencia y backend son SIEMPRE
-responsabilidad de la app consumidora.
-Responsabilidades del core: crear/editar/renderizar/generar JSON, resolver ejes
-(responsive + locale), gestionar eventos, temas y migraciones.
+---
 
-DX es un requisito de primera clase: la API debe sentirse tan cuidada como
-Vue/Nuxt/Vite/Tailwind — intuitiva, consistente, curva de aprendizaje baja.
+## Code Style & Conventions
 
-## Reglas de arquitectura (no violar)
-- `@kiv/engine` es el core headless. Su ÚNICA dependencia de Vue es `@vue/reactivity`.
-  Nunca importar componentes de Vue ni tocar el DOM aquí. Si necesitas runtime de
-  Vue o el DOM dentro de engine, PARA: algo está en el paquete equivocado.
-- Fronteras: engine ← nodes ← {vue | react} ← editor. La dependencia SIEMPRE va
-  hacia el core; el core no conoce a nadie aguas arriba.
-- Multi-framework: los nodos (@kiv/nodes) son definiciones PURAS (schema + defaults,
-  sin componente). Cada renderer (@kiv/vue, @kiv/react) registra sus propios
-  componentes contra esos tipos. Añadir un renderer nuevo NO toca engine ni nodes.
-- El contrato público estable es el JSON del documento (schemaVersion), no la API de TS.
-- `exports` map cerrado: nada de deep imports.
-- Estilos token-constrained: los nodos referencian tokens del theme vía tokenRef()
-  (`var(--kiv-*)`), no valores crudos salvo escape hatch explícito.
-- Responsive y localización son ejes SEPARADOS, no una matriz.
-- Event-Driven: el core expone emit/on; NO implementa analytics, heatmaps ni A/B.
-  Eso vive en plugins. Emitir un evento nuevo no debe requerir cambiar el bus.
-- Plugin-Based: extensiones vía `engine.use(plugin)`. Un nodo interactivo o una
-  integración debe poder añadirse SIN tocar @kiv/engine. Ese es el examen de la arquitectura.
-- "Solo lo necesario": el MVP no adelanta features que ningún consumidor use aún.
-  La visión es la estrella polar (destino), NO el backlog inmediato. Se llega por
-  iteraciones; la arquitectura debe permitir crecer sin romper el JSON.
-## Catálogo de nodos
+- **TypeScript** strict + `noUncheckedIndexedAccess` + `verbatimModuleSyntax`
+- **Zod 4** — use `ZodType`, NOT deprecated `ZodTypeAny`
+- **Biome** — tabs, double quotes, NO ESLint/Prettier
+- **Vitest** for all tests
+- **No comments in code** unless absolutely necessary for non-obvious logic
+- **English ONLY** in code, comments, error messages, documentation, and commit messages
+- **Exports maps are closed** — no deep imports from packages
+- **Kebab-case for files**, PascalCase for types/components
+- **Prefix all error messages** with `[kiv]` or `[kiv/<package>]`
+- **Every mutation must be immutable** — return new objects, never mutate inputs
+- **Every feature needs tests** — engine core tests are mandatory, editor tests are required, Vue renderer tests are required
 
-### MVP — @kiv/nodes (Fase 2): 10 nodos ESTÁTICOS
-Layout (contenedores, slot `default`):
-- Page (raíz, lang activo), Section (RICA — ver abajo),
-  Container (max-width centrado), Grid (slot solo acepta Column),
-  Column (acepta cualquier nodo), Stack (flex vertical/horizontal)
-Contenido (hojas, sin hijos):
-- Heading (prop level 1-6), Text, Button
-Media (hoja):
-- Image (src, alt, fit cover/contain)
+### Verification (run before every commit)
+```bash
+pnpm biome check --write .
+pnpm typecheck
+pnpm test
+```
 
-**Section RICA (decisión: estilo Framer/Webflow desde el MVP).**
-Section debe soportar, todo token-constrained y responsive donde aplique:
-background color · background image · background video · overlay · gradient ·
-blur · opacity · border · border radius · shadow · padding · margin.
-Objetivo: construir páginas modernas sin escribir CSS libre. Es el único nodo
-del MVP que rompe deliberadamente el minimalismo, porque es el diferenciador visual.
-Nota: background video NO convierte a Section en interactivo (no tiene estado ni
-emite eventos); es media de fondo declarativa.
+---
 
-**Button — navegación (3 modos, el renderer elige el mecanismo):**
-- `href` (`#price`, `https://…`, `/about`), `target` (`_self` | `_blank`),
-  `linkType`: `anchor` (scroll a sección) | `external` (`<a>` normal) |
-  `internal` (SPA sin recarga → RouterLink en Vue, Link en React, fallback `<a>`).
-El engine guarda la INTENCIÓN de navegación; cada renderer resuelve el mecanismo.
+## Monorepo Structure
 
-Orden de construcción: contenedores simples primero
-(Page → Section → Container → Stack), luego hojas
-(Heading → Text → Button → Image), Grid/Column al final (slots más elaborados).
+```
+packages/
+├── engine/            @kiv/engine     — Core headless engine
+│   └── src/
+│       ├── types/         KivDocument, KivNode, Responsive<T>, Localizable<T>
+│       ├── schema/        defineNode, FieldDescriptor, f.* helpers, CompiledNode
+│       ├── registry/      Registry class (register/get/has/types/all)
+│       ├── resolver/      resolveNode, resolveProps, resolveResponsive, resolveLocalized
+│       ├── theme/         ThemeTokens, defaultTheme, resolveTheme, themeToCssVars, tokenRef
+│       ├── events/        createEventBus — emit/on/once/off/clear, wildcards (*, node.*)
+│       ├── i18n/          validateI18nConfig, buildLocaleFallbackChain
+│       ├── migrations/    migrateDocument, CURRENT_SCHEMA_VERSION, Migration[]
+│       ├── plugin/        KivPlugin, PluginContext
+│       ├── media/ ← NEW   MediaProvider interface, MediaAsset types
+│       ├── services/ ← NEW Service types (ApiClient, AuthProvider, etc.)
+│       ├── editor/ ← NEW  Framework-agnostic EditorEngine, SelectionState, HistoryManager
+│       ├── render/ ← NEW  renderToHtml() for SSR/HTML export
+│       └── engine/        createEngine({theme, i18n, plugins, nodes})
+├── nodes/             @kiv/nodes      — Pure node definitions (10 base nodes + scales)
+├── vue/               @kiv/vue        — Vue 3 renderer (KivRenderer, KivNodeRenderer, 10 components)
+├── editor/            @kiv/editor     — Vue 3 editor UI (canvas, tree, inspector, palette, DnD)
+├── react/  ← FUTURE   @kiv/react      — React renderer
+└── plugin-analytics/  @kiv/plugin-analytics — Example plugin
+```
 
-### FUERA del MVP (v1+) — NO implementar en Fase 2
-- Contenido avanzado: RichText, Link (como nodo), Divider
-- Media avanzada: Video (nodo autónomo), SVG, Icon, Embed.
-  OJO: background image/video de Section SÍ está en el MVP; el nodo Video
-  autónomo (reproductor con controles) NO — ese es interactivo.
-- Interactivos: Modal, Accordion, Tabs, Carousel, Slider, Gallery,
-  FAQ, Timeline, Countdown, Lightbox
-- Row: NO existe. Un Stack horizontal ya es una fila. No duplicar.
+---
 
-### Regla: estáticos vs interactivos
-Los nodos base son estáticos: JSON → render, sin estado en runtime.
-Los interactivos tienen estado + comportamiento + emiten eventos (modal.opened,
-slide.changed, etc.) + usan slots múltiples (un slot por tab/panel).
-Arquitectónicamente SIGUEN siendo nodos (mismo defineNode, registry, resolver).
-Llegan DESPUÉS del MVP y varios como packs/plugins opcionales
-(@kiv/nodes-interactive, @kiv/plugin-*), NUNCA dentro del core ni del pack base.
-Poder añadir un interactivo sin tocar @kiv/engine es el examen de la arquitectura.
+## Phase 1 Implementation Plan (Current Sprint)
 
-## Stack
-- TypeScript strict + noUncheckedIndexedAccess
-- Zod 4 (usar `ZodType`, no `ZodTypeAny` deprecado)
-- Biome (tabs, comillas dobles) — NO ESLint/Prettier
-- Vitest
-- unbuild (engine), Vite library mode (vue/nodes/editor)
+### Goal: v0.1.0 — Hardening for production consumption
 
-## Verificación (correr siempre antes de dar algo por hecho)
-pnpm biome check --write . && pnpm typecheck && pnpm test
+The engine core is solid. The editor is too Vue-coupled. The plugin system is too thin.
+The goal of Phase 1 is to make @kiv/engine a framework that any application can consume
+without forking or patching.
 
-## Monorepo (paquetes objetivo)
-- @kiv/engine — core headless (tipos, schema, registry, resolver, theme, i18n,
-  migrations, event bus, plugin system, createEngine). ÚNICA dep Vue: @vue/reactivity.
-- @kiv/nodes — definiciones puras de los nodos base (schema + defaults, sin UI).
-- @kiv/vue — renderer Vue (<KivRenderer>) + componentes de los nodos.
-- @kiv/react — renderer React (mismo contrato, mismos @kiv/nodes). Post-Vue.
-- @kiv/editor — builder visual (canvas, inspector auto-generado, tree, DnD, preview).
-- @kiv/nodes-interactive, @kiv/plugin-* — packs opcionales, NUNCA en el core ni base.
+### Step 1: EditorEngine — framework-agnostic editor state
 
-## Estado actual
-Core @kiv/engine — COMPLETO (todos los pilares implementados + tests):
-- 1.1 Tipos base: KivNode, KivDocument, Responsive<T>, Localizable<T>, Breakpoint
-- 1.2 Field descriptor sobre Zod: defineNode, f.*, InferProps
-- 1.3 Registry de nodos
-- 1.4 Resolver (ejes responsive + locale, mobile-first)
-- 1.5 Theme engine (tokens → CSS variables, --kiv-*)
-- 1.6 Event Bus tipado: createEventBus, emit/on/once/off/clear, wildcard por
-  namespace (`node.*`) y global (`*`). En src/events/. (SÍ existe — 13 tests.)
-- 1.7 i18n config: validateI18nConfig + buildLocaleFallbackChain (src/i18n/)
-- 1.8 Migraciones scaffold: migrateDocument + CURRENT_SCHEMA_VERSION (src/migrations/)
-- 1.9 Plugin System: KivPlugin { name, install(ctx) }, engine.use(plugin),
-  PluginContext da acceso a bus/registry/theme/i18n. En src/plugin/.
-- 1.10 createEngine({ theme, i18n, plugins, nodes }) → KivEngine
-  { bus, registry, theme, i18n, use, css, resolve }. En src/engine/.
+**Files to create:**
+- `packages/engine/src/editor/editor-engine.ts`
+- `packages/engine/src/editor/selection.ts`
+- `packages/engine/src/editor/history.ts`
+- `packages/engine/src/editor/types.ts`
+- `packages/engine/src/editor/index.ts`
 
-Fases 2–4 — COMPLETADAS:
-- @kiv/nodes: 10 nodos base + escalas de estilo compartidas (src/scales.ts,
-  fuente única para todos los renderers — ver Reglas de arquitectura).
-- @kiv/vue: <KivRenderer> + los 10 componentes de nodo, consumen las escalas.
-- @kiv/editor: canvas, inspector, tree con DnD, paleta, i18n en vivo,
-  light/dark, ID editable. Demo multi-locale (en/es/fr) en apps/demos/vue.
+**What to implement:**
+- `SelectionState` class: track selected node IDs, support multi-select (add/remove/toggle/clear/all)
+- `HistoryManager` class: stack of immutable snapshots with configurable depth, undo/redo, skip-to-index, operation metadata
+- `EditorEngine` class: coordinates document state + selection + history, emits mutation events
+- `DocumentMutations` type: operations that emit `node.created`, `node.removed`, `node.moved`, `node.propsChanged`
+- All pure TypeScript, NO Vue imports, NO `ref`/`computed` — use simple class instances with getter/setter patterns
 
-Pendiente:
-- @kiv/react: segundo renderer (mismo contrato, mismas escalas de @kiv/nodes).
-  Es la prueba real del diseño multi-framework.
-- Persistencia end-to-end de ejemplo (guardar/cargar JSON, probar migrateDocument).
-- Packs interactivos (@kiv/nodes-interactive), plugins (analytics/forms/…), docs site.
+**Files to modify:**
+- `packages/engine/src/index.ts` — add exports for editor types
+- `packages/engine/src/types/node.ts` — add `locked?: boolean`, `visible?: Responsive<boolean>` to KivNode
+
+**Files to update:**
+- `packages/editor/src/store/editor-store.ts` — rewrite to WRAP EditorEngine instead of implementing state directly
+- `packages/editor/src/store/context.ts` — update injection key if needed
+
+### Step 2: PluginContext enrichment
+
+**Files to modify:**
+- `packages/engine/src/plugin/types.ts` — extend PluginContext with editor, media, services
+
+**New PluginContext shape:**
+```typescript
+interface PluginContext {
+  // Core (existing)
+  bus: EventBus
+  registry: Registry
+  theme: ThemeTokens
+  i18n: I18nConfig | null
+
+  // Editor hooks (optional — null when no editor is loaded)
+  editor?: {
+    addToolbarButton(btn: ToolbarButton): void
+    addPanel(name: string, component: ComponentDef): void
+    addPaletteItem(item: PaletteItem): void
+    addInspectorTab(name: string, component: ComponentDef): void
+    addFieldControl(type: string, component: ComponentDef): void
+    addKeyboardShortcut(sc: ShortcutDef): void
+    onNodeSelect(cb: (node: KivNode) => void): void
+    onNodeCreate(cb: (node: KivNode) => void): void
+    onDocumentChange(cb: (doc: KivDocument) => void): void
+  }
+
+  // Media (optional — null when no media provider is configured)
+  media?: {
+    upload(file: File, opts?: UploadOpts): Promise<MediaAsset>
+    resolve(src: string, transforms?: ImageTransform): string
+    delete(url: string): Promise<void>
+  }
+
+  // Services (injected by consumer app)
+  services: {
+    api?: ApiClient
+    auth?: AuthProvider
+    router?: RouterProvider
+    storage?: StorageProvider
+  }
+}
+```
+
+**Files to also create:**
+- `packages/engine/src/plugin/types-editor.ts` — ToolbarButton, PaletteItem, InspectorTab, ShortcutDef, ComponentDef types
+- `packages/engine/src/plugin/types-media.ts` — MediaProvider, MediaAsset, UploadOptions, ImageTransform types
+- `packages/engine/src/plugin/types-services.ts` — ApiClient, AuthProvider, RouterProvider, StorageProvider types
+
+### Step 3: CompiledNode enrichment
+
+**Files to modify:**
+- `packages/engine/src/schema/define-node.ts` — add to CompiledNode:
+  ```typescript
+  label?: string                          // Human-readable name
+  icon?: string                           // Icon identifier
+  slotConstraints?: Record<string, string[]>  // e.g. { default: ["column"] } means only Column goes in default slot
+  description?: string                    // Shown in palette
+  category?: string                       // Already exists — use for palette grouping
+  ```
+
+- `packages/engine/src/schema/field.ts` — add to FieldDescriptor:
+  ```typescript
+  placeholder?: string    // Placeholder text in inspector
+  hint?: string           // Helper text below the control
+  required?: boolean      // Mark as required
+  hidden?: boolean        // Hide from inspector (for system fields)
+  ```
+
+### Step 4: MediaProvider interface
+
+**Files to create:**
+- `packages/engine/src/media/types.ts` — MediaProvider, MediaAsset, UploadOptions, ImageTransform
+- `packages/engine/src/media/index.ts` — exports
+
+**Files to modify:**
+- `packages/engine/src/engine/create-engine.ts` — accept `media?: { provider: MediaProvider }` in CreateEngineOptions
+- `packages/engine/src/index.ts` — add exports
+
+### Step 5: Services container
+
+**Files to create:**
+- `packages/engine/src/services/types.ts` — ApiClient, AuthProvider, RouterProvider, StorageProvider interfaces
+- `packages/engine/src/services/index.ts` — exports
+
+**Files to modify:**
+- `packages/engine/src/engine/create-engine.ts` — accept `services?: ServicesContainer` in CreateEngineOptions
+
+### Step 6: renderToHtml()
+
+**Files to create:**
+- `packages/engine/src/render/render-to-html.ts` — minimal HTML renderer that walks KivNode tree and produces HTML
+- `packages/engine/src/render/types.ts` — RenderContext, RenderOptions
+- `packages/engine/src/render/index.ts`
+
+**Design:**
+- Each CompiledNode can optionally provide a `toHtml(props, children, ctx) => string` function
+- If a node type doesn't provide toHtml, render a `<div>` with data-kiv-* attributes as fallback
+- Inline styles from resolved props (not external CSS)
+- Enables: SSR for SEO, email rendering, PDF generation
+
+### Step 7: English everything
+
+**Scan all files for non-English content:**
+- `packages/engine/src/**/*.ts` — translate all Spanish comments and error messages
+- `packages/nodes/src/**/*.ts` — translate
+- `packages/vue/src/**/*.{ts,vue}` — translate
+- `packages/editor/src/**/*.{ts,vue}` — translate
+- All error messages prefixed with `[kiv]` or `[kiv/<package>]`
+
+### Step 8: Test coverage
+
+- Engine: add tests for EditorEngine, HistoryManager, SelectionState
+- Engine: add tests for new PluginContext types
+- Engine: add tests for renderToHtml
+- Nodes: add tests for each node definition (validate defaults match schema)
+- Vue: add tests for KivRenderer, KivNodeRenderer, each component
+- Editor: add tests for store, canvas interactions, palette
+
+---
+
+## Package Export Maps Convention
+
+Each package must have a closed `exports` map in `package.json`:
+
+```json
+{
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.mjs", "require": "./dist/index.cjs" },
+    "./scales": { "types": "./dist/scales.d.ts", "import": "./dist/scales.mjs" },
+    "./nodes": { "types": "./dist/nodes/index.d.ts", "import": "./dist/nodes/index.mjs" }
+  }
+}
+```
+
+No deep imports (`@kiv/engine/src/...`) allowed.
+
+---
+
+## Verifying Completeness
+
+Before marking any phase as done:
+
+```bash
+pnpm biome check --write .   # No lint errors
+pnpm typecheck               # No type errors
+pnpm test                    # All tests pass
+pnpm build                   # All packages build
+```
+
+Then manually verify:
+- Engine exports are as expected
+- Editor loads without errors
+- Demo app works (editor + preview + locale switching + autosave)
+- All Spanish content migrated to English

@@ -1,0 +1,11 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "demo-vue",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": ["--filter", "@kiv/demo-vue", "dev", "--port", "5199", "--strictPort"],
+			"port": 5199
+		}
+	]
+}

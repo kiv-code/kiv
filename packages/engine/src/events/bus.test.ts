@@ -13,8 +13,8 @@ describe("createEventBus", () => {
 	it("passes payload to handler", () => {
 		const bus = createEventBus();
 		const handler = vi.fn();
-		bus.on("node.created", handler);
-		bus.emit("node.created", { id: "abc" });
+		bus.on("widget.created", handler);
+		bus.emit("widget.created", { id: "abc" });
 		expect(handler).toHaveBeenCalledWith({ id: "abc" });
 	});
 
@@ -39,9 +39,9 @@ describe("createEventBus", () => {
 	it("once fires only once", () => {
 		const bus = createEventBus();
 		const handler = vi.fn();
-		bus.once("node.created", handler);
-		bus.emit("node.created", { id: "1" });
-		bus.emit("node.created", { id: "2" });
+		bus.once("widget.created", handler);
+		bus.emit("widget.created", { id: "1" });
+		bus.emit("widget.created", { id: "2" });
 		expect(handler).toHaveBeenCalledOnce();
 		expect(handler).toHaveBeenCalledWith({ id: "1" });
 	});
@@ -49,22 +49,22 @@ describe("createEventBus", () => {
 	it("once unsubscribe function prevents the single fire", () => {
 		const bus = createEventBus();
 		const handler = vi.fn();
-		const stop = bus.once("node.created", handler);
+		const stop = bus.once("widget.created", handler);
 		stop();
-		bus.emit("node.created", { id: "1" });
+		bus.emit("widget.created", { id: "1" });
 		expect(handler).not.toHaveBeenCalled();
 	});
 
 	it("namespace wildcard matches all events in namespace", () => {
 		const bus = createEventBus();
 		const handler = vi.fn();
-		bus.on("node.*", handler);
-		bus.emit("node.created", { id: "1" });
-		bus.emit("node.updated", { id: "2" });
+		bus.on("widget.*", handler);
+		bus.emit("widget.created", { id: "1" });
+		bus.emit("widget.updated", { id: "2" });
 		bus.emit("page.loaded", undefined);
 		expect(handler).toHaveBeenCalledTimes(2);
-		expect(handler).toHaveBeenCalledWith("node.created", { id: "1" });
-		expect(handler).toHaveBeenCalledWith("node.updated", { id: "2" });
+		expect(handler).toHaveBeenCalledWith("widget.created", { id: "1" });
+		expect(handler).toHaveBeenCalledWith("widget.updated", { id: "2" });
 	});
 
 	it("global wildcard receives all events", () => {
@@ -72,16 +72,16 @@ describe("createEventBus", () => {
 		const handler = vi.fn();
 		bus.on("*", handler);
 		bus.emit("page.loaded", undefined);
-		bus.emit("node.created", { id: "1" });
+		bus.emit("widget.created", { id: "1" });
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
 	it("wildcard unsubscribe works", () => {
 		const bus = createEventBus();
 		const handler = vi.fn();
-		const stop = bus.on("node.*", handler);
+		const stop = bus.on("widget.*", handler);
 		stop();
-		bus.emit("node.created", { id: "1" });
+		bus.emit("widget.created", { id: "1" });
 		expect(handler).not.toHaveBeenCalled();
 	});
 
@@ -99,10 +99,10 @@ describe("createEventBus", () => {
 		const h1 = vi.fn();
 		const h2 = vi.fn();
 		bus.on("page.loaded", h1);
-		bus.on("node.*", h2);
+		bus.on("widget.*", h2);
 		bus.clear();
 		bus.emit("page.loaded", undefined);
-		bus.emit("node.created", { id: "1" });
+		bus.emit("widget.created", { id: "1" });
 		expect(h1).not.toHaveBeenCalled();
 		expect(h2).not.toHaveBeenCalled();
 	});

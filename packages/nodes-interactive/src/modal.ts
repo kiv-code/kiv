@@ -95,7 +95,7 @@ export const modalNode = defineNode({
 			label: "Auto Open",
 			default: false,
 			group: "Auto Open",
-			hint: "Opens automatically without user clicking the trigger.",
+			hint: "Opens automatically without user clicking the trigger. Only runs on the Preview tab or the published page — it never fires while editing on this canvas.",
 		}),
 		openDelay: f.number({
 			label: "Open Delay (ms)",

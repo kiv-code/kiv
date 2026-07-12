@@ -4,6 +4,7 @@ import {
 	BUTTON_SIZE,
 	BUTTON_VARIANT,
 	resolveBackgroundPaint,
+	resolveIcon,
 	resolveSpacingStyle,
 	SHADOW,
 } from "@kiv/nodes";
@@ -18,46 +19,59 @@ declare module "@kiv/engine" {
 	}
 }
 
-const props = defineProps<{
-	nodeId?: string;
-	size?: string;
-	contentPadding?: unknown;
-	panelBackground?: string;
-	panelRadius?: string;
-	panelShadow?: string;
-	closeOnOverlay?: boolean;
-	closeOnEscape?: boolean;
-	showCloseButton?: boolean;
-	preventScroll?: boolean;
-	animation?: string;
-	overlayColor?: string;
-	overlayBlur?: string;
-	autoOpen?: boolean;
-	openDelay?: number;
-	openFrequency?: string;
-	openTrigger?: string;
-	scrollPercent?: number;
-	timeOnPage?: number;
-	showTrigger?: boolean;
-	triggerLabel?: string;
-	triggerTag?: string;
-	triggerVariant?: string;
-	triggerIcon?: string;
-	triggerIconPosition?: string;
-	triggerSize?: string;
-	triggerRadius?: string;
-	triggerPadding?: unknown;
-	triggerMargin?: unknown;
-	triggerBackground?: unknown;
-	triggerTextColor?: string;
-	triggerBorderColor?: string;
-	triggerBorderWidth?: number;
-	triggerShadow?: string;
-	triggerFullWidth?: boolean;
-	clickAction?: string;
-	actionHref?: string;
-	actionTarget?: string;
-}>();
+const props = withDefaults(
+	defineProps<{
+		nodeId?: string;
+		size?: string;
+		contentPadding?: unknown;
+		panelBackground?: string;
+		panelRadius?: string;
+		panelShadow?: string;
+		closeOnOverlay?: boolean;
+		closeOnEscape?: boolean;
+		showCloseButton?: boolean;
+		preventScroll?: boolean;
+		animation?: string;
+		overlayColor?: string;
+		overlayBlur?: string;
+		autoOpen?: boolean;
+		openDelay?: number;
+		openFrequency?: string;
+		openTrigger?: string;
+		scrollPercent?: number;
+		timeOnPage?: number;
+		showTrigger?: boolean;
+		triggerLabel?: string;
+		triggerTag?: string;
+		triggerVariant?: string;
+		triggerIcon?: string;
+		triggerIconPosition?: string;
+		triggerSize?: string;
+		triggerRadius?: string;
+		triggerPadding?: unknown;
+		triggerMargin?: unknown;
+		triggerBackground?: unknown;
+		triggerTextColor?: string;
+		triggerBorderColor?: string;
+		triggerBorderWidth?: number;
+		triggerShadow?: string;
+		triggerFullWidth?: boolean;
+		clickAction?: string;
+		actionHref?: string;
+		actionTarget?: string;
+	}>(),
+	{
+		// Vue coerces an omitted boolean-typed prop to `false`, not `undefined`,
+		// when it has no explicit default — matching each field's own schema
+		// default here (see modal.ts) keeps a bare `<ModalNode />` (no props
+		// passed, e.g. in tests) behaving the same as the resolved document.
+		closeOnOverlay: true,
+		closeOnEscape: true,
+		showCloseButton: true,
+		preventScroll: true,
+		showTrigger: true,
+	},
+);
 
 const bus = inject(KIV_BUS_KEY, null);
 const isEditorMode = inject(KIV_EDITOR_MODE_KEY, false);
@@ -215,7 +229,44 @@ const resolvedTriggerTag = computed(() => {
 	return props.triggerTag ?? "button";
 });
 
-const triggerIconSvg = computed(() => props.triggerIcon || null);
+// A hidden-trigger modal (the setup Auto Open's own hint recommends) has
+// nothing else on the canvas to select or position — `display: none` would
+// make the whole node vanish while editing, with no way to tell it's still
+// there. Only actually hide it in the real, non-editor render; in the editor
+// itself show a small placeholder instead (see template below).
+const wrapperHidden = computed(
+	() => props.showTrigger === false && !isEditorMode,
+);
+const showEditorPlaceholder = computed(
+	() => isEditorMode && props.showTrigger === false,
+);
+const autoOpenSummary = computed(() => {
+	if (!props.autoOpen) return "";
+	const trigger = props.openTrigger ?? "load";
+	if (trigger === "load") return `after ${props.openDelay ?? 1000}ms on load`;
+	if (trigger === "time") return `after ${props.timeOnPage ?? 10}s on page`;
+	if (trigger === "scroll") return `at ${props.scrollPercent ?? 50}% scroll`;
+	return "on exit intent";
+});
+
+const hasTriggerIcon = computed(() => !!props.triggerIcon?.trim());
+const resolvedTriggerSvg = computed(() => resolveIcon(props.triggerIcon ?? ""));
+const triggerIconIsSvg = computed(
+	() =>
+		(props.triggerIcon?.trim().startsWith("<") ?? false) ||
+		!!resolvedTriggerSvg.value,
+);
+const triggerIconContent = computed(() => {
+	if (resolvedTriggerSvg.value) return resolvedTriggerSvg.value;
+	if (props.triggerIcon?.trim().startsWith("<")) return props.triggerIcon;
+	return "";
+});
+const triggerIconClass = computed(() =>
+	triggerIconIsSvg.value ? "" : (props.triggerIcon ?? ""),
+);
+const triggerIconOnRight = computed(
+	() => (props.triggerIconPosition ?? "left") === "right",
+);
 
 const triggerBtnSize = computed(
 	() => BUTTON_SIZE[props.triggerSize ?? "md"] ?? BUTTON_SIZE.md,
@@ -329,39 +380,67 @@ const transitionName = computed(() => `kiv-modal-${props.animation ?? "fade"}`);
 const contentStyle = computed(() =>
 	resolveSpacingStyle("padding", props.contentPadding, "24px"),
 );
-
-const iconSide = computed(() => props.triggerIconPosition ?? "left");
 </script>
 
 <template>
-	<div class="kiv-modal" :style="showTrigger === false ? { display: 'none' } : { display: 'inline-block' }">
-		<button
-			v-if="resolvedTriggerTag === 'button'"
-			type="button"
-			:style="triggerStyle"
-			data-kiv-modal-trigger
-			@click="openModal"
-		>
-			<span>{{ triggerLabel ?? "Open" }}</span>
-		</button>
-		<a
-			v-else-if="resolvedTriggerTag === 'a'"
-			:href="actionHref"
-			:target="actionTarget"
-			:style="triggerStyle"
-			data-kiv-modal-trigger
-			@click.prevent="openModal"
-		>
-			<span>{{ triggerLabel ?? "Open" }}</span>
-		</a>
-		<span
-			v-else
-			:style="triggerStyle"
-			data-kiv-modal-trigger
-			@click="openModal"
-		>
-			<span>{{ triggerLabel ?? "Open" }}</span>
-		</span>
+	<div class="kiv-modal" :style="wrapperHidden ? { display: 'none' } : { display: 'inline-block' }">
+		<template v-if="showTrigger !== false">
+			<button
+				v-if="resolvedTriggerTag === 'button'"
+				type="button"
+				:style="triggerStyle"
+				data-kiv-modal-trigger
+				@click="openModal"
+			>
+				<template v-if="hasTriggerIcon && !triggerIconOnRight">
+					<span v-if="triggerIconIsSvg" class="kiv-modal__trigger-icon" v-html="triggerIconContent" />
+					<i v-else :class="triggerIconClass" class="kiv-modal__trigger-icon" aria-hidden="true" />
+				</template>
+				<span>{{ triggerLabel ?? "Open" }}</span>
+				<template v-if="hasTriggerIcon && triggerIconOnRight">
+					<span v-if="triggerIconIsSvg" class="kiv-modal__trigger-icon" v-html="triggerIconContent" />
+					<i v-else :class="triggerIconClass" class="kiv-modal__trigger-icon" aria-hidden="true" />
+				</template>
+			</button>
+			<a
+				v-else-if="resolvedTriggerTag === 'a'"
+				:href="actionHref"
+				:target="actionTarget"
+				:style="triggerStyle"
+				data-kiv-modal-trigger
+				@click.prevent="openModal"
+			>
+				<template v-if="hasTriggerIcon && !triggerIconOnRight">
+					<span v-if="triggerIconIsSvg" class="kiv-modal__trigger-icon" v-html="triggerIconContent" />
+					<i v-else :class="triggerIconClass" class="kiv-modal__trigger-icon" aria-hidden="true" />
+				</template>
+				<span>{{ triggerLabel ?? "Open" }}</span>
+				<template v-if="hasTriggerIcon && triggerIconOnRight">
+					<span v-if="triggerIconIsSvg" class="kiv-modal__trigger-icon" v-html="triggerIconContent" />
+					<i v-else :class="triggerIconClass" class="kiv-modal__trigger-icon" aria-hidden="true" />
+				</template>
+			</a>
+			<span
+				v-else
+				:style="triggerStyle"
+				data-kiv-modal-trigger
+				@click="openModal"
+			>
+				<template v-if="hasTriggerIcon && !triggerIconOnRight">
+					<span v-if="triggerIconIsSvg" class="kiv-modal__trigger-icon" v-html="triggerIconContent" />
+					<i v-else :class="triggerIconClass" class="kiv-modal__trigger-icon" aria-hidden="true" />
+				</template>
+				<span>{{ triggerLabel ?? "Open" }}</span>
+				<template v-if="hasTriggerIcon && triggerIconOnRight">
+					<span v-if="triggerIconIsSvg" class="kiv-modal__trigger-icon" v-html="triggerIconContent" />
+					<i v-else :class="triggerIconClass" class="kiv-modal__trigger-icon" aria-hidden="true" />
+				</template>
+			</span>
+		</template>
+		<div v-else-if="showEditorPlaceholder" class="kiv-modal__editor-placeholder" data-kiv-modal-trigger>
+			<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+			<span>Modal (no trigger button){{ autoOpenSummary ? ` — auto-opens ${autoOpenSummary}` : "" }}</span>
+		</div>
 
 		<Teleport to="body">
 			<Transition :name="transitionName">
@@ -396,6 +475,19 @@ const iconSide = computed(() => props.triggerIconPosition ?? "left");
 </template>
 
 <style scoped>
+.kiv-modal__editor-placeholder {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 10px;
+	border: 1px dashed #94a3b8;
+	border-radius: 6px;
+	color: #64748b;
+	font-size: 12px;
+	white-space: nowrap;
+	cursor: default;
+}
+
 .kiv-modal__backdrop {
 	position: fixed;
 	inset: 0;

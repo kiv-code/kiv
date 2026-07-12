@@ -1,6 +1,12 @@
 import { defineNode, f } from "@kiv/engine";
+import { borderVisualFields } from "../border-field";
 import { escapeHtml, styleToString } from "../html-utils";
 import { RADIUS, SHADOW } from "../scales";
+
+const border = borderVisualFields({
+	group: "Style",
+	shadowOptions: ["none", "sm", "md", "lg"],
+});
 
 function embedUrl(
 	provider: string | undefined,
@@ -136,16 +142,8 @@ export const videoNode = defineNode({
 			default: "16/9",
 			group: "Style",
 		}),
-		borderRadius: f.select(["none", "sm", "md", "lg", "xl", "full"], {
-			label: "Border radius",
-			default: "none",
-			group: "Style",
-		}),
-		shadow: f.select(["none", "sm", "md", "lg"], {
-			label: "Shadow",
-			default: "none",
-			group: "Style",
-		}),
+		borderRadius: border.borderRadius,
+		shadow: border.shadow,
 		autoplay: f.boolean({
 			label: "Autoplay",
 			default: false,

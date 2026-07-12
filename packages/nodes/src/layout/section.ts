@@ -1,5 +1,5 @@
 import { defineNode, f } from "@kiv/engine";
-import { borderVisualFields } from "../border-field";
+import { borderColorField, borderVisualFields } from "../border-field";
 import {
 	colorOrGradientField,
 	resolveBackgroundPaint,
@@ -234,11 +234,7 @@ export const sectionNode = defineNode({
 			default: "0",
 			group: "Border",
 		}),
-		borderColor: f.color({
-			label: "Border color",
-			default: "#e2e8f0",
-			group: "Border",
-		}),
+		borderColor: borderColorField({ group: "Border" }),
 		borderRadius: border.borderRadius,
 		shadow: border.shadow,
 	},

@@ -1,5 +1,5 @@
 import { defineNode, f } from "@kiv/engine";
-import { borderVisualFields } from "../border-field";
+import { borderVisualFields, uniformBorderFields } from "../border-field";
 import {
 	colorOrGradientField,
 	resolveBackgroundPaint,
@@ -15,6 +15,11 @@ const border = borderVisualFields({
 	radiusOptions: ["none", "sm", "md", "lg", "xl"],
 	radiusDefault: "lg",
 	shadowDefault: "md",
+});
+const borderUniform = uniformBorderFields({
+	group: "Style",
+	widthLabel: "Border Width",
+	colorLabel: "Border Color",
 });
 
 export const cardNode = defineNode({
@@ -59,16 +64,8 @@ export const cardNode = defineNode({
 			hint: "Overrides Padding for individual sides. Empty side = use the shorthand above.",
 		}),
 		shadow: border.shadow,
-		borderWidth: f.number({
-			label: "Border Width",
-			default: 0,
-			group: "Style",
-		}),
-		borderColor: f.color({
-			label: "Border Color",
-			default: "#e2e8f0",
-			group: "Style",
-		}),
+		borderWidth: borderUniform.borderWidth,
+		borderColor: borderUniform.borderColor,
 		highlighted: f.boolean({
 			label: "Highlighted (featured)",
 			default: false,

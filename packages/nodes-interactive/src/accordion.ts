@@ -1,5 +1,25 @@
 import { defineNode, f } from "@kiv/engine";
-import { escapeHtml, GAP, RADIUS, SPACING, styleToString } from "@kiv/nodes";
+import {
+	borderVisualFields,
+	escapeHtml,
+	GAP,
+	gapField,
+	RADIUS,
+	SPACING,
+	styleToString,
+} from "@kiv/nodes";
+
+const accordionRadius = borderVisualFields({
+	radiusLabel: "Border Radius",
+	radiusOptions: ["none", "sm", "md", "lg"],
+	radiusDefault: "md",
+});
+const itemRadius = borderVisualFields({
+	radiusLabel: "Item Border Radius",
+	radiusHint: "Border radius for each individual accordion item.",
+	radiusOptions: ["none", "sm", "md", "lg"],
+	radiusDefault: "sm",
+});
 
 export const accordionNode = defineNode({
 	type: "accordion",
@@ -57,22 +77,15 @@ export const accordionNode = defineNode({
 			default: 12,
 			group: "Style",
 		}),
-		gap: f.select(["none", "xs", "sm", "md", "lg"], {
+		gap: gapField({
 			label: "Gap Between Items",
 			default: "sm",
+			responsive: false,
+			scale: ["none", "xs", "sm", "md", "lg"],
 			group: "Layout",
 		}),
-		borderRadius: f.select(["none", "sm", "md", "lg"], {
-			label: "Border Radius",
-			default: "md",
-			group: "Style",
-		}),
-		itemBorderRadius: f.select(["none", "sm", "md", "lg"], {
-			label: "Item Border Radius",
-			default: "sm",
-			group: "Style",
-			hint: "Border radius for each individual accordion item.",
-		}),
+		borderRadius: accordionRadius.borderRadius,
+		itemBorderRadius: itemRadius.borderRadius,
 		showSeparator: f.boolean({
 			label: "Show Separator Line",
 			default: false,

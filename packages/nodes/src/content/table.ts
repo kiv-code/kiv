@@ -1,4 +1,5 @@
 import { defineNode, f } from "@kiv/engine";
+import { alignField } from "../align-field";
 import { escapeHtml, styleToString } from "../html-utils";
 
 export interface TableData {
@@ -92,10 +93,6 @@ export const tableNode = defineNode({
 			default: "#f8fafc",
 			group: "Style",
 		}),
-		align: f.select(["left", "center", "right"], {
-			label: "Cell Align",
-			default: "left",
-			group: "Style",
-		}),
+		align: alignField({ label: "Cell Align", default: "left", group: "Style" }),
 	},
 });

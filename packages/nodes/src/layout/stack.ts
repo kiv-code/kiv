@@ -1,13 +1,15 @@
 import { defineNode, f } from "@kiv/engine";
-import { borderVisualFields } from "../border-field";
+import { borderSidesFields, borderVisualFields } from "../border-field";
 import { gapField } from "../gap-field";
 import { styleToString } from "../html-utils";
 import { RADIUS, SHADOW, SPACING } from "../scales";
-import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
+import { resolveSpacingStyle } from "../spacing-field";
+import { spacingFields } from "../spacing-fields";
 
 const border = borderVisualFields({
 	shadowOptions: ["none", "sm", "md", "lg"],
 });
+const borderSides = borderSidesFields();
 
 export const stackNode = defineNode({
 	type: "stack",
@@ -109,39 +111,9 @@ export const stackNode = defineNode({
 			responsive: true,
 			group: "Layout",
 		}),
-		paddingY: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Padding Y",
-			default: "none",
-			responsive: true,
-			group: "Spacing",
-		}),
-		paddingX: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Padding X",
-			default: "none",
-			responsive: true,
-			group: "Spacing",
-		}),
-		marginY: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Margin Y",
-			default: "none",
-			responsive: true,
-			group: "Spacing",
-		}),
-		marginX: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Margin X",
-			default: "none",
-			responsive: true,
-			group: "Spacing",
-		}),
-		paddingBox: spacingBoxField({
-			label: "Padding (per side)",
-			group: "Spacing",
-			hint: "Overrides Padding X/Y for individual sides.",
-		}),
-		marginBox: spacingBoxField({
-			label: "Margin (per side)",
-			group: "Spacing",
-			hint: "Overrides Margin X/Y for individual sides.",
+		...spacingFields({
+			includeMargin: true,
+			paddingHint: "Overrides Padding X/Y for individual sides.",
 		}),
 		background: f.color({
 			label: "Background",
@@ -150,35 +122,6 @@ export const stackNode = defineNode({
 		}),
 		borderRadius: border.borderRadius,
 		shadow: border.shadow,
-		borderTopWidth: f.number({
-			label: "Border top (px)",
-			default: 0,
-			group: "Border",
-		}),
-		borderRightWidth: f.number({
-			label: "Border right (px)",
-			default: 0,
-			group: "Border",
-		}),
-		borderBottomWidth: f.number({
-			label: "Border bottom (px)",
-			default: 0,
-			group: "Border",
-		}),
-		borderLeftWidth: f.number({
-			label: "Border left (px)",
-			default: 0,
-			group: "Border",
-		}),
-		borderStyle: f.select(["solid", "dashed", "dotted", "double"], {
-			label: "Border style",
-			default: "solid",
-			group: "Border",
-		}),
-		borderColor: f.color({
-			label: "Border color",
-			default: "#e2e8f0",
-			group: "Border",
-		}),
+		...borderSides,
 	},
 });

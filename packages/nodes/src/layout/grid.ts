@@ -2,7 +2,8 @@ import { defineNode, f } from "@kiv/engine";
 import { gapField } from "../gap-field";
 import { styleToString } from "../html-utils";
 import { GAP, SPACING } from "../scales";
-import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
+import { resolveSpacingStyle } from "../spacing-field";
+import { spacingFields } from "../spacing-fields";
 
 export const gridNode = defineNode({
 	type: "grid",
@@ -47,22 +48,6 @@ export const gridNode = defineNode({
 			default: "stretch",
 			group: "Layout",
 		}),
-		paddingX: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Padding X",
-			default: "none",
-			responsive: true,
-			group: "Spacing",
-		}),
-		paddingY: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Padding Y",
-			default: "none",
-			responsive: true,
-			group: "Spacing",
-		}),
-		paddingBox: spacingBoxField({
-			label: "Padding (per side)",
-			group: "Spacing",
-			hint: "Overrides Padding X/Y for individual sides. Empty side = use the shorthand above.",
-		}),
+		...spacingFields(),
 	},
 });

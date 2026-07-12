@@ -1,7 +1,8 @@
 import { defineNode, f } from "@kiv/engine";
 import { styleToString } from "../html-utils";
 import { SPACING } from "../scales";
-import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
+import { resolveSpacingStyle } from "../spacing-field";
+import { spacingFields } from "../spacing-fields";
 
 export const columnNode = defineNode({
 	type: "column",
@@ -66,22 +67,6 @@ export const columnNode = defineNode({
 				group: "Layout",
 			},
 		),
-		paddingX: f.select(["none", "xs", "sm", "md", "lg"], {
-			label: "Padding X",
-			default: "none",
-			responsive: true,
-			group: "Spacing",
-		}),
-		paddingY: f.select(["none", "xs", "sm", "md", "lg"], {
-			label: "Padding Y",
-			default: "none",
-			responsive: true,
-			group: "Spacing",
-		}),
-		paddingBox: spacingBoxField({
-			label: "Padding (per side)",
-			group: "Spacing",
-			hint: "Overrides Padding X/Y for individual sides. Empty side = use the shorthand above.",
-		}),
+		...spacingFields({ paddingScale: ["none", "xs", "sm", "md", "lg"] }),
 	},
 });

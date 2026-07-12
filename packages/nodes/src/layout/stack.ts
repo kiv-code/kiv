@@ -1,17 +1,13 @@
 import { defineNode, f } from "@kiv/engine";
+import { borderVisualFields } from "../border-field";
+import { gapField } from "../gap-field";
 import { styleToString } from "../html-utils";
-import { GAP, RADIUS, SHADOW, SPACING } from "../scales";
+import { RADIUS, SHADOW, SPACING } from "../scales";
+import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
 
-/** A per-side override (e.g. paddingTop) wins over the Y/X shorthand when set; empty falls back to it. */
-function side(
-	override: unknown,
-	shorthand: unknown,
-	scale: Record<string, string>,
-): string {
-	const raw = typeof override === "string" ? override.trim() : "";
-	if (raw) return raw;
-	return scale[String(shorthand ?? "none")] ?? "0";
-}
+const border = borderVisualFields({
+	shadowOptions: ["none", "sm", "md", "lg"],
+});
 
 export const stackNode = defineNode({
 	type: "stack",
@@ -27,21 +23,29 @@ export const stackNode = defineNode({
 		const borderStyle = String(props.borderStyle ?? "solid");
 		const borderColor = String(props.borderColor ?? "#e2e8f0");
 
+		const paddingY = SPACING[String(props.paddingY ?? "none")] ?? "0";
+		const paddingX = SPACING[String(props.paddingX ?? "none")] ?? "0";
+		const marginY = SPACING[String(props.marginY ?? "none")] ?? "0";
+		const marginX = SPACING[String(props.marginX ?? "none")] ?? "0";
 		const style = styleToString({
 			display: "flex",
 			flexDirection: props.direction === "row" ? "row" : "column",
-			gap: GAP[String(props.gap ?? "md")] ?? "16px",
+			gap: SPACING[String(props.gap ?? "md")] ?? "16px",
 			alignItems: String(props.align ?? "flex-start"),
 			justifyContent: String(props.justify ?? "flex-start"),
 			flexWrap: props.wrap ? "wrap" : "nowrap",
-			paddingTop: side(props.paddingTop, props.paddingY, SPACING),
-			paddingRight: side(props.paddingRight, props.paddingX, SPACING),
-			paddingBottom: side(props.paddingBottom, props.paddingY, SPACING),
-			paddingLeft: side(props.paddingLeft, props.paddingX, SPACING),
-			marginTop: side(props.marginTop, props.marginY, SPACING),
-			marginRight: side(props.marginRight, props.marginX, SPACING),
-			marginBottom: side(props.marginBottom, props.marginY, SPACING),
-			marginLeft: side(props.marginLeft, props.marginX, SPACING),
+			...resolveSpacingStyle("padding", props.paddingBox, {
+				top: paddingY,
+				right: paddingX,
+				bottom: paddingY,
+				left: paddingX,
+			}),
+			...resolveSpacingStyle("margin", props.marginBox, {
+				top: marginY,
+				right: marginX,
+				bottom: marginY,
+				left: marginX,
+			}),
 			background:
 				props.background && props.background !== "transparent"
 					? String(props.background)
@@ -71,12 +75,7 @@ export const stackNode = defineNode({
 			responsive: true,
 			group: "Layout",
 		}),
-		gap: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Gap",
-			default: "md",
-			responsive: true,
-			group: "Layout",
-		}),
+		gap: gapField(),
 		align: f.select(
 			["flex-start", "center", "flex-end", "stretch", "baseline"],
 			{
@@ -108,7 +107,6 @@ export const stackNode = defineNode({
 			responsive: true,
 			group: "Layout",
 		}),
-		// Quick shorthand — sets all four sides at once via the spacing scale.
 		paddingY: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
 			label: "Padding Y",
 			default: "none",
@@ -133,73 +131,23 @@ export const stackNode = defineNode({
 			responsive: true,
 			group: "Spacing",
 		}),
-		// Independent per-side overrides — any CSS length (e.g. "12px", "2rem").
-		// Empty means "use the Y/X shorthand above for this side".
-		paddingTop: f.text({
-			label: "Padding top",
-			default: "",
-			hint: "Overrides Padding Y for this side. Any CSS length.",
-			group: "Spacing (advanced)",
+		paddingBox: spacingBoxField({
+			label: "Padding (per side)",
+			group: "Spacing",
+			hint: "Overrides Padding X/Y for individual sides.",
 		}),
-		paddingRight: f.text({
-			label: "Padding right",
-			default: "",
-			hint: "Overrides Padding X for this side. Any CSS length.",
-			group: "Spacing (advanced)",
-		}),
-		paddingBottom: f.text({
-			label: "Padding bottom",
-			default: "",
-			hint: "Overrides Padding Y for this side. Any CSS length.",
-			group: "Spacing (advanced)",
-		}),
-		paddingLeft: f.text({
-			label: "Padding left",
-			default: "",
-			hint: "Overrides Padding X for this side. Any CSS length.",
-			group: "Spacing (advanced)",
-		}),
-		marginTop: f.text({
-			label: "Margin top",
-			default: "",
-			hint: "Overrides Margin Y for this side. Any CSS length.",
-			group: "Spacing (advanced)",
-		}),
-		marginRight: f.text({
-			label: "Margin right",
-			default: "",
-			hint: "Overrides Margin X for this side. Any CSS length.",
-			group: "Spacing (advanced)",
-		}),
-		marginBottom: f.text({
-			label: "Margin bottom",
-			default: "",
-			hint: "Overrides Margin Y for this side. Any CSS length.",
-			group: "Spacing (advanced)",
-		}),
-		marginLeft: f.text({
-			label: "Margin left",
-			default: "",
-			hint: "Overrides Margin X for this side. Any CSS length.",
-			group: "Spacing (advanced)",
+		marginBox: spacingBoxField({
+			label: "Margin (per side)",
+			group: "Spacing",
+			hint: "Overrides Margin X/Y for individual sides.",
 		}),
 		background: f.color({
 			label: "Background",
 			default: "transparent",
 			group: "Style",
 		}),
-		borderRadius: f.select(["none", "sm", "md", "lg", "xl", "full"], {
-			label: "Border radius",
-			default: "none",
-			group: "Style",
-		}),
-		shadow: f.select(["none", "sm", "md", "lg"], {
-			label: "Shadow",
-			default: "none",
-			group: "Style",
-		}),
-		// Independent per-side border widths (0 = no border on that side), a
-		// shared style + color for whichever sides are enabled.
+		borderRadius: border.borderRadius,
+		shadow: border.shadow,
 		borderTopWidth: f.number({
 			label: "Border top (px)",
 			default: 0,

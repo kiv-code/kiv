@@ -10,6 +10,7 @@ import {
 	resolveBackgroundPaint,
 	resolveIcon,
 	resolveSolidColor,
+	resolveSpacingStyle,
 	resolveTextPaintStyle,
 } from "@kiv/nodes";
 import { computed, getCurrentInstance, inject } from "vue";
@@ -34,6 +35,7 @@ const props = defineProps<{
 	fontWeight?: string;
 	background?: unknown;
 	textColor?: unknown;
+	paddingBox?: unknown;
 	customBorderColor?: string;
 	hoverEffect?: string;
 	hoverGlowColor?: string;
@@ -138,6 +140,20 @@ const borderFinal = computed(() =>
 );
 const hoverClass = computed(() => hoverEffectClass(props.hoverEffect));
 
+// Per-side escape hatch, shared across every node that needs it (see
+// packages/nodes/src/spacing-field.ts). Empty side falls back to the size
+// preset's padding shorthand ("Ypx Xpx").
+const paddingFallback = computed(() => {
+	if (variantStyle.value.textDecoration) {
+		return { top: "0", right: "0", bottom: "0", left: "0" };
+	}
+	const [y, x] = sizing.value.padding.split(" ");
+	return { top: y, right: x, bottom: y, left: x };
+});
+const paddingFinal = computed(() =>
+	resolveSpacingStyle("padding", props.paddingBox, paddingFallback.value),
+);
+
 const buttonStyle = computed(() => ({
 	// Flex when there's an icon so icon + label align with a gap.
 	display: hasIcon.value
@@ -151,7 +167,7 @@ const buttonStyle = computed(() => ({
 	justifyContent: hasIcon.value ? ("center" as const) : undefined,
 	gap: hasIcon.value ? "0.5em" : undefined,
 	width: props.fullWidth ? "100%" : undefined,
-	padding: variantStyle.value.textDecoration ? "0" : sizing.value.padding,
+	...paddingFinal.value,
 	fontSize: sizing.value.fontSize,
 	fontWeight: props.fontWeight ?? "600",
 	fontFamily: "inherit",

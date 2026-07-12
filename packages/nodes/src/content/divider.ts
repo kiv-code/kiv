@@ -1,4 +1,5 @@
 import { defineNode, f } from "@kiv/engine";
+import { alignField } from "../align-field";
 import { escapeHtml, styleToString } from "../html-utils";
 import { SPACING } from "../scales";
 import { sizeField } from "../size-field";
@@ -51,7 +52,7 @@ export const dividerNode = defineNode({
 			group: "Style",
 			hint: "Any percentage or pixel value — drag the slider or type an exact size.",
 		}),
-		alignment: f.select(["left", "center", "right"], {
+		alignment: alignField({
 			label: "Alignment",
 			default: "center",
 			responsive: true,

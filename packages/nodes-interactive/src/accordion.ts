@@ -1,5 +1,5 @@
 import { defineNode, f } from "@kiv/engine";
-import { escapeHtml, GAP, RADIUS, styleToString } from "@kiv/nodes";
+import { escapeHtml, GAP, RADIUS, SPACING, styleToString } from "@kiv/nodes";
 
 export const accordionNode = defineNode({
 	type: "accordion",
@@ -52,6 +52,11 @@ export const accordionNode = defineNode({
 			default: "right",
 			group: "Style",
 		}),
+		iconSize: f.number({
+			label: "Icon Size (px)",
+			default: 12,
+			group: "Style",
+		}),
 		gap: f.select(["none", "xs", "sm", "md", "lg"], {
 			label: "Gap Between Items",
 			default: "sm",
@@ -61,6 +66,24 @@ export const accordionNode = defineNode({
 			label: "Border Radius",
 			default: "md",
 			group: "Style",
+		}),
+		itemBorderRadius: f.select(["none", "sm", "md", "lg"], {
+			label: "Item Border Radius",
+			default: "sm",
+			group: "Style",
+			hint: "Border radius for each individual accordion item.",
+		}),
+		showSeparator: f.boolean({
+			label: "Show Separator Line",
+			default: false,
+			group: "Style",
+			hint: "Adds a border-bottom between accordion items.",
+		}),
+		separatorColor: f.color({
+			label: "Separator Color",
+			default: "#e2e8f0",
+			group: "Style",
+			showIf: { field: "showSeparator", equals: "true" },
 		}),
 	},
 });
@@ -84,17 +107,17 @@ export const accordionItemNode = defineNode({
 		const summaryStyle = styleToString({
 			cursor: props.disabled ? "not-allowed" : "pointer",
 			color: props.titleColor ? String(props.titleColor) : undefined,
-			fontWeight: "600",
-			padding: "12px 16px",
+			fontWeight: String(props.titleFontWeight ?? "600"),
+			fontSize: props.titleFontSize ? `${props.titleFontSize}px` : undefined,
+			padding: SPACING[String(props.padding ?? "md")] ?? "12px 16px",
 			opacity: props.disabled ? "0.5" : undefined,
 		});
-		const bodyStyle = styleToString({ padding: "0 16px 16px" });
+		const bodyStyle = styleToString({
+			padding: SPACING[String(props.bodyPadding ?? "md")] ?? "0 16px 16px",
+		});
 		const title = props.title !== undefined ? escapeHtml(props.title) : "";
 		const openAttr = props.defaultOpen ? " open" : "";
 		const disabledAttr = props.disabled ? ' aria-disabled="true"' : "";
-		// <details>/<summary> is a real, no-JS accordion — the Vue renderer
-		// owns richer runtime state (multi-open, icons, animation), but the
-		// static export stays genuinely collapsible without any script.
 		return (
 			`<details data-kiv-type="accordion-item" style="${wrapStyle}"${openAttr}${disabledAttr}>` +
 			`<summary style="${summaryStyle}">${title}</summary>` +
@@ -126,5 +149,26 @@ export const accordionItemNode = defineNode({
 			group: "Style",
 		}),
 		titleColor: f.color({ label: "Title Color", default: "", group: "Style" }),
+		titleFontSize: f.number({
+			label: "Title Font Size (px)",
+			default: 0,
+			hint: "0 = inherit from Accordion settings.",
+			group: "Style",
+		}),
+		titleFontWeight: f.select(["400", "500", "600", "700"], {
+			label: "Title Font Weight",
+			default: "600",
+			group: "Style",
+		}),
+		padding: f.select(["none", "xs", "sm", "md", "lg"], {
+			label: "Header Padding",
+			default: "md",
+			group: "Spacing",
+		}),
+		bodyPadding: f.select(["none", "xs", "sm", "md", "lg"], {
+			label: "Body Padding",
+			default: "md",
+			group: "Spacing",
+		}),
 	},
 });

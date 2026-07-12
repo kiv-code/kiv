@@ -1,5 +1,6 @@
 import { defineNode, f } from "@kiv/engine";
 import { hoverEffectClass, hoverGlowStyle } from "../hover-effects";
+import { hoverFields } from "../hover-field";
 import { escapeHtml, normalizeSvgIconSize, styleToString } from "../html-utils";
 import { resolveIcon } from "../icons";
 import { GAP, RADIUS } from "../scales";
@@ -47,6 +48,11 @@ const SHAPE_RADIUS: Record<string, string> = {
 	rounded: RADIUS.md ?? "8px",
 };
 
+const hover = hoverFields({
+	effects: ["none", "lift", "grow", "glow"],
+	defaultEffect: "lift",
+});
+
 export const socialIconsNode = defineNode({
 	type: "social-icons",
 	category: "content",
@@ -91,10 +97,11 @@ export const socialIconsNode = defineNode({
 	},
 	fields: {
 		links: f.text({
-			label: "Links (JSON array of {platform, url})",
+			label: "Links",
 			default: "[]",
-			hint: 'e.g. [{"platform":"twitter","url":"https://..."}]',
+			hint: "Pick a platform and paste its profile URL for each link.",
 			group: "Content",
+			pluginControl: "social-links-editor",
 		}),
 		size: f.number({ label: "Icon Size", default: 20, group: "Style" }),
 		gap: f.select(["xs", "sm", "md", "lg"], {
@@ -113,10 +120,7 @@ export const socialIconsNode = defineNode({
 			default: "transparent",
 			group: "Style",
 		}),
-		hoverEffect: f.select(["none", "lift", "grow", "glow"], {
-			label: "Hover Effect",
-			default: "lift",
-			group: "Effects",
-		}),
+		hoverEffect: hover.hoverEffect,
+		hoverGlowColor: hover.hoverGlowColor,
 	},
 });

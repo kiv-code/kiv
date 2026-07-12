@@ -52,6 +52,7 @@ interface ColorOrGradientFieldOptions {
 	group?: string;
 	hint?: string;
 	default?: Partial<ColorOrGradientValue>;
+	showIf?: { field: string; equals: string | string[] };
 }
 
 /** Field descriptor for a solid-or-gradient color, rendered by the shared ColorGradientControl. */
@@ -65,6 +66,7 @@ export function colorOrGradientField(
 		label: opts.label,
 		group: opts.group,
 		hint: opts.hint,
+		showIf: opts.showIf,
 		default: { ...DEFAULT_COLOR_OR_GRADIENT, ...opts.default },
 	};
 }

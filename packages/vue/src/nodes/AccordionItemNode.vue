@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import { RADIUS } from "@kiv/nodes";
+import { RADIUS, SPACING } from "@kiv/nodes";
 import { computed, inject, onBeforeUnmount, onMounted } from "vue";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
 import { ACCORDION_CONTEXT_KEY } from "./accordion-context";
 
 let uidCounter = 0;
 
-const props = defineProps<{
-	nodeId?: string;
-	title?: string;
-	defaultOpen?: boolean;
-	disabled?: boolean;
-	icon?: string;
-	background?: string;
-	titleColor?: string;
-}>();
+const props = withDefaults(
+	defineProps<{
+		nodeId?: string;
+		title?: string;
+		defaultOpen?: boolean;
+		disabled?: boolean;
+		icon?: string;
+		background?: string;
+		titleColor?: string;
+		titleFontSize?: number;
+		titleFontWeight?: string;
+		padding?: string;
+		bodyPadding?: string;
+	}>(),
+	{ titleFontSize: 0 },
+);
 
 const ctx = inject(ACCORDION_CONTEXT_KEY, null);
 const isEditorMode = inject(KIV_EDITOR_MODE_KEY, false);
@@ -28,7 +35,6 @@ onBeforeUnmount(() => {
 	ctx?.unregister(id);
 });
 
-// Editor mode keeps items expanded so their content stays selectable/editable.
 const isOpen = computed(
 	() => isEditorMode || (ctx ? ctx.isOpen(id) : props.defaultOpen === true),
 );
@@ -52,10 +58,11 @@ const headerStyle = computed(() => ({
 	alignItems: "center" as const,
 	justifyContent: "space-between" as const,
 	gap: "8px",
-	padding: "12px 16px",
+	padding: SPACING[props.padding ?? "md"] ?? "12px 16px",
 	cursor: props.disabled ? "not-allowed" : "pointer",
 	color: props.titleColor || undefined,
-	fontWeight: 600,
+	fontWeight: Number(props.titleFontWeight ?? "600"),
+	fontSize: props.titleFontSize > 0 ? `${props.titleFontSize}px` : undefined,
 	opacity: props.disabled ? 0.5 : 1,
 	flexDirection:
 		(ctx?.iconPosition.value ?? "right") === "left"
@@ -63,17 +70,56 @@ const headerStyle = computed(() => ({
 			: ("row" as const),
 }));
 
-const bodyStyle = computed(() => ({
-	display: "grid" as const,
-	gridTemplateRows: isOpen.value ? "1fr" : "0fr",
-	overflow: "hidden" as const,
-	transition:
-		(ctx?.animation.value ?? "slide") === "none"
-			? undefined
-			: `grid-template-rows ${ctx?.animationDuration.value ?? 200}ms ease`,
+const bodyPaddingStyle = computed(() => ({
+	padding: SPACING[props.bodyPadding ?? "md"] ?? "0 16px 16px",
 }));
 
 const iconKind = computed(() => ctx?.icon.value ?? "chevron");
+const iconSize = computed(() => ctx?.iconSize.value ?? 12);
+
+function onBodyEnter(el: Element, done: () => void): void {
+	const e = el as HTMLElement;
+	const inner = e.firstElementChild as HTMLElement | null;
+	if (!inner) {
+		done();
+		return;
+	}
+	const h = inner.scrollHeight;
+	e.style.transition = "height 0.25s ease";
+	e.style.height = "0px";
+	e.style.overflow = "hidden";
+	requestAnimationFrame(() => {
+		e.style.height = `${h}px`;
+		e.addEventListener("transitionend", done, { once: true });
+	});
+}
+
+function onBodyAfterEnter(el: Element): void {
+	const e = el as HTMLElement;
+	e.style.height = "";
+	e.style.overflow = "";
+	e.style.transition = "";
+}
+
+function onBodyLeave(el: Element, done: () => void): void {
+	const e = el as HTMLElement;
+	const inner = e.firstElementChild as HTMLElement | null;
+	const h = inner?.scrollHeight ?? e.scrollHeight;
+	e.style.transition = "height 0.25s ease";
+	e.style.height = `${h}px`;
+	e.style.overflow = "hidden";
+	requestAnimationFrame(() => {
+		e.style.height = "0px";
+		e.addEventListener("transitionend", done, { once: true });
+	});
+}
+
+function onBodyAfterLeave(el: Element): void {
+	const e = el as HTMLElement;
+	e.style.height = "";
+	e.style.overflow = "";
+	e.style.transition = "";
+}
 </script>
 
 <template>
@@ -92,22 +138,28 @@ const iconKind = computed(() => ctx?.icon.value ?? "chevron");
 				class="kiv-accordion-item__icon"
 				:class="{ 'kiv-accordion-item__icon--open': isOpen }"
 			>
-				<svg v-if="iconKind === 'chevron'" width="12" height="12" viewBox="0 0 12 12" fill="none">
+				<svg v-if="iconKind === 'chevron'" :width="iconSize" :height="iconSize" viewBox="0 0 12 12" fill="none">
 					<path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
 				</svg>
-				<svg v-else-if="iconKind === 'plus'" width="12" height="12" viewBox="0 0 12 12" fill="none">
+				<svg v-else-if="iconKind === 'plus'" :width="iconSize" :height="iconSize" viewBox="0 0 12 12" fill="none">
 					<path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
 				</svg>
-				<svg v-else width="12" height="12" viewBox="0 0 12 12" fill="none">
+				<svg v-else :width="iconSize" :height="iconSize" viewBox="0 0 12 12" fill="none">
 					<path d="M1 6h9M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
 				</svg>
 			</span>
 		</div>
-		<div :style="bodyStyle">
-			<div style="min-height: 0; overflow: hidden; padding: 0 16px 16px;">
+		<Transition
+			:css="false"
+			@enter="onBodyEnter"
+			@after-enter="onBodyAfterEnter"
+			@leave="onBodyLeave"
+			@after-leave="onBodyAfterLeave"
+		>
+			<div v-if="isOpen" :style="bodyPaddingStyle">
 				<slot />
 			</div>
-		</div>
+		</Transition>
 	</div>
 </template>
 

@@ -1,5 +1,7 @@
 export { default as AccordionItemNode } from "./AccordionItemNode.vue";
 export { default as AccordionNode } from "./AccordionNode.vue";
+export { default as AgendaItemNode } from "./AgendaItemNode.vue";
+export { default as AgendaNode } from "./AgendaNode.vue";
 export { default as ButtonNode } from "./ButtonNode.vue";
 export { default as CardNode } from "./CardNode.vue";
 export { default as CarouselNode } from "./CarouselNode.vue";
@@ -17,6 +19,7 @@ export { default as ImageNode } from "./ImageNode.vue";
 export { default as LinkNode } from "./LinkNode.vue";
 export { default as ModalNode } from "./ModalNode.vue";
 export { default as PageNode } from "./PageNode.vue";
+export { default as PricingNode } from "./PricingNode.vue";
 export { default as RichTextNode } from "./RichTextNode.vue";
 export { default as SectionNode } from "./SectionNode.vue";
 export { default as SocialIconsNode } from "./SocialIconsNode.vue";

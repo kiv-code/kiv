@@ -15,7 +15,11 @@ import { EditorExtensions } from "../extensions";
 import ColorGradientControl from "../inspector/controls/ColorGradientControl.vue";
 import IconPicker from "../inspector/controls/IconPicker.vue";
 import MediaPicker from "../inspector/controls/MediaPicker.vue";
+import PricingEditor from "../inspector/controls/PricingEditor.vue";
 import SizeSliderControl from "../inspector/controls/SizeSliderControl.vue";
+import SocialLinksEditor from "../inspector/controls/SocialLinksEditor.vue";
+import SpacingBoxControl from "../inspector/controls/SpacingBoxControl.vue";
+import TableEditor from "../inspector/controls/TableEditor.vue";
 import { EDITOR_EXTENSIONS_KEY, EDITOR_STORE_KEY } from "../store/context";
 import { useEditorStore } from "../store/editor-store";
 import { insertNodeNearSelection } from "../utils/insert-node";
@@ -51,7 +55,11 @@ const extensions = new EditorExtensions();
 extensions.addFieldControl("icon-picker", IconPicker);
 extensions.addFieldControl("color-gradient", ColorGradientControl);
 extensions.addFieldControl("size-slider", SizeSliderControl);
+extensions.addFieldControl("spacing-box", SpacingBoxControl);
 extensions.addFieldControl("media-picker", MediaPicker);
+extensions.addFieldControl("table-editor", TableEditor);
+extensions.addFieldControl("pricing-editor", PricingEditor);
+extensions.addFieldControl("social-links-editor", SocialLinksEditor);
 provide(EDITOR_EXTENSIONS_KEY, extensions);
 
 watch(

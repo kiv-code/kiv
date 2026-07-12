@@ -4,6 +4,7 @@ import {
 	RADIUS,
 	resolveBackgroundPaint,
 	resolveSolidColor,
+	resolveSpacingStyle,
 	SECTION_SPACING,
 	SHADOW,
 } from "@kiv/nodes";
@@ -29,7 +30,9 @@ const props = defineProps<{
 	opacity?: number;
 	paddingY?: string;
 	paddingX?: string;
+	paddingBox?: unknown;
 	marginY?: string;
+	marginBox?: unknown;
 	borderWidth?: string;
 	borderColor?: string;
 	borderRadius?: string;
@@ -41,7 +44,7 @@ const props = defineProps<{
 }>();
 
 const sectionStyle = computed(() => {
-	const s: Record<string, string> = {};
+	const s: Record<string, string | undefined> = {};
 
 	const solidBg = resolveSolidColor(props.background, "");
 	if (solidBg) s.backgroundColor = solidBg;
@@ -62,21 +65,34 @@ const sectionStyle = computed(() => {
 	if (props.opacity !== undefined && props.opacity !== 1) {
 		s.opacity = String(props.opacity);
 	}
-	if (props.paddingY && props.paddingY !== "none") {
-		const v = SECTION_SPACING[props.paddingY] ?? props.paddingY;
-		s.paddingTop = v;
-		s.paddingBottom = v;
-	}
-	if (props.paddingX && props.paddingX !== "none") {
-		const v = SECTION_SPACING[props.paddingX] ?? props.paddingX;
-		s.paddingLeft = v;
-		s.paddingRight = v;
-	}
-	if (props.marginY && props.marginY !== "none") {
-		const v = SECTION_SPACING[props.marginY] ?? props.marginY;
-		s.marginTop = v;
-		s.marginBottom = v;
-	}
+	const paddingY =
+		props.paddingY && props.paddingY !== "none"
+			? (SECTION_SPACING[props.paddingY] ?? props.paddingY)
+			: undefined;
+	const paddingX =
+		props.paddingX && props.paddingX !== "none"
+			? (SECTION_SPACING[props.paddingX] ?? props.paddingX)
+			: undefined;
+	const marginY =
+		props.marginY && props.marginY !== "none"
+			? (SECTION_SPACING[props.marginY] ?? props.marginY)
+			: undefined;
+	// Per-side overrides, shared with every other node that needs this escape
+	// hatch (see packages/nodes/src/spacing-field.ts). Empty side falls back
+	// to the Padding/Margin X/Y shorthand above.
+	Object.assign(
+		s,
+		resolveSpacingStyle("padding", props.paddingBox, {
+			top: paddingY,
+			right: paddingX,
+			bottom: paddingY,
+			left: paddingX,
+		}),
+		resolveSpacingStyle("margin", props.marginBox, {
+			top: marginY,
+			bottom: marginY,
+		}),
+	);
 	if (props.borderWidth && props.borderWidth !== "0") {
 		s.borderWidth = `${props.borderWidth}px`;
 		s.borderStyle = "solid";

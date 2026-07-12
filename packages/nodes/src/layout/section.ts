@@ -1,4 +1,5 @@
 import { defineNode, f } from "@kiv/engine";
+import { borderVisualFields } from "../border-field";
 import {
 	colorOrGradientField,
 	resolveBackgroundPaint,
@@ -6,6 +7,7 @@ import {
 } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
 import { BLUR, RADIUS, SECTION_SPACING, SHADOW } from "../scales";
+import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
 
 function isGradient(value: unknown): boolean {
 	return (
@@ -14,6 +16,8 @@ function isGradient(value: unknown): boolean {
 		(value as { type?: string }).type === "gradient"
 	);
 }
+
+const border = borderVisualFields({ group: "Border" });
 
 export const sectionNode = defineNode({
 	type: "section",
@@ -32,35 +36,38 @@ export const sectionNode = defineNode({
 			s.backgroundSize = String(props.backgroundSize ?? "cover");
 			s.backgroundPosition = String(props.backgroundPosition ?? "center");
 		}
-		// Gradient wins over an image background, matching the previous
-		// (pre-migration) precedence of the standalone "gradient" field.
 		if (isGradient(props.background)) {
 			s.backgroundImage = resolveBackgroundPaint(props.background, "");
-			// Default background-origin is padding-box: paired with a border
-			// (borderWidth > 0), the gradient sizes to the smaller padding-box
-			// area then tiles to fill the border strip, leaving a visible seam.
 			s.backgroundOrigin = "border-box";
 		}
 		if (props.opacity !== undefined && props.opacity !== 1) {
 			s.opacity = String(props.opacity);
 		}
-		if (props.paddingY && props.paddingY !== "none") {
-			const v =
-				SECTION_SPACING[String(props.paddingY)] ?? String(props.paddingY);
-			s.paddingTop = v;
-			s.paddingBottom = v;
-		}
-		if (props.paddingX && props.paddingX !== "none") {
-			const v =
-				SECTION_SPACING[String(props.paddingX)] ?? String(props.paddingX);
-			s.paddingLeft = v;
-			s.paddingRight = v;
-		}
-		if (props.marginY && props.marginY !== "none") {
-			const v = SECTION_SPACING[String(props.marginY)] ?? String(props.marginY);
-			s.marginTop = v;
-			s.marginBottom = v;
-		}
+		const paddingY =
+			props.paddingY && props.paddingY !== "none"
+				? (SECTION_SPACING[String(props.paddingY)] ?? String(props.paddingY))
+				: undefined;
+		const paddingX =
+			props.paddingX && props.paddingX !== "none"
+				? (SECTION_SPACING[String(props.paddingX)] ?? String(props.paddingX))
+				: undefined;
+		const marginY =
+			props.marginY && props.marginY !== "none"
+				? (SECTION_SPACING[String(props.marginY)] ?? String(props.marginY))
+				: undefined;
+		Object.assign(
+			s,
+			resolveSpacingStyle("padding", props.paddingBox, {
+				top: paddingY,
+				right: paddingX,
+				bottom: paddingY,
+				left: paddingX,
+			}),
+			resolveSpacingStyle("margin", props.marginBox, {
+				top: marginY,
+				bottom: marginY,
+			}),
+		);
 		if (props.borderWidth && props.borderWidth !== "0") {
 			s.borderWidth = `${props.borderWidth}px`;
 			s.borderStyle = "solid";
@@ -133,7 +140,6 @@ export const sectionNode = defineNode({
 		return `<section style="${styleToString(s)}" data-kiv-type="section" class="kiv-section">${videoHtml}${blurHtml}${overlayHtml}<div class="kiv-section__content" style="${contentStyle}">${children.default ?? ""}</div></section>`;
 	},
 	fields: {
-		// Background
 		background: colorOrGradientField({
 			label: "Background",
 			group: "Background",
@@ -156,27 +162,22 @@ export const sectionNode = defineNode({
 			default: "center",
 			group: "Background",
 		}),
-		// Overlay
 		overlay: f.boolean({
 			label: "Enable overlay",
 			default: false,
 			group: "Overlay",
 		}),
-		// Opacity is the alpha slider on the solid color (or per-stop on a
-		// gradient overlay) — no separate "overlay opacity" field needed.
 		overlayColor: colorOrGradientField({
 			label: "Overlay color",
 			group: "Overlay",
 			default: { solid: "#000000", alpha: 0.4 },
 		}),
-		// Effects
 		blur: f.select(["none", "sm", "md", "lg"], {
 			label: "Backdrop blur",
 			default: "none",
 			group: "Effects",
 		}),
 		opacity: f.number({ label: "Opacity (0–1)", default: 1, group: "Effects" }),
-		// Layout
 		fullWidth: f.boolean({
 			label: "Full width",
 			default: true,
@@ -201,6 +202,16 @@ export const sectionNode = defineNode({
 			responsive: true,
 			group: "Layout",
 		}),
+		paddingBox: spacingBoxField({
+			label: "Padding (per side)",
+			group: "Layout",
+			hint: "Overrides Padding X/Y for individual sides. Empty side = use the shorthand above.",
+		}),
+		marginBox: spacingBoxField({
+			label: "Margin (per side)",
+			group: "Layout",
+			hint: "Overrides Margin Y for individual sides. Empty side = use the shorthand above.",
+		}),
 		alignItems: f.select(["flex-start", "center", "flex-end", "stretch"], {
 			label: "Align horizontal",
 			default: "flex-start",
@@ -216,7 +227,6 @@ export const sectionNode = defineNode({
 				group: "Layout",
 			},
 		),
-		// Border
 		borderWidth: f.select(["0", "1", "2", "4"], {
 			label: "Border width",
 			default: "0",
@@ -227,15 +237,7 @@ export const sectionNode = defineNode({
 			default: "#e2e8f0",
 			group: "Border",
 		}),
-		borderRadius: f.select(["none", "sm", "md", "lg", "xl", "full"], {
-			label: "Border radius",
-			default: "none",
-			group: "Border",
-		}),
-		shadow: f.select(["none", "sm", "md", "lg", "xl"], {
-			label: "Shadow",
-			default: "none",
-			group: "Border",
-		}),
+		borderRadius: border.borderRadius,
+		shadow: border.shadow,
 	},
 });

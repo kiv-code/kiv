@@ -58,8 +58,11 @@ export const videoNode = defineNode({
 			captionHtml
 				? `<figure style="margin:0;">${inner}${captionHtml}</figure>`
 				: inner;
+		const noSourceText = String(
+			props.noSourceText ?? "No video source configured",
+		);
 		const noSource = wrap(
-			`<div style="${containerStyle}" data-kiv-type="video"><p style="padding:1rem;text-align:center;color:#999;">No video source configured</p></div>`,
+			`<div style="${containerStyle}" data-kiv-type="video"><p style="padding:1rem;text-align:center;color:#999;">${escapeHtml(noSourceText)}</p></div>`,
 		);
 
 		if (isHtml5) {
@@ -117,6 +120,12 @@ export const videoNode = defineNode({
 		}),
 		caption: f.text({
 			label: "Caption",
+			localizable: true,
+			group: "Content",
+		}),
+		noSourceText: f.text({
+			label: "No Source Text",
+			default: "No video source configured",
 			localizable: true,
 			group: "Content",
 		}),

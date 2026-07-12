@@ -46,8 +46,26 @@ const trackRef = ref<HTMLElement | null>(null);
 
 const currentIndex = ref(0);
 const paused = ref(false);
+const slideCount = ref(0);
 
-const slideCount = computed(() => slots.default?.({})?.length ?? 0);
+// Synchronous initial count from slots (available during setup/render).
+const slotCount = computed(() => slots.default?.({})?.length ?? 0);
+slideCount.value = slotCount.value;
+
+// DOM-based count for dynamic updates (DnD, etc.) — onUpdated fires after
+// each render, catching children added/removed after the initial mount.
+function updateSlideCount(): void {
+	if (trackRef.value) {
+		slideCount.value = trackRef.value.children.length;
+	}
+}
+
+onMounted(updateSlideCount);
+onUpdated(updateSlideCount);
+
+function onTrackEl(el: unknown): void {
+	trackRef.value = el as HTMLElement | null;
+}
 
 function goTo(index: number): void {
 	const count = slideCount.value;
@@ -167,25 +185,28 @@ function applySlideStyles(): void {
 	}
 }
 
-onMounted(applySlideStyles);
-onUpdated(applySlideStyles);
 watch(
 	[
 		currentIndex,
 		isAbsoluteLayout,
 		() => props.animation,
 		() => props.animationDuration,
+		slideCount,
 	],
 	async () => {
 		await nextTick();
 		applySlideStyles();
 	},
 );
+onMounted(async () => {
+	await nextTick();
+	applySlideStyles();
+});
 </script>
 
 <template>
 	<div :style="viewportStyle" data-kiv-type="carousel" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
-		<div ref="trackRef" class="kiv-carousel__track" :style="trackStyle">
+		<div :ref="onTrackEl" class="kiv-carousel__track" :style="trackStyle">
 			<slot />
 		</div>
 

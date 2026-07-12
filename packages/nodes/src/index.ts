@@ -1,5 +1,9 @@
+export * from "./align-field";
+export * from "./border-field";
 export * from "./color-gradient";
 export {
+	agendaItemNode,
+	agendaNode,
 	buttonNode,
 	cardNode,
 	computeCountdownParts,
@@ -12,11 +16,17 @@ export {
 	headingNode,
 	iconNode,
 	linkNode,
+	type PricingData,
+	type PricingRow,
+	type PricingTier,
+	parsePricingData,
 	parseSelectOptions,
 	parseSocialLinks,
 	parseTableData,
+	pricingNode,
 	renderStars,
 	richTextNode,
+	type SocialLink,
 	socialIconsNode,
 	statNode,
 	tableNode,
@@ -24,7 +34,9 @@ export {
 	textNode,
 	videoNode,
 } from "./content";
+export * from "./gap-field";
 export * from "./hover-effects";
+export * from "./hover-field";
 export * from "./html-utils";
 export * from "./icons";
 export {
@@ -39,7 +51,11 @@ export {
 export { imageNode } from "./media";
 export * from "./scales";
 export * from "./size-field";
+export * from "./spacing-field";
+export * from "./spacing-fields";
+export * from "./typography-field";
 
+import { agendaItemNode, agendaNode } from "./content/agenda";
 import { buttonNode } from "./content/button";
 import { cardNode } from "./content/card";
 import { countdownNode } from "./content/countdown";
@@ -50,6 +66,7 @@ import { formFieldNode } from "./content/form-field";
 import { headingNode } from "./content/heading";
 import { iconNode } from "./content/icon";
 import { linkNode } from "./content/link";
+import { pricingNode } from "./content/pricing";
 import { richTextNode } from "./content/rich-text";
 import { socialIconsNode } from "./content/social-icons";
 import { statNode } from "./content/stat";
@@ -66,7 +83,7 @@ import { spacerNode } from "./layout/spacer";
 import { stackNode } from "./layout/stack";
 import { imageNode } from "./media/image";
 
-/** All 25 base nodes — pass to registry.registerMany(ALL_NODES). */
+/** All 28 base nodes — pass to registry.registerMany(ALL_NODES). */
 export const ALL_NODES = [
 	pageNode,
 	sectionNode,
@@ -93,4 +110,7 @@ export const ALL_NODES = [
 	socialIconsNode,
 	embedNode,
 	tableNode,
+	agendaNode,
+	agendaItemNode,
+	pricingNode,
 ] as const;

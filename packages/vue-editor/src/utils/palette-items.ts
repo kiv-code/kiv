@@ -162,6 +162,27 @@ export const PALETTE: PaletteItem[] = [
 		category: "content",
 	},
 	{
+		type: "agenda",
+		label: "Agenda",
+		description: "Event schedule — a list of time-blocked sessions",
+		hasDefaultSlot: true,
+		category: "content",
+	},
+	{
+		type: "agenda-item",
+		label: "Agenda Item",
+		description: "A single time-blocked session inside an Agenda",
+		hasDefaultSlot: false,
+		category: "content",
+	},
+	{
+		type: "pricing",
+		label: "Pricing",
+		description: "Pricing table with tiers and rows — table or card styles",
+		hasDefaultSlot: false,
+		category: "content",
+	},
+	{
 		type: "image",
 		label: "Image",
 		description: "Responsive image with cover/contain fit",
@@ -254,6 +275,8 @@ export const LEAF_TYPES = new Set([
 	"social-icons",
 	"embed",
 	"table",
+	"agenda-item",
+	"pricing",
 ]);
 
 export function paletteItemByType(type: string): PaletteItem | undefined {

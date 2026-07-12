@@ -1,6 +1,8 @@
 import {
 	AccordionItemNode,
 	AccordionNode,
+	AgendaItemNode,
+	AgendaNode,
 	ButtonNode,
 	CardNode,
 	CarouselNode,
@@ -18,6 +20,7 @@ import {
 	LinkNode,
 	ModalNode,
 	PageNode,
+	PricingNode,
 	RichTextNode,
 	SectionNode,
 	SocialIconsNode,
@@ -35,7 +38,7 @@ import { createVueRegistry } from "./registry";
 
 /**
  * Creates a VueRegistry pre-loaded with components for all 25 base nodes plus
- * the 6 interactive nodes (carousel, accordion, tabs, modal).
+ * the 9 interactive nodes (carousel, accordion, tabs, modal, agenda, pricing).
  * Pass additional calls to .register() to extend it with custom nodes.
  */
 export function createDefaultVueRegistry() {
@@ -71,5 +74,8 @@ export function createDefaultVueRegistry() {
 	registry.register("tabs", TabsNode);
 	registry.register("tab-panel", TabPanelNode);
 	registry.register("modal", ModalNode);
+	registry.register("agenda", AgendaNode);
+	registry.register("agenda-item", AgendaItemNode);
+	registry.register("pricing", PricingNode);
 	return registry;
 }

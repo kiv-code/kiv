@@ -2,6 +2,10 @@ export { accordionItemNode, accordionNode } from "./accordion";
 export { carouselNode } from "./carousel";
 export { modalNode } from "./modal";
 export { tabPanelNode, tabsNode } from "./tabs";
+export {
+	CONTENT_TEMPLATES,
+	type ContentTemplate,
+} from "./templates";
 
 import { accordionItemNode, accordionNode } from "./accordion";
 import { carouselNode } from "./carousel";

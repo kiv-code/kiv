@@ -1,6 +1,7 @@
 import { defineNode, f } from "@kiv/engine";
 import { styleToString } from "../html-utils";
 import { SPACING } from "../scales";
+import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
 
 export const columnNode = defineNode({
 	type: "column",
@@ -13,16 +14,26 @@ export const columnNode = defineNode({
 			s.gridColumnStart = String(Number(props.offset) + 1);
 		if (props.alignSelf && props.alignSelf !== "auto")
 			s.alignSelf = String(props.alignSelf);
-		const px = SPACING[String(props.paddingX ?? "none")] ?? "0";
-		const py = SPACING[String(props.paddingY ?? "none")] ?? "0";
-		if (px !== "0") {
-			s.paddingLeft = px;
-			s.paddingRight = px;
-		}
-		if (py !== "0") {
-			s.paddingTop = py;
-			s.paddingBottom = py;
-		}
+		const px =
+			props.paddingX && props.paddingX !== "none"
+				? SPACING[String(props.paddingX)]
+				: undefined;
+		const py =
+			props.paddingY && props.paddingY !== "none"
+				? SPACING[String(props.paddingY)]
+				: undefined;
+		// Per-side override, shared with every other node that needs this
+		// escape hatch (see packages/nodes/src/spacing-field.ts). Empty side
+		// falls back to the Padding X/Y shorthand above.
+		Object.assign(
+			s,
+			resolveSpacingStyle("padding", props.paddingBox, {
+				top: py,
+				right: px,
+				bottom: py,
+				left: px,
+			}),
+		);
 		return `<div style="${styleToString(s)}" data-kiv-type="column">${children.default ?? ""}</div>`;
 	},
 	fields: {
@@ -64,6 +75,11 @@ export const columnNode = defineNode({
 			default: "none",
 			responsive: true,
 			group: "Spacing",
+		}),
+		paddingBox: spacingBoxField({
+			label: "Padding (per side)",
+			group: "Spacing",
+			hint: "Overrides Padding X/Y for individual sides. Empty side = use the shorthand above.",
 		}),
 	},
 });

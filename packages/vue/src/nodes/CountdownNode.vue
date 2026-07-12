@@ -6,8 +6,12 @@ const props = withDefaults(
 	defineProps<{
 		targetDate?: string;
 		expiredMessage?: string;
+		daysLabel?: string;
+		hoursLabel?: string;
+		minutesLabel?: string;
+		secondsLabel?: string;
 		showLabels?: boolean;
-		style?: string;
+		countdownStyle?: string;
 		size?: string;
 		accentColor?: string;
 	}>(),
@@ -31,13 +35,13 @@ const parts = computed(() =>
 
 const SIZE_PX: Record<string, string> = { sm: "18px", md: "28px", lg: "40px" };
 const fontSize = computed(() => SIZE_PX[props.size ?? "md"] ?? "28px");
-const displayStyle = computed(() => props.style ?? "boxes");
+const displayStyle = computed(() => props.countdownStyle ?? "boxes");
 
 const units = computed(() => [
-	{ value: parts.value.days, label: "Days" },
-	{ value: parts.value.hours, label: "Hours" },
-	{ value: parts.value.minutes, label: "Min" },
-	{ value: parts.value.seconds, label: "Sec" },
+	{ value: parts.value.days, label: props.daysLabel ?? "Days" },
+	{ value: parts.value.hours, label: props.hoursLabel ?? "Hours" },
+	{ value: parts.value.minutes, label: props.minutesLabel ?? "Min" },
+	{ value: parts.value.seconds, label: props.secondsLabel ?? "Sec" },
 ]);
 
 function pad(value: number): string {

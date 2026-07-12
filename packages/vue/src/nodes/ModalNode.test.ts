@@ -17,7 +17,7 @@ function mountModal(props: Record<string, unknown> = {}, bus?: unknown) {
 describe("ModalNode", () => {
 	it("renders the trigger and no dialog until opened", () => {
 		const wrapper = mountModal();
-		expect(wrapper.text()).toContain("Open dialog");
+		expect(wrapper.html()).toContain("Open dialog");
 		expect(document.querySelector('[data-kiv-type="modal"]')).toBeNull();
 	});
 

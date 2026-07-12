@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GAP, RADIUS, SHADOW, SPACING } from "@kiv/nodes";
+import { GAP, RADIUS, resolveSpacingStyle, SHADOW, SPACING } from "@kiv/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{
@@ -12,14 +12,8 @@ const props = defineProps<{
 	paddingX?: string;
 	marginY?: string;
 	marginX?: string;
-	paddingTop?: string;
-	paddingRight?: string;
-	paddingBottom?: string;
-	paddingLeft?: string;
-	marginTop?: string;
-	marginRight?: string;
-	marginBottom?: string;
-	marginLeft?: string;
+	paddingBox?: unknown;
+	marginBox?: unknown;
 	background?: string;
 	borderRadius?: string;
 	shadow?: string;
@@ -31,17 +25,6 @@ const props = defineProps<{
 	borderColor?: string;
 }>();
 
-/** A per-side override wins over the Y/X shorthand when set; empty falls back to it. */
-function side(
-	override: string | undefined,
-	shorthand: string | undefined,
-	scale: Record<string, string>,
-): string {
-	const raw = override?.trim();
-	if (raw) return raw;
-	return scale[shorthand ?? "none"] ?? "0";
-}
-
 const stackStyle = computed(() => {
 	const borderWidths = {
 		top: props.borderTopWidth ?? 0,
@@ -52,6 +35,10 @@ const stackStyle = computed(() => {
 	const hasBorder = Object.values(borderWidths).some((w) => w > 0);
 	const borderStyle = props.borderStyle ?? "solid";
 	const borderColor = props.borderColor ?? "#e2e8f0";
+	const paddingY = SPACING[props.paddingY ?? "none"] ?? "0";
+	const paddingX = SPACING[props.paddingX ?? "none"] ?? "0";
+	const marginY = SPACING[props.marginY ?? "none"] ?? "0";
+	const marginX = SPACING[props.marginX ?? "none"] ?? "0";
 
 	return {
 		display: "flex" as const,
@@ -62,14 +49,21 @@ const stackStyle = computed(() => {
 		alignItems: props.align ?? "flex-start",
 		justifyContent: props.justify ?? "flex-start",
 		flexWrap: (props.wrap ? "wrap" : "nowrap") as "wrap" | "nowrap",
-		paddingTop: side(props.paddingTop, props.paddingY, SPACING),
-		paddingRight: side(props.paddingRight, props.paddingX, SPACING),
-		paddingBottom: side(props.paddingBottom, props.paddingY, SPACING),
-		paddingLeft: side(props.paddingLeft, props.paddingX, SPACING),
-		marginTop: side(props.marginTop, props.marginY, SPACING),
-		marginRight: side(props.marginRight, props.marginX, SPACING),
-		marginBottom: side(props.marginBottom, props.marginY, SPACING),
-		marginLeft: side(props.marginLeft, props.marginX, SPACING),
+		// Per-side override, shared with every other node that needs this
+		// escape hatch (see packages/nodes/src/spacing-field.ts). Empty side
+		// falls back to the Y/X shorthand above.
+		...resolveSpacingStyle("padding", props.paddingBox, {
+			top: paddingY,
+			right: paddingX,
+			bottom: paddingY,
+			left: paddingX,
+		}),
+		...resolveSpacingStyle("margin", props.marginBox, {
+			top: marginY,
+			right: marginX,
+			bottom: marginY,
+			left: marginX,
+		}),
 		background:
 			props.background && props.background !== "transparent"
 				? props.background

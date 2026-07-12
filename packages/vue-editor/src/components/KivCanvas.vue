@@ -433,6 +433,29 @@ function computeDropTarget(
 			width,
 		};
 	}
+
+	// Check if the closest element is a container (has slots with children or
+	// an empty default slot). The middle 50% strip — between 25 % and 75 % of
+	// the element's height — drops inside the container as a child; the top
+	// and bottom edges insert as a sibling before / after the element.
+	const closestLoc = findNode(doc, id);
+	const closestSlots = closestLoc?.node.slots;
+	const hasDefaultSlot = closestSlots && "default" in closestSlots;
+	const relY = rect.height > 0 ? (clientY - rect.top) / rect.height : 0.5;
+	const inMiddleStrip = relY > 0.25 && relY < 0.75;
+
+	if (hasDefaultSlot && inMiddleStrip) {
+		const children = closestSlots?.default ?? [];
+		return {
+			parentId: id,
+			slot: "default",
+			index: children.length,
+			top: rect.bottom - stageRect.top,
+			left,
+			width,
+		};
+	}
+
 	const loc = findParentLocation(doc.root, id);
 	if (!loc) return null;
 	return {

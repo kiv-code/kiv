@@ -74,6 +74,7 @@ export const formFieldNode = defineNode({
 		}),
 		options: f.text({
 			label: "Options (comma-separated, for select)",
+			localizable: true,
 			group: "Content",
 			showIf: { field: "fieldType", equals: "select" },
 		}),

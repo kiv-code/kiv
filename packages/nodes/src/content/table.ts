@@ -75,9 +75,10 @@ export const tableNode = defineNode({
 	},
 	fields: {
 		data: f.textarea({
-			label: "Data (JSON: { headers: string[], rows: string[][] })",
+			label: "Data",
 			default: '{"headers":["Column 1","Column 2"],"rows":[["",""]]}',
 			group: "Content",
+			pluginControl: "table-editor",
 		}),
 		striped: f.boolean({
 			label: "Striped Rows",

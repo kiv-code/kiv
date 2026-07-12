@@ -9,8 +9,12 @@ const props = defineProps<{
 	nodeId?: string;
 	title?: string;
 	icon?: string;
+	iconSize?: number;
+	iconColor?: string;
 	badge?: string;
 	badgeColor?: string;
+	titleColor?: string;
+	titleFontSize?: string;
 	disabled?: boolean;
 }>();
 
@@ -23,8 +27,12 @@ function meta() {
 	return {
 		title: props.title ?? "",
 		icon: props.icon,
+		iconSize: props.iconSize,
+		iconColor: props.iconColor,
 		badge: props.badge,
 		badgeColor: props.badgeColor,
+		titleColor: props.titleColor,
+		titleFontSize: props.titleFontSize,
 		disabled: props.disabled === true,
 	};
 }
@@ -40,14 +48,17 @@ watch(
 	() => [
 		props.title,
 		props.icon,
+		props.iconSize,
+		props.iconColor,
 		props.badge,
 		props.badgeColor,
+		props.titleColor,
+		props.titleFontSize,
 		props.disabled,
 	],
 	() => ctx?.update(id, meta()),
 );
 
-// Editor mode always shows the panel so its content stays selectable/editable.
 const isActive = computed(() => isEditorMode || ctx?.activeId.value === id);
 </script>
 

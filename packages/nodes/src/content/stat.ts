@@ -1,4 +1,5 @@
 import { defineNode, f } from "@kiv/engine";
+import { alignField } from "../align-field";
 import { colorOrGradientField, resolveTextPaintStyle } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
 import { STAT_SIZE } from "../scales";
@@ -20,8 +21,6 @@ export const statNode = defineNode({
 	category: "content",
 	label: "Stat Counter",
 	icon: "trending-up",
-	// The animated count-up is a live/preview-only effect (see StatNode.vue) —
-	// a static export renders the final value directly, with no animation.
 	toHtml(props) {
 		const align = String(props.align ?? "center");
 		const size = STAT_SIZE[String(props.size ?? "xl")] ?? STAT_SIZE.xl;
@@ -56,8 +55,12 @@ export const statNode = defineNode({
 	},
 	fields: {
 		value: f.number({ label: "Value", default: 100, group: "Content" }),
-		prefix: f.text({ label: "Prefix", group: "Content" }),
-		suffix: f.text({ label: "Suffix (e.g. %, +, k)", group: "Content" }),
+		prefix: f.text({ label: "Prefix", localizable: true, group: "Content" }),
+		suffix: f.text({
+			label: "Suffix (e.g. %, +, k)",
+			localizable: true,
+			group: "Content",
+		}),
 		label: f.text({ label: "Label", localizable: true, group: "Content" }),
 		decimals: f.number({
 			label: "Decimal Places",
@@ -74,11 +77,7 @@ export const statNode = defineNode({
 			default: 1500,
 			group: "Behavior",
 		}),
-		align: f.select(["left", "center", "right"], {
-			label: "Align",
-			default: "center",
-			group: "Style",
-		}),
+		align: alignField({ default: "center", group: "Style" }),
 		valueColor: colorOrGradientField({ label: "Value Color", group: "Style" }),
 		size: f.select(["md", "lg", "xl", "2xl"], {
 			label: "Size",

@@ -9,6 +9,7 @@ export interface AccordionContext {
 	animationDuration: ComputedRef<number>;
 	icon: ComputedRef<string>;
 	iconPosition: ComputedRef<string>;
+	iconSize: ComputedRef<number>;
 }
 
 export const ACCORDION_CONTEXT_KEY: InjectionKey<AccordionContext> = Symbol(

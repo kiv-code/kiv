@@ -1,7 +1,23 @@
 import { defineNode, f } from "@kiv/engine";
-import { colorOrGradientField, resolveTextPaintStyle } from "../color-gradient";
+import { colorOrGradientField } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
-import { HEADING_LEVEL_SIZE, LETTER_SPACING, LINE_HEIGHT } from "../scales";
+import { HEADING_LEVEL_SIZE } from "../scales";
+import { resolveTypographyStyle, typographyFields } from "../typography-field";
+
+const typo = typographyFields({
+	group: "Typography",
+	weightOptions: ["300", "400", "500", "600", "700", "800", "900"],
+	weightDefault: "700",
+	lineHeightDefault: "normal",
+	letterSpacingOptions: [
+		"tighter",
+		"tight",
+		"normal",
+		"wide",
+		"wider",
+		"widest",
+	],
+});
 
 export const headingNode = defineNode({
 	type: "heading",
@@ -9,15 +25,13 @@ export const headingNode = defineNode({
 	toHtml(props) {
 		const level = String(props.level ?? "2");
 		const style = styleToString({
-			fontSize: `${props.size ?? HEADING_LEVEL_SIZE[level] ?? 36}px`,
-			fontWeight: String(props.weight ?? "700"),
-			...resolveTextPaintStyle(props.color, "inherit"),
-			textAlign: String(props.align ?? "left"),
-			lineHeight: LINE_HEIGHT[String(props.lineHeight ?? "normal")] ?? "1.4",
-			letterSpacing:
-				LETTER_SPACING[String(props.letterSpacing ?? "normal")] ?? "0em",
+			...resolveTypographyStyle(props, {
+				size: HEADING_LEVEL_SIZE[level] ?? 36,
+				weight: "700",
+				colorFallback: "inherit",
+				lineHeightFallback: "normal",
+			}),
 			textTransform: String(props.transform ?? "none"),
-			margin: "0",
 		});
 		const text = props.text !== undefined ? escapeHtml(props.text) : "";
 		return `<h${level} style="${style}" data-kiv-type="heading">${text}</h${level}>`;
@@ -34,41 +48,16 @@ export const headingNode = defineNode({
 			default: "2",
 			group: "Typography",
 		}),
-		size: f.number({
-			label: "Size (px)",
-			responsive: true,
-			group: "Typography",
-		}),
-		weight: f.select(["300", "400", "500", "600", "700", "800", "900"], {
-			label: "Weight",
-			default: "700",
-			responsive: true,
-			group: "Typography",
-		}),
+		size: typo.size,
+		weight: typo.weight,
 		color: colorOrGradientField({
 			label: "Color",
 			group: "Typography",
 			default: { solid: "#000000" },
 		}),
-		align: f.select(["left", "center", "right", "justify"], {
-			label: "Align",
-			default: "left",
-			responsive: true,
-			group: "Typography",
-		}),
-		lineHeight: f.select(["tight", "snug", "normal", "relaxed", "loose"], {
-			label: "Line height",
-			default: "normal",
-			group: "Typography",
-		}),
-		letterSpacing: f.select(
-			["tighter", "tight", "normal", "wide", "wider", "widest"],
-			{
-				label: "Letter spacing",
-				default: "normal",
-				group: "Typography",
-			},
-		),
+		align: typo.align,
+		lineHeight: typo.lineHeight,
+		letterSpacing: typo.letterSpacing,
 		transform: f.select(["none", "uppercase", "lowercase", "capitalize"], {
 			label: "Transform",
 			default: "none",

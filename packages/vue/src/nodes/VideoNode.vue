@@ -8,6 +8,7 @@ const props = defineProps<{
 	videoId?: string;
 	poster?: string;
 	caption?: string;
+	noSourceText?: string;
 	aspectRatio?: string;
 	borderRadius?: string;
 	shadow?: string;
@@ -87,7 +88,7 @@ const containerStyle = computed(() => ({
 			/>
 		</div>
 		<div v-else :style="containerStyle" data-kiv-type="video">
-			<p style="padding:1rem;text-align:center;color:#999;">No video source configured</p>
+			<p style="padding:1rem;text-align:center;color:#999;">{{ noSourceText ?? 'No video source configured' }}</p>
 		</div>
 		<figcaption
 			v-if="caption"

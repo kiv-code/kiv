@@ -77,16 +77,17 @@ export const countdownNode = defineNode({
 	category: "content",
 	label: "Countdown",
 	icon: "timer",
-	// toHtml can only render a snapshot of the remaining time AT EXPORT TIME —
-	// a static HTML export has no runtime to keep ticking, so the number is
-	// frozen the moment this function runs. The `<time>` element preserves the
-	// real target so a consumer with their own script could still hydrate it.
 	toHtml(props) {
-		const style = String(props.style ?? "boxes");
+		const style = String(props.countdownStyle ?? "boxes");
 		const showLabels = props.showLabels !== false;
 		const accentColor = String(props.accentColor ?? "#6366f1");
 		const fontSize = COUNTDOWN_SIZE[String(props.size ?? "md")] ?? "28px";
 		const parts = computeCountdownParts(props.targetDate);
+
+		const daysLabel = String(props.daysLabel ?? "Days");
+		const hoursLabel = String(props.hoursLabel ?? "Hours");
+		const minutesLabel = String(props.minutesLabel ?? "Min");
+		const secondsLabel = String(props.secondsLabel ?? "Sec");
 
 		if (parts.expired) {
 			return `<div data-kiv-type="countdown"><time datetime="${escapeHtml(props.targetDate ?? "")}">${escapeHtml(props.expiredMessage ?? "Time's up!")}</time></div>`;
@@ -101,10 +102,17 @@ export const countdownNode = defineNode({
 		const separator =
 			style === "inline" ? '<span style="opacity:0.5;">:</span>' : "";
 		const units = [
-			unitBoxHtml(parts.days, "Days", showLabels, style, accentColor, fontSize),
+			unitBoxHtml(
+				parts.days,
+				daysLabel,
+				showLabels,
+				style,
+				accentColor,
+				fontSize,
+			),
 			unitBoxHtml(
 				parts.hours,
-				"Hours",
+				hoursLabel,
 				showLabels,
 				style,
 				accentColor,
@@ -112,7 +120,7 @@ export const countdownNode = defineNode({
 			),
 			unitBoxHtml(
 				parts.minutes,
-				"Min",
+				minutesLabel,
 				showLabels,
 				style,
 				accentColor,
@@ -120,7 +128,7 @@ export const countdownNode = defineNode({
 			),
 			unitBoxHtml(
 				parts.seconds,
-				"Sec",
+				secondsLabel,
 				showLabels,
 				style,
 				accentColor,
@@ -137,12 +145,36 @@ export const countdownNode = defineNode({
 			localizable: true,
 			group: "Behavior",
 		}),
+		daysLabel: f.text({
+			label: "Days Label",
+			default: "Days",
+			localizable: true,
+			group: "Labels",
+		}),
+		hoursLabel: f.text({
+			label: "Hours Label",
+			default: "Hours",
+			localizable: true,
+			group: "Labels",
+		}),
+		minutesLabel: f.text({
+			label: "Minutes Label",
+			default: "Min",
+			localizable: true,
+			group: "Labels",
+		}),
+		secondsLabel: f.text({
+			label: "Seconds Label",
+			default: "Sec",
+			localizable: true,
+			group: "Labels",
+		}),
 		showLabels: f.boolean({
 			label: "Show Unit Labels",
 			default: true,
 			group: "Style",
 		}),
-		style: f.select(["boxes", "inline", "minimal"], {
+		countdownStyle: f.select(["boxes", "inline", "minimal"], {
 			label: "Style",
 			default: "boxes",
 			group: "Style",

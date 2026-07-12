@@ -6,6 +6,7 @@ import {
 	resolveTextPaintStyle,
 } from "../color-gradient";
 import { hoverEffectClass, hoverGlowStyle } from "../hover-effects";
+import { hoverFields } from "../hover-field";
 import { escapeHtml, normalizeSvgIconSize, styleToString } from "../html-utils";
 import { resolveIcon } from "../icons";
 import {
@@ -15,15 +16,11 @@ import {
 	type ButtonSizeStyle,
 	type ButtonVariantStyle,
 } from "../scales";
+import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
 
-const BUTTON_HOVER_OPTIONS = [
-	"none",
-	"lift",
-	"grow",
-	"glow",
-	"fade",
-	"underline",
-] as const;
+const hover = hoverFields({
+	effects: ["none", "lift", "grow", "glow", "fade", "underline"],
+});
 
 const DEFAULT_SIZE: ButtonSizeStyle = { padding: "9px 20px", fontSize: "14px" };
 const DEFAULT_VARIANT: ButtonVariantStyle = {
@@ -54,6 +51,15 @@ export const buttonNode = defineNode({
 		const border = props.customBorderColor
 			? `2px solid ${props.customBorderColor}`
 			: variant.border;
+		const [sizingPadY, sizingPadX] = sizing.padding.split(" ");
+		const paddingFallback = variant.textDecoration
+			? { top: "0", right: "0", bottom: "0", left: "0" }
+			: {
+					top: sizingPadY,
+					right: sizingPadX,
+					bottom: sizingPadY,
+					left: sizingPadX,
+				};
 
 		const style = styleToString({
 			display: hasIcon ? "inline-flex" : "inline-block",
@@ -61,7 +67,7 @@ export const buttonNode = defineNode({
 			justifyContent: hasIcon ? "center" : undefined,
 			gap: hasIcon ? "0.5em" : undefined,
 			width: props.fullWidth ? "100%" : undefined,
-			padding: variant.textDecoration ? "0" : sizing.padding,
+			...resolveSpacingStyle("padding", props.paddingBox, paddingFallback),
 			fontSize: sizing.fontSize,
 			fontWeight: String(props.fontWeight ?? "600"),
 			fontFamily: "inherit",
@@ -71,9 +77,6 @@ export const buttonNode = defineNode({
 			lineHeight: "1",
 			whiteSpace: "nowrap",
 			background,
-			// See ButtonNode.vue's identical comment: without this, a gradient
-			// background paired with a transparent border tiles at the edges
-			// instead of extending smoothly under the border.
 			backgroundOrigin: "border-box",
 			color,
 			border,
@@ -146,10 +149,6 @@ export const buttonNode = defineNode({
 			default: "primary",
 			group: "Style",
 		}),
-		// ── Colors ────────────────────────────────────────────────────────────
-		// Escape hatch: override the variant's theme colors for this one button.
-		// Empty solid → inherit variant/theme. Shared control across all nodes
-		// that support solid-or-gradient paint (see packages/nodes/src/color-gradient.ts).
 		background: colorOrGradientField({ label: "Background", group: "Colors" }),
 		textColor: colorOrGradientField({ label: "Text color", group: "Colors" }),
 		customBorderColor: f.color({
@@ -162,6 +161,11 @@ export const buttonNode = defineNode({
 			default: "md",
 			responsive: true,
 			group: "Style",
+		}),
+		paddingBox: spacingBoxField({
+			label: "Padding (per side)",
+			group: "Style",
+			hint: "Overrides the size preset's padding for individual sides.",
 		}),
 		fullWidth: f.boolean({
 			label: "Full width",
@@ -184,17 +188,7 @@ export const buttonNode = defineNode({
 			default: "600",
 			group: "Style",
 		}),
-		hoverEffect: f.select([...BUTTON_HOVER_OPTIONS], {
-			label: "Hover effect",
-			default: "none",
-			group: "Effects",
-		}),
-		hoverGlowColor: f.color({
-			label: "Glow color",
-			default: "",
-			hint: "Empty uses the default indigo glow.",
-			showIf: { field: "hoverEffect", equals: "glow" },
-			group: "Effects",
-		}),
+		hoverEffect: hover.hoverEffect,
+		hoverGlowColor: hover.hoverGlowColor,
 	},
 });

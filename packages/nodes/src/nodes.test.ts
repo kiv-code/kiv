@@ -2,6 +2,8 @@ import { createRegistry } from "@kiv/engine";
 import { describe, expect, it } from "vitest";
 import {
 	ALL_NODES,
+	agendaItemNode,
+	agendaNode,
 	buttonNode,
 	cardNode,
 	columnNode,
@@ -17,9 +19,11 @@ import {
 	headingNode,
 	imageNode,
 	pageNode,
+	parsePricingData,
 	parseSelectOptions,
 	parseSocialLinks,
 	parseTableData,
+	pricingNode,
 	renderStars,
 	sectionNode,
 	socialIconsNode,
@@ -34,13 +38,13 @@ import {
 const ctx = { locale: "en", breakpoint: "base" as const };
 
 describe("ALL_NODES", () => {
-	it("contains 25 nodes", () => {
-		expect(ALL_NODES).toHaveLength(25);
+	it("contains 28 nodes", () => {
+		expect(ALL_NODES).toHaveLength(28);
 	});
 
 	it("all nodes have unique types", () => {
 		const types = ALL_NODES.map((n) => n.type);
-		expect(new Set(types).size).toBe(25);
+		expect(new Set(types).size).toBe(28);
 	});
 
 	it("registers without errors into a Registry", () => {
@@ -505,5 +509,101 @@ describe("table", () => {
 		expect(html).toContain("<tbody>");
 		expect(html).toContain("Name");
 		expect(html).toContain("Ada");
+	});
+});
+
+describe("agenda", () => {
+	it("agenda: type and slot constraint", () => {
+		expect(agendaNode.type).toBe("agenda");
+		expect(agendaNode.slotConstraints?.default).toEqual(["agenda-item"]);
+	});
+
+	it("passes stripe width and item radius down via CSS custom properties", () => {
+		const html = agendaNode.toHtml?.(
+			{ stripeWidth: "180px", itemRadius: "lg" },
+			{ default: "" },
+			ctx,
+		);
+		expect(html).toContain("--kiv-agenda-stripe-width: 180px");
+		expect(html).toContain("--kiv-agenda-item-radius: 16px");
+	});
+
+	it("agenda-item renders time, title, and location", () => {
+		const html = agendaItemNode.toHtml?.(
+			{ time: "8h às 8h30", title: "Abertura", location: "Palco Principal" },
+			{},
+			ctx,
+		);
+		expect(html).toContain("8h às 8h30");
+		expect(html).toContain("Abertura");
+		expect(html).toContain("Palco Principal");
+	});
+
+	it("agenda-item only renders the speaker card when hasSpeaker is true", () => {
+		const withoutSpeaker = agendaItemNode.toHtml?.(
+			{ title: "Coffee" },
+			{},
+			ctx,
+		);
+		expect(withoutSpeaker).not.toContain("kiv-agenda-item__speaker");
+
+		const withSpeaker = agendaItemNode.toHtml?.(
+			{
+				title: "Palestra",
+				hasSpeaker: true,
+				speakerName: "Alice Altissimo",
+				speakerRole: "VP",
+			},
+			{},
+			ctx,
+		);
+		expect(withSpeaker).toContain("Alice Altissimo");
+		expect(withSpeaker).toContain("VP");
+	});
+});
+
+describe("pricing", () => {
+	it("parsePricingData returns empty arrays for malformed JSON without throwing", () => {
+		expect(() => parsePricingData("{not valid")).not.toThrow();
+		expect(parsePricingData("{not valid")).toEqual({ tiers: [], rows: [] });
+	});
+
+	const sampleData = JSON.stringify({
+		tiers: [
+			{ period: "Julio", tier: "Regular", highlighted: true },
+			{ period: "Agosto", tier: "Late", highlighted: false },
+		],
+		rows: [{ label: "PMI Members", values: ["S/ 1,700", "S/ 2,100"] }],
+	});
+
+	it("renders the table variant with a highlighted tier column", () => {
+		const html = pricingNode.toHtml?.(
+			{ data: sampleData, variant: "table" },
+			{},
+			ctx,
+		);
+		expect(html).toContain("<table");
+		expect(html).toContain("PMI Members");
+		expect(html).toContain("S/ 1,700");
+		expect(html).toContain("Regular");
+	});
+
+	it("renders the cards variant as a grid, not a table", () => {
+		const html = pricingNode.toHtml?.(
+			{ data: sampleData, variant: "cards" },
+			{},
+			ctx,
+		);
+		expect(html).not.toContain("<table");
+		expect(html).toContain("S/ 2,100");
+	});
+
+	it("renders a Featured badge only for the highlighted tier in cards-featured", () => {
+		const html = pricingNode.toHtml?.(
+			{ data: sampleData, variant: "cards-featured" },
+			{},
+			ctx,
+		);
+		expect(html).toContain("Featured");
 	});
 });

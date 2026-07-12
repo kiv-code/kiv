@@ -1,17 +1,17 @@
 import { defineNode, f } from "@kiv/engine";
+import { borderVisualFields } from "../border-field";
 import { hoverEffectClass, hoverGlowStyle } from "../hover-effects";
+import { hoverFields } from "../hover-field";
 import { escapeHtml, styleToString } from "../html-utils";
 import { RADIUS, SHADOW } from "../scales";
 import { sizeField } from "../size-field";
 
-const IMAGE_HOVER_OPTIONS = [
-	"none",
-	"lift",
-	"grow",
-	"glow",
-	"fade",
-	"grayscale",
-] as const;
+const hover = hoverFields({
+	effects: ["none", "lift", "grow", "glow", "fade", "grayscale"],
+});
+const border = borderVisualFields({
+	shadowOptions: ["none", "sm", "md", "lg"],
+});
 
 export const imageNode = defineNode({
 	type: "image",
@@ -60,27 +60,9 @@ export const imageNode = defineNode({
 			group: "Style",
 			hint: "Any percentage or pixel value — drag the slider or type an exact size.",
 		}),
-		borderRadius: f.select(["none", "sm", "md", "lg", "xl", "full"], {
-			label: "Border radius",
-			default: "none",
-			group: "Style",
-		}),
-		shadow: f.select(["none", "sm", "md", "lg"], {
-			label: "Shadow",
-			default: "none",
-			group: "Style",
-		}),
-		hoverEffect: f.select([...IMAGE_HOVER_OPTIONS], {
-			label: "Hover effect",
-			default: "none",
-			group: "Effects",
-		}),
-		hoverGlowColor: f.color({
-			label: "Glow color",
-			default: "",
-			hint: "Empty uses the default indigo glow.",
-			showIf: { field: "hoverEffect", equals: "glow" },
-			group: "Effects",
-		}),
+		borderRadius: border.borderRadius,
+		shadow: border.shadow,
+		hoverEffect: hover.hoverEffect,
+		hoverGlowColor: hover.hoverGlowColor,
 	},
 });

@@ -26,6 +26,9 @@ export const NODE_LABELS: Record<string, string> = {
 	tabs: "Tabs",
 	"tab-panel": "Tab Panel",
 	modal: "Modal",
+	agenda: "Agenda",
+	"agenda-item": "Agenda Item",
+	pricing: "Pricing",
 };
 
 // Short label for canvas overlay badges
@@ -56,6 +59,9 @@ export const NODE_LABELS_SHORT: Record<string, string> = {
 	tabs: "Tabs",
 	"tab-panel": "Panel",
 	modal: "Modal",
+	agenda: "Agenda",
+	"agenda-item": "Item",
+	pricing: "Pricing",
 };
 
 export function getNodeLabel(type: string): string {
@@ -95,6 +101,9 @@ const NODE_CATEGORY: Record<
 	"social-icons": "content",
 	embed: "content",
 	table: "content",
+	agenda: "content",
+	"agenda-item": "content",
+	pricing: "content",
 	image: "media",
 	video: "media",
 	icon: "media",

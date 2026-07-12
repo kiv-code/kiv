@@ -26,8 +26,12 @@ const props = defineProps<{
 	animationDuration?: number;
 	icon?: string;
 	iconPosition?: string;
+	iconSize?: number;
 	gap?: string;
 	borderRadius?: string;
+	itemBorderRadius?: string;
+	showSeparator?: boolean;
+	separatorColor?: string;
 }>();
 
 const bus = inject(KIV_BUS_KEY, null);
@@ -97,6 +101,7 @@ const context: AccordionContext = {
 	animationDuration: computed(() => props.animationDuration ?? 200),
 	icon: computed(() => props.icon ?? "chevron"),
 	iconPosition: computed(() => props.iconPosition ?? "right"),
+	iconSize: computed(() => props.iconSize ?? 12),
 };
 provide(ACCORDION_CONTEXT_KEY, context);
 

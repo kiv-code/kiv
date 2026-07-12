@@ -4,8 +4,12 @@ export interface TabPanelMeta {
 	id: string;
 	title: string;
 	icon?: string;
+	iconSize?: number;
+	iconColor?: string;
 	badge?: string;
 	badgeColor?: string;
+	titleColor?: string;
+	titleFontSize?: string;
 	disabled: boolean;
 }
 
@@ -16,6 +20,8 @@ export interface TabsContext {
 	update(id: string, patch: Partial<Omit<TabPanelMeta, "id">>): void;
 	unregister(id: string): void;
 	panels: Ref<TabPanelMeta[]>;
+	iconPosition: Ref<string>;
+	icon: Ref<string>;
 }
 
 export const TABS_CONTEXT_KEY: InjectionKey<TabsContext> =

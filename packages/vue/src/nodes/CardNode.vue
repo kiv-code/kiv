@@ -4,6 +4,7 @@ import {
 	hoverGlowStyle,
 	RADIUS,
 	resolveBackgroundPaint,
+	resolveSpacingStyle,
 	SHADOW,
 	SPACING,
 } from "@kiv/nodes";
@@ -13,6 +14,7 @@ const props = defineProps<{
 	background?: unknown;
 	borderRadius?: string;
 	padding?: string;
+	paddingBox?: unknown;
 	shadow?: string;
 	borderWidth?: number;
 	borderColor?: string;
@@ -24,7 +26,14 @@ const props = defineProps<{
 const cardStyle = computed(() => ({
 	background: resolveBackgroundPaint(props.background, "#ffffff"),
 	borderRadius: RADIUS[props.borderRadius ?? "lg"] ?? "16px",
-	padding: SPACING[props.padding ?? "lg"] ?? "32px",
+	// Per-side override, shared with every other node that needs this escape
+	// hatch (see packages/nodes/src/spacing-field.ts). Empty side falls back
+	// to the Padding shorthand above.
+	...resolveSpacingStyle(
+		"padding",
+		props.paddingBox,
+		SPACING[props.padding ?? "lg"] ?? "32px",
+	),
 	boxShadow: SHADOW[props.shadow ?? "md"] ?? "none",
 	borderWidth: props.borderWidth ? `${props.borderWidth}px` : undefined,
 	borderStyle: props.borderWidth ? ("solid" as const) : undefined,

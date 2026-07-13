@@ -1,4 +1,4 @@
-import { createRegistry } from "@kiv/engine";
+import { createRegistry } from "@kivcode/engine";
 import { describe, expect, it } from "vitest";
 import {
 	ALL_INTERACTIVE_NODES,

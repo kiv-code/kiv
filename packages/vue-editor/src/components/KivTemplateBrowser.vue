@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PageTemplate } from "@kiv/engine";
+import type { PageTemplate } from "@kivcode/engine";
 import { computed, ref } from "vue";
 import NodeIcon from "./NodeIcon.vue";
 

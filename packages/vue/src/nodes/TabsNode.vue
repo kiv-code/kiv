@@ -7,7 +7,7 @@ import {
 	resolveSolidColor,
 	resolveSpacingStyle,
 	SHADOW,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 import { computed, inject, onMounted, provide, ref } from "vue";
 import { KIV_BUS_KEY } from "../bus";
 import {
@@ -16,7 +16,7 @@ import {
 	type TabsContext,
 } from "./tabs-context";
 
-declare module "@kiv/engine" {
+declare module "@kivcode/engine" {
 	interface KivEventMap {
 		"tabs.tabChanged": {
 			nodeId?: string;

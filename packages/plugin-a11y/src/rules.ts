@@ -1,5 +1,5 @@
-import type { KivDocument, KivNode, Localizable } from "@kiv/engine";
-import { HEADING_LEVEL_SIZE, resolveSolidColor } from "@kiv/nodes";
+import type { KivDocument, KivNode, Localizable } from "@kivcode/engine";
+import { HEADING_LEVEL_SIZE, resolveSolidColor } from "@kivcode/nodes";
 import { contrastRatio, minimumContrastRatio } from "./contrast";
 
 export type A11ySeverity = "error" | "warning";

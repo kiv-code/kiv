@@ -1,4 +1,4 @@
-import { type FieldDescriptor, f } from "@kiv/engine";
+import { type FieldDescriptor, f } from "@kivcode/engine";
 
 export interface HoverFields {
 	hoverEffect: FieldDescriptor<string>;

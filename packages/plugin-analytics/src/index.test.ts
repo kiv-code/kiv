@@ -1,4 +1,4 @@
-import { createEngine } from "@kiv/engine";
+import { createEngine } from "@kivcode/engine";
 import { describe, expect, it } from "vitest";
 import { type AnalyticsEvent, analyticsPlugin } from "./index";
 

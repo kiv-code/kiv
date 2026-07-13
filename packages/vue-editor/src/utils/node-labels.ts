@@ -1,6 +1,6 @@
-import type { Registry } from "@kiv/engine";
+import type { Registry } from "@kivcode/engine";
 
-// The registry's `label`/`category` (declared once per node in `@kiv/nodes`)
+// The registry's `label`/`category` (declared once per node in `@kivcode/nodes`)
 // are the single source of truth — these helpers only add editor-specific
 // presentation on top (an abbreviation for tight badges, a color per category).
 

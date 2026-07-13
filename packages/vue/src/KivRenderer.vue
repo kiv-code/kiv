@@ -5,8 +5,8 @@ import type {
 	KivDocument,
 	MediaProvider,
 	ServicesContainer,
-} from "@kiv/engine";
-import { HOVER_EFFECTS_CSS } from "@kiv/nodes";
+} from "@kivcode/engine";
+import { HOVER_EFFECTS_CSS } from "@kivcode/nodes";
 import { computed, provide } from "vue";
 import { KIV_BUS_KEY } from "./bus";
 import { KIV_CONTEXT_KEY } from "./context";

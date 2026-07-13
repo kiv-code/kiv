@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computeCountdownParts } from "@kiv/nodes";
+import { computeCountdownParts } from "@kivcode/nodes";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = withDefaults(

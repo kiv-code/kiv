@@ -33,12 +33,12 @@ de Kiv:
 
 | Tu formato tiene... | Se traduce a... |
 |---|---|
-| Una lista plana de "bloques" con `type` + props | Nodos hoja de `@kiv/nodes` (uno por tipo, ver tabla de equivalencias abajo) |
-| Contenedores con columnas/grillas | `section`/`grid`/`column` (ya existen en `@kiv/nodes`, mapeo casi directo) |
+| Una lista plana de "bloques" con `type` + props | Nodos hoja de `@kivcode/nodes` (uno por tipo, ver tabla de equivalencias abajo) |
+| Contenedores con columnas/grillas | `section`/`grid`/`column` (ya existen en `@kivcode/nodes`, mapeo casi directo) |
 | "Secciones predefinidas" opacas con su propio componente de render fijo | Ver "Nodos opacos de compatibilidad" más abajo — **no las decompongas de entrada** |
 | Texto localizado como `{ locale: value }` inline | Probablemente compatible casi 1:1 con `Localizable<T>` de Kiv — confirmar el shape exacto antes de asumirlo |
-| Un popup/modal de página | El nodo `modal` de `@kiv/nodes-interactive` |
-| Un tipo de contenido sin ningún análogo en `@kiv/nodes` | Ver "Cuándo escribir un nodo nuevo" más abajo |
+| Un popup/modal de página | El nodo `modal` de `@kivcode/nodes-interactive` |
+| Un tipo de contenido sin ningún análogo en `@kivcode/nodes` | Ver "Cuándo escribir un nodo nuevo" más abajo |
 
 ## Paso 2 — Nodos opacos de compatibilidad (para contenido "predefinido" opaco)
 
@@ -76,24 +76,24 @@ inmediatamente de edición completamente flexible.
 ## Paso 3 — Cuándo escribir un nodo nuevo vs. cuándo no
 
 - Si el contenido es genérico y probablemente útil fuera de tu proyecto (una
-  tarjeta de persona, un badge, un contador) → considera proponerlo a `@kiv/nodes`
+  tarjeta de persona, un badge, un contador) → considera proponerlo a `@kivcode/nodes`
   directamente, para que cualquier otro proyecto que integre Kiv se beneficie.
 - Si el contenido está atado a datos/lógica de backend específicos de tu dominio
   (un formulario dinámico ligado a un modelo de tu base de datos, por ejemplo) →
   escríbelo como un nodo de **tu propio paquete de plugin** (no lo subas a
-  `@kiv/nodes`), ver [Crear un Node](./creating-a-node.md).
+  `@kivcode/nodes`), ver [Crear un Node](./creating-a-node.md).
 
 ## Paso 4 — El puente de tema
 
 Si tu proyecto ya tiene un sistema de diseño/theming propio (tokens de marca,
 modo claro/oscuro, white-label por cliente, etc.), no dejes que Kiv inyecte su
 propio tema por defecto compitiendo con el tuyo. Traduce tu tema ya resuelto a la
-forma que espera `@kiv/engine` una vez, en un solo punto de integración — nunca
+forma que espera `@kivcode/engine` una vez, en un solo punto de integración — nunca
 nodo por nodo.
 
 ## Paso 5 — El puente de medios
 
-`@kiv/engine` expone una interfaz `MediaProvider` pluggable pensada exactamente
+`@kivcode/engine` expone una interfaz `MediaProvider` pluggable pensada exactamente
 para esto — implementa un adaptador delgado sobre tu endpoint de subida de
 archivos existente en vez de construir un flujo de subida nuevo.
 
@@ -115,9 +115,9 @@ Patrón recomendado, en este orden:
    escritura con tests de round-trip (`tu formato → KivDocument → tu formato`
    debe ser idéntico) contra datos reales, no solo fixtures sintéticas.
 2. **Fase de renderizado** — reemplaza el renderizado (no la edición) por
-   `@kiv/vue`/`renderToHtml()` detrás de un flag, comparando visualmente contra tu
+   `@kivcode/vue`/`renderToHtml()` detrás de un flag, comparando visualmente contra tu
    pipeline actual antes de exponerlo.
-3. **Fase de editor opt-in** — nueva ruta/flag que monta `@kiv/vue-editor` sobre
+3. **Fase de editor opt-in** — nueva ruta/flag que monta `@kivcode/vue-editor` sobre
    el documento adaptado, conviviendo con tu editor viejo.
 4. **Fase de paridad de Inspector** — portar cada campo de tus formularios de
    edición actuales a `FieldDescriptor`s, hasta que el Inspector genérico de Kiv

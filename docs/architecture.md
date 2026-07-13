@@ -3,21 +3,21 @@
 ## Flujo de dependencias (estricto, unidireccional)
 
 ```
-@kiv/engine (core, SIN Vue/React — solo @vue/reactivity)
-  ← @kiv/nodes (schema + defaults puros, SIN componentes)
-    ← @kiv/vue (renderer Vue 3)
-      ← @kiv/vue-editor (editor UI: canvas, tree, inspector, DnD)
-    ← @kiv/react (futuro, comparte @kiv/nodes)
+@kivcode/engine (core, SIN Vue/React — solo @vue/reactivity)
+  ← @kivcode/nodes (schema + defaults puros, SIN componentes)
+    ← @kivcode/vue (renderer Vue 3)
+      ← @kivcode/vue-editor (editor UI: canvas, tree, inspector, DnD)
+    ← @kivcode/react (futuro, comparte @kivcode/nodes)
 ```
 
 Reglas invariantes (no se rompen nunca, en ninguna integración):
 
-1. **`@kiv/engine` nunca importa un framework de UI.** Es el único paquete cuya
+1. **`@kivcode/engine` nunca importa un framework de UI.** Es el único paquete cuya
    única dependencia real es `@vue/reactivity` — y eso es una elección interna de
    implementación (reactividad), no una dependencia de renderizado.
-2. **Los nodos (`@kiv/nodes`) son definiciones puras.** Un nodo es *schema +
+2. **Los nodos (`@kivcode/nodes`) son definiciones puras.** Un nodo es *schema +
    defaults + (opcionalmente) `toHtml`* — nunca un componente. Cada renderer
-   (`@kiv/vue`, a futuro `@kiv/react`) provee sus propios componentes para los
+   (`@kivcode/vue`, a futuro `@kivcode/react`) provee sus propios componentes para los
    mismos tipos de nodo.
 3. **La API pública es la forma del documento JSON** (`KivDocument` +
    `schemaVersion`), no una API de clases que el consumidor deba conocer en
@@ -31,14 +31,14 @@ Reglas invariantes (no se rompen nunca, en ninguna integración):
 5. **`Responsive<T>` y `Localizable<T>` son ejes independientes.** La cadena de
    resolución es siempre responsive → locale, nunca al revés, y nunca mezclados en
    un único wrapper.
-6. **Agregar nodos o integraciones nuevas nunca requiere tocar `@kiv/engine`.**
+6. **Agregar nodos o integraciones nuevas nunca requiere tocar `@kivcode/engine`.**
    Si te encuentras necesitando modificar el engine para agregar un nodo, una
    plantilla o una integración, es una señal de que el punto de extensión correcto
    todavía no existe — hay que diseñarlo como tal, no saltárselo.
 
 ## Los paquetes, uno por uno
 
-### `@kiv/engine` — el núcleo headless
+### `@kivcode/engine` — el núcleo headless
 
 Contiene:
 - **Document model** (`KivDocument`, `KivNode`) — un árbol recursivo de nodos con
@@ -63,14 +63,14 @@ Contiene:
   que el engine sepa nada de S3, Laravel, etc.
 - **Plugin system** (`createEngine({ plugins })`) — ver [Plugins](./plugins.md).
 
-### `@kiv/nodes` — el catálogo de contenido
+### `@kivcode/nodes` — el catálogo de contenido
 
 ~28 definiciones de nodo (layout: `page`/`section`/`container`/`grid`/`column`/
 `stack`/`spacer`; contenido: `heading`/`text`/`rich-text`/`button`/`link`/
 `image`/`video`/`icon`/`divider`/`card`/`form`/`form-field`/`testimonial`/
 `countdown`/`stat`/`social-icons`/`embed`/`table`/`agenda`/`agenda-item`/
 `pricing`). Cada uno es puro — schema + `toHtml` + (para el renderer Vue) nada
-más; el componente visual vive en `@kiv/vue`, no aquí.
+más; el componente visual vive en `@kivcode/vue`, no aquí.
 
 Helpers de campo compartidos (única fuente de verdad para lo que se repite entre
 nodos): `typography-field.ts`, `hover-field.ts`, `border-field.ts`,
@@ -79,27 +79,27 @@ nodos): `typography-field.ts`, `hover-field.ts`, `border-field.ts`,
 campo (padding, borde, tipografía…), la respuesta correcta es un helper aquí, no
 duplicar el `FieldDescriptor` en cada nodo.
 
-### `@kiv/nodes-interactive` — nodos con estado propio
+### `@kivcode/nodes-interactive` — nodos con estado propio
 
 `accordion`/`accordion-item`, `tabs`/`tab-panel`, `modal`, `carousel` — separados
-de `@kiv/nodes` porque requieren estado de interacción en tiempo de ejecución
+de `@kivcode/nodes` porque requieren estado de interacción en tiempo de ejecución
 (abierto/cerrado, tab activo, slide actual), a diferencia de los nodos de
-`@kiv/nodes` que son mayormente presentacionales. También trae un sistema de
+`@kivcode/nodes` que son mayormente presentacionales. También trae un sistema de
 **templates de bloque de contenido** (Hero, Pricing, FAQ, etc. — 20 en total,
-compuestos enteramente con nodos de `@kiv/nodes`, sin lógica duplicada) — ver
+compuestos enteramente con nodos de `@kivcode/nodes`, sin lógica duplicada) — ver
 [Sistema de Templates](./templates.md).
 
-### `@kiv/vue` — el renderer
+### `@kivcode/vue` — el renderer
 
 Componentes Vue 3 por cada tipo de nodo (`HeadingNode.vue`, `ButtonNode.vue`,
 etc.), más `KivRenderer.vue`/`KivNodeRenderer.vue` (recorren un `KivDocument` y
 montan el árbol de componentes), `defaultRegistry.ts` (registro con todos los
-nodos de `@kiv/nodes` ya registrados, listo para usar), y el sistema de
+nodos de `@kivcode/nodes` ya registrados, listo para usar), y el sistema de
 inyecciones (`KIV_EDITOR_MODE_KEY`, `KIV_BUS_KEY`, `KIV_MEDIA_KEY`,
 `KIV_SERVICES_KEY`) que cada nodo usa para saber si está en modo editor
 (interacciones deshabilitadas) vs. modo real.
 
-### `@kiv/vue-editor` — la UI del editor
+### `@kivcode/vue-editor` — la UI del editor
 
 `KivEditor.vue` es el punto de entrada — orquesta:
 - **Store** (`useEditorStore`) — wrapper Vue reactivo sobre `EditorEngine`,

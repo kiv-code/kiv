@@ -8,7 +8,7 @@ export {
 	type NodeLocation,
 	removeNode,
 	updateNodeProps,
-} from "@kiv/engine";
+} from "@kivcode/engine";
 export { default as KivCanvas } from "./components/KivCanvas.vue";
 export { default as KivEditor } from "./components/KivEditor.vue";
 export { default as KivInspector } from "./components/KivInspector.vue";

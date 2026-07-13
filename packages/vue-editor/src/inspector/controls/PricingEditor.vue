@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PricingData } from "@kiv/nodes";
+import type { PricingData } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

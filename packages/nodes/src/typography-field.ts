@@ -1,4 +1,4 @@
-import { type FieldDescriptor, f } from "@kiv/engine";
+import { type FieldDescriptor, f } from "@kivcode/engine";
 import { resolveTextPaintStyle } from "./color-gradient";
 import { LETTER_SPACING, LINE_HEIGHT } from "./scales";
 

@@ -1,10 +1,10 @@
-import { defineNode, f } from "@kiv/engine";
+import { defineNode, f } from "@kivcode/engine";
 import {
 	colorOrGradientField,
 	escapeHtml,
 	spacingBoxField,
 	styleToString,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 
 export const modalNode = defineNode({
 	type: "modal",

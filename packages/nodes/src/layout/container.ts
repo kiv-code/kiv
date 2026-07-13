@@ -1,4 +1,4 @@
-import { defineNode, f } from "@kiv/engine";
+import { defineNode, f } from "@kivcode/engine";
 import { styleToString } from "../html-utils";
 import { MAX_WIDTH, SPACING } from "../scales";
 import { resolveSpacingStyle } from "../spacing-field";

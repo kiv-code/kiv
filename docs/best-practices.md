@@ -38,8 +38,8 @@
   genérico — la tentación de "un panel especial para este nodo" casi siempre se
   resuelve mejor con un control de campo custom (`pluginControl`).
 - **No hardcodees CSS que ya existe como escala/token compartido** (`SPACING`,
-  `RADIUS`, `SHADOW`, `GAP` en `@kiv/nodes`) — usa la escala, no el valor mágico.
-- **No metas lógica de negocio específica de un consumidor en `@kiv/nodes`.** Un
+  `RADIUS`, `SHADOW`, `GAP` en `@kivcode/nodes`) — usa la escala, no el valor mágico.
+- **No metas lógica de negocio específica de un consumidor en `@kivcode/nodes`.** Un
   nodo atado a datos/backend de un proyecto específico vive en el paquete de ese
   proyecto (ver [Migración](./migration.md)), no en el núcleo.
 - **No asumas que un prop pasado a un template/nodo realmente se usa** — la

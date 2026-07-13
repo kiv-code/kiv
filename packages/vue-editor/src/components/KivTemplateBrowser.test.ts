@@ -1,4 +1,4 @@
-import type { PageTemplate } from "@kiv/engine";
+import type { PageTemplate } from "@kivcode/engine";
 import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import KivTemplateBrowser from "./KivTemplateBrowser.vue";

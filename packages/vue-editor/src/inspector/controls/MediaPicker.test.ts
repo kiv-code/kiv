@@ -1,5 +1,5 @@
-import type { KivDocument, MediaAsset, MediaProvider } from "@kiv/engine";
-import { createRegistry } from "@kiv/engine";
+import type { KivDocument, MediaAsset, MediaProvider } from "@kivcode/engine";
+import { createRegistry } from "@kivcode/engine";
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { EDITOR_STORE_KEY } from "../../store/context";

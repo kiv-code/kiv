@@ -1,6 +1,6 @@
 {
-	"name": "@kiv/demo-vue",
-	"version": "0.0.0",
+	"name": "@kivcode/demo-vue",
+	"version": "0.0.1",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -9,14 +9,14 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@kiv/vue-editor": "workspace:*",
-		"@kiv/engine": "workspace:*",
-		"@kiv/nodes": "workspace:*",
-		"@kiv/nodes-interactive": "workspace:*",
-		"@kiv/plugin-a11y": "workspace:*",
-		"@kiv/plugin-analytics": "workspace:*",
-		"@kiv/plugin-seo": "workspace:*",
-		"@kiv/vue": "workspace:*",
+		"@kivcode/vue-editor": "workspace:*",
+		"@kivcode/engine": "workspace:*",
+		"@kivcode/nodes": "workspace:*",
+		"@kivcode/nodes-interactive": "workspace:*",
+		"@kivcode/plugin-a11y": "workspace:*",
+		"@kivcode/plugin-analytics": "workspace:*",
+		"@kivcode/plugin-seo": "workspace:*",
+		"@kivcode/vue": "workspace:*",
 		"vue": "^3.5.17"
 	},
 	"devDependencies": {

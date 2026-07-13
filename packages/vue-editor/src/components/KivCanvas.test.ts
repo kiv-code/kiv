@@ -1,7 +1,7 @@
-import type { KivDocument } from "@kiv/engine";
-import { createRegistry } from "@kiv/engine";
-import { ALL_NODES } from "@kiv/nodes";
-import { createDefaultVueRegistry } from "@kiv/vue";
+import type { KivDocument } from "@kivcode/engine";
+import { createRegistry } from "@kivcode/engine";
+import { ALL_NODES } from "@kivcode/nodes";
+import { createDefaultVueRegistry } from "@kivcode/vue";
 import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";

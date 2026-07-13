@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { SpacingBoxValue } from "@kiv/nodes";
-import { normalizeSpacingBox } from "@kiv/nodes";
+import type { SpacingBoxValue } from "@kivcode/nodes";
+import { normalizeSpacingBox } from "@kivcode/nodes";
 import { computed, ref } from "vue";
 
 const props = defineProps<{ modelValue?: unknown }>();

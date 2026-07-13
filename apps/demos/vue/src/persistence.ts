@@ -1,5 +1,5 @@
-import type { KivDocument } from "@kiv/engine";
-import { migrateDocument } from "@kiv/engine";
+import type { KivDocument } from "@kivcode/engine";
+import { migrateDocument } from "@kivcode/engine";
 
 /**
  * Document persistence — a stand-in for your real backend.

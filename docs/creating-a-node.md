@@ -8,7 +8,7 @@ Guía completa, paso a paso, con un ejemplo real de principio a fin (proponer:
 un nodo "Badge" simple, ya identificado como faltante en el análisis de
 integración con KMJK Events — buen primer ejemplo porque es genuinamente pequeño).
 
-1. **Definir el schema** — `defineNode()` en `@kiv/nodes` (o en tu propio paquete
+1. **Definir el schema** — `defineNode()` en `@kivcode/nodes` (o en tu propio paquete
    de plugin si el nodo es específico de tu dominio, ver
    [Migración](./migration.md#paso-3--cuándo-escribir-un-nodo-nuevo-vs-cuándo-no)):
    `type`, `category`, `label`, `icon`, `description`, `fields`, `slotConstraints`
@@ -21,7 +21,7 @@ integración con KMJK Events — buen primer ejemplo porque es genuinamente pequ
 3. **Registrar el nodo** — agregarlo a `ALL_NODES` (o al array equivalente de tu
    paquete de plugin) para que `registry.registerMany([...ALL_NODES])` lo
    incluya.
-4. **Escribir el componente Vue** (`@kiv/vue`) — un `.vue` por nodo, inyectando
+4. **Escribir el componente Vue** (`@kivcode/vue`) — un `.vue` por nodo, inyectando
    `KIV_EDITOR_MODE_KEY`/`KIV_BUS_KEY` si el nodo tiene interacción real
    (ver `ModalNode.vue` como referencia de un nodo con estado propio).
 5. **`toHtml()` — mantenerlo en paridad exacta con el componente Vue.** Ejemplo
@@ -32,7 +32,7 @@ integración con KMJK Events — buen primer ejemplo porque es genuinamente pequ
    `toHtml()` por cada rama de comportamiento no trivial del nodo (ver el patrón
    agregado para `video`/`divider`/`link`/`icon`/`rich-text` en la Fase 5 de la
    auditoría — cada test ahí encontró o hubiera podido encontrar un bug real).
-7. **Ícono en `NodeIcon.vue`** (`@kiv/vue-editor`) — si el nodo no tiene un ícono
+7. **Ícono en `NodeIcon.vue`** (`@kivcode/vue-editor`) — si el nodo no tiene un ícono
    dedicado, cae a un fallback genérico; documentar cuándo vale la pena agregar
    uno propio.
 

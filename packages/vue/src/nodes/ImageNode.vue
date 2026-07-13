@@ -5,7 +5,7 @@ import {
 	IMAGE_SRCSET_WIDTHS,
 	RADIUS,
 	SHADOW,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 import { computed, inject } from "vue";
 import { KIV_MEDIA_KEY } from "../media";
 

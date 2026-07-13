@@ -1,5 +1,5 @@
-import { defineNode, f } from "@kiv/engine";
-import { RADIUS, styleToString } from "@kiv/nodes";
+import { defineNode, f } from "@kivcode/engine";
+import { RADIUS, styleToString } from "@kivcode/nodes";
 
 export const carouselNode = defineNode({
 	type: "carousel",

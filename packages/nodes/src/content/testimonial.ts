@@ -1,4 +1,4 @@
-import { defineNode, f } from "@kiv/engine";
+import { defineNode, f } from "@kivcode/engine";
 import { escapeHtml, normalizeSvgIconSize, styleToString } from "../html-utils";
 import { resolveIcon } from "../icons";
 import { RADIUS, SHADOW, SPACING } from "../scales";

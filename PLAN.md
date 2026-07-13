@@ -1,4 +1,4 @@
-# @kiv/engine — Product & Technical Roadmap
+# @kivcode/engine — Product & Technical Roadmap
 
 ## Vision
 
@@ -10,16 +10,16 @@ plugin-based, and designed for multi-tenant SaaS applications.
 
 | Package | Status | Description |
 |---|---|---|
-| `@kiv/engine` | ✅ Core complete, needs hardening | Types, schema, registry, resolver, theme, events, plugins, migrations |
-| `@kiv/nodes` | ✅ Complete | 10 base node definitions + shared scales |
-| `@kiv/vue` | ✅ Complete | Vue 3 renderer + 10 components |
-| `@kiv/vue-editor` | ✅ Decoupled | Vue 3 editor UI — wraps the framework-agnostic EditorEngine from @kiv/engine |
-| `@kiv/react` | ❌ Pending | React renderer (same contract as Vue) |
-| `@kiv/nodes-interactive` | ❌ Planned | Carousel, Accordion, Tabs, Modal |
-| `@kiv/provider-s3` | ❌ Planned | S3 media provider |
-| `@kiv/plugin-seo` | ❌ Planned | SEO meta tags, OG, structured data |
-| `@kiv/plugin-a11y` | ❌ Planned | Accessibility checker |
-| `@kiv/provider-cloudinary` | ❌ Stretch | Cloudinary media provider |
+| `@kivcode/engine` | ✅ Core complete, needs hardening | Types, schema, registry, resolver, theme, events, plugins, migrations |
+| `@kivcode/nodes` | ✅ Complete | 10 base node definitions + shared scales |
+| `@kivcode/vue` | ✅ Complete | Vue 3 renderer + 10 components |
+| `@kivcode/vue-editor` | ✅ Decoupled | Vue 3 editor UI — wraps the framework-agnostic EditorEngine from @kivcode/engine |
+| `@kivcode/react` | ❌ Pending | React renderer (same contract as Vue) |
+| `@kivcode/nodes-interactive` | ❌ Planned | Carousel, Accordion, Tabs, Modal |
+| `@kivcode/provider-s3` | ❌ Planned | S3 media provider |
+| `@kivcode/plugin-seo` | ❌ Planned | SEO meta tags, OG, structured data |
+| `@kivcode/plugin-a11y` | ❌ Planned | Accessibility checker |
+| `@kivcode/provider-cloudinary` | ❌ Stretch | Cloudinary media provider |
 
 ## Development Phases
 
@@ -85,13 +85,13 @@ Collaboration (CRDT/OT), persisted undo, custom breakpoints, AI hooks, export/im
 │       ├── 03-phase-3-content-media.md
 │       └── 04-phase-4-interactive-plugins.md
 ├── packages/
-│   ├── engine/          @kiv/engine        (core)
-│   ├── nodes/           @kiv/nodes         (base nodes)
-│   ├── vue/             @kiv/vue           (Vue renderer)
-│   ├── vue-editor/      @kiv/vue-editor    (Vue editor)
-│   ├── plugin-analytics/@kiv/plugin-analytics (example)
-│   ├── nodes-interactive/@kiv/nodes-interactive (future)
-│   ├── plugin-seo/      @kiv/plugin-seo    (future)
-│   └── plugin-a11y/     @kiv/plugin-a11y   (future)
+│   ├── engine/          @kivcode/engine        (core)
+│   ├── nodes/           @kivcode/nodes         (base nodes)
+│   ├── vue/             @kivcode/vue           (Vue renderer)
+│   ├── vue-editor/      @kivcode/vue-editor    (Vue editor)
+│   ├── plugin-analytics/@kivcode/plugin-analytics (example)
+│   ├── nodes-interactive/@kivcode/nodes-interactive (future)
+│   ├── plugin-seo/      @kivcode/plugin-seo    (future)
+│   └── plugin-a11y/     @kivcode/plugin-a11y   (future)
 └── apps/demos/vue/      (demo app)
 ```

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SocialLink } from "@kiv/nodes";
+import type { SocialLink } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

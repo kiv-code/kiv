@@ -1,4 +1,4 @@
-import type { KivDocument, KivNode } from "@kiv/engine";
+import type { KivDocument, KivNode } from "@kivcode/engine";
 import { describe, expect, it } from "vitest";
 import { checkDocument } from "./rules";
 

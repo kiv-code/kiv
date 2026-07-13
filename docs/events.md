@@ -4,7 +4,7 @@
 
 ## Alcance de este documento
 
-- Qué es el `EventBus` (`@kiv/engine`) y cómo se comparte entre `EditorEngine`,
+- Qué es el `EventBus` (`@kivcode/engine`) y cómo se comparte entre `EditorEngine`,
   `KivEditor` y cualquier plugin — un solo bus por instancia de editor, no uno
   por componente.
 - Catálogo completo de eventos emitidos por el core (`node.created`,
@@ -13,7 +13,7 @@
   `packages/engine/src/editor/editor-engine.ts`) — payload exacto de cada uno.
 - Eventos emitidos por nodos con estado propio (ejemplo real: `modal.opened`/
   `modal.closed` del nodo `modal`) — patrón para que un nodo nuevo con
-  interacción propia declare y emita los suyos (`declare module "@kiv/engine" {
+  interacción propia declare y emita los suyos (`declare module "@kivcode/engine" {
   interface KivEventMap { ... } }`).
 - Cómo un plugin externo se suscribe (`ctx.bus.on(...)`) desde
   `createEngine({ plugins })`.
@@ -28,4 +28,4 @@
 
 Código fuente: `packages/engine/src/plugin/` (tipos `EditorExtensionPoints`),
 `packages/engine/src/editor/editor-engine.ts`, cualquier nodo que declare
-`KivEventMap` (buscar `declare module "@kiv/engine"` en `packages/vue/src/nodes/`).
+`KivEventMap` (buscar `declare module "@kivcode/engine"` en `packages/vue/src/nodes/`).

@@ -12,7 +12,7 @@ import {
 	resolveSolidColor,
 	resolveSpacingStyle,
 	resolveTextPaintStyle,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 import { computed, getCurrentInstance, inject } from "vue";
 import { KIV_BUS_KEY } from "../bus";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
@@ -48,7 +48,7 @@ const bus = inject(KIV_BUS_KEY, null);
 // which warns to the console whenever the name isn't found — even when the
 // result is never used. A plain lookup in the app's registered components is
 // silent: if the consumer's app installed vue-router, `RouterLink` is there;
-// otherwise this is undefined and we fall back to a plain <a>. @kiv/vue never
+// otherwise this is undefined and we fall back to a plain <a>. @kivcode/vue never
 // imports vue-router.
 const registeredRouterLink = computed(() => {
 	if (isEditorMode || props.linkType !== "internal") return undefined;

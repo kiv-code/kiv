@@ -6,7 +6,7 @@
 			"runtimeExecutable": "pnpm",
 			"runtimeArgs": [
 				"--filter",
-				"@kiv/demo-vue",
+				"@kivcode/demo-vue",
 				"dev",
 				"--port",
 				"5199",

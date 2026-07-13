@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ContentTemplate } from "@kiv/nodes-interactive";
+import type { ContentTemplate } from "@kivcode/nodes-interactive";
 import { computed, ref } from "vue";
 import NodeIcon from "./NodeIcon.vue";
 

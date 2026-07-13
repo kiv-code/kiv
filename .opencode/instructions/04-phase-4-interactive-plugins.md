@@ -2,7 +2,7 @@
 
 ## Goal
 Deliver the interactive node system (Carousel, Accordion, Tabs, Modal) as a separate
-`@kiv/nodes-interactive` package, proving the plugin architecture. Expand the plugin
+`@kivcode/nodes-interactive` package, proving the plugin architecture. Expand the plugin
 system with editor hooks (toolbar buttons, custom panels, custom field controls).
 Add document mutation events, history timeline, SEO plugin, accessibility checker,
 and page templates.
@@ -21,14 +21,14 @@ Interactive nodes share:
 
 ### Package: `packages/nodes-interactive/`
 
-New monorepo package. Depends on `@kiv/engine` and `@kiv/nodes`.
+New monorepo package. Depends on `@kivcode/engine` and `@kivcode/nodes`.
 
 ```json
 {
-  "name": "@kiv/nodes-interactive",
+  "name": "@kivcode/nodes-interactive",
   "dependencies": {
-    "@kiv/engine": "workspace:*",
-    "@kiv/nodes": "workspace:*"
+    "@kivcode/engine": "workspace:*",
+    "@kivcode/nodes": "workspace:*"
   }
 }
 ```
@@ -251,8 +251,8 @@ function mutationTypeToBusEvent(type: DocumentMutation["type"]): string {
 
 ### Extend KivEventMap
 ```typescript
-// In @kiv/engine/src/events/types.ts or via module augmentation
-declare module "@kiv/engine" {
+// In @kivcode/engine/src/events/types.ts or via module augmentation
+declare module "@kivcode/engine" {
   interface KivEventMap {
     "node.created": DocumentMutation & { type: "node.created" }
     "node.removed": DocumentMutation & { type: "node.removed" }
@@ -404,7 +404,7 @@ interface PageTemplate {
 
 ## Completion Checklist
 
-- [x] `@kiv/nodes-interactive` package exists with Carousel, Accordion, Tabs, Modal
+- [x] `@kivcode/nodes-interactive` package exists with Carousel, Accordion, Tabs, Modal
 - [x] Interactive nodes emit correct events on state changes
 - [x] Document mutation events fire on the bus (was already done pre-Phase-4, see PROGRESS.md)
 - [x] Plugin hooks (addToolbarButton, addPanel, addPaletteItem, etc.) work (also already done pre-Phase-4)

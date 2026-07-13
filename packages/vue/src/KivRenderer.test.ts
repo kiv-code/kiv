@@ -1,4 +1,4 @@
-import type { KivDocument } from "@kiv/engine";
+import type { KivDocument } from "@kivcode/engine";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import { createDefaultVueRegistry } from "./defaultRegistry";

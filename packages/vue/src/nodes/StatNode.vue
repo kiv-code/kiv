@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { formatStatValue, resolveTextPaintStyle, STAT_SIZE } from "@kiv/nodes";
+import {
+	formatStatValue,
+	resolveTextPaintStyle,
+	STAT_SIZE,
+} from "@kivcode/nodes";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const props = withDefaults(

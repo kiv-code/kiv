@@ -1,4 +1,4 @@
-import { defineNode, f } from "@kiv/engine";
+import { defineNode, f } from "@kivcode/engine";
 import { escapeHtml, styleToString } from "../html-utils";
 
 // Raw embedded HTML/scripts are an XSS vector the moment this document is

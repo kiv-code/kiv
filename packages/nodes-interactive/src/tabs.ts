@@ -1,4 +1,4 @@
-import { defineNode, f } from "@kiv/engine";
+import { defineNode, f } from "@kivcode/engine";
 import {
 	colorOrGradientField,
 	escapeHtml,
@@ -6,7 +6,7 @@ import {
 	sizeField,
 	spacingBoxField,
 	styleToString,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 
 export const TAB_HOVER_OPTIONS = ["none", "lift", "grow"] as const;
 

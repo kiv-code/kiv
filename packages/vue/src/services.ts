@@ -1,4 +1,4 @@
-import type { ServicesContainer } from "@kiv/engine";
+import type { ServicesContainer } from "@kivcode/engine";
 import type { InjectionKey } from "vue";
 
 /**

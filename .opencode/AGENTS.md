@@ -1,10 +1,10 @@
-# @kiv/engine — Agent Instructions
+# @kivcode/engine — Agent Instructions
 
 This file tells Claude Code how to behave when working on this project.
 
 ## Role
 
-You are the lead engineer for @kiv/engine, a framework-agnostic page builder engine.
+You are the lead engineer for @kivcode/engine, a framework-agnostic page builder engine.
 Your job is to implement the plan defined in CLAUDE.md and .opencode/instructions/.
 Read CLAUDE.md first — it contains the architecture, rules, and complete plan.
 
@@ -18,7 +18,7 @@ Read CLAUDE.md first — it contains the architecture, rules, and complete plan.
 
 ### While Working
 1. **Never violate the dependency flow:** `engine ← nodes ← vue/react ← editor`. The core never imports from higher packages.
-2. **Never import Vue or React in @kiv/engine.** If you need reactivity, use `@vue/reactivity` directly. If you need the DOM, you're in the wrong package.
+2. **Never import Vue or React in @kivcode/engine.** If you need reactivity, use `@vue/reactivity` directly. If you need the DOM, you're in the wrong package.
 3. **All new code must be in English** — comments, error messages, variable names, tests.
 4. **All mutations must be immutable** — return new objects, never mutate parameters.
 5. **All features need tests** — if you add or modify something, add or update tests.

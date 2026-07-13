@@ -2,7 +2,7 @@
 
 ## Goal
 
-Make @kiv/engine a framework that any application can consume without forking or patching.
+Make @kivcode/engine a framework that any application can consume without forking or patching.
 Decouple the editor from Vue, enrich the plugin system, add media/services abstractions,
 add HTML renderer, translate to English, and add test coverage.
 
@@ -590,7 +590,7 @@ Before marking Phase 1 as complete, verify:
 - [x] PluginContext includes editor/media/services
 - [x] CompiledNode includes label/icon/slotConstraints/description
 - [x] FieldDescriptor includes placeholder/hint/required/hidden
-- [x] MediaProvider interface exists in @kiv/engine
-- [x] Services container types exist in @kiv/engine
+- [x] MediaProvider interface exists in @kivcode/engine
+- [x] Services container types exist in @kivcode/engine
 - [x] renderToHtml() works and is exported
 - [x] KivNode has locked and visible fields

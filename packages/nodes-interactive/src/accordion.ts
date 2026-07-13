@@ -1,4 +1,4 @@
-import { defineNode, f } from "@kiv/engine";
+import { defineNode, f } from "@kivcode/engine";
 import {
 	borderVisualFields,
 	escapeHtml,
@@ -7,7 +7,7 @@ import {
 	RADIUS,
 	SPACING,
 	styleToString,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 
 const accordionRadius = borderVisualFields({
 	radiusLabel: "Border Radius",

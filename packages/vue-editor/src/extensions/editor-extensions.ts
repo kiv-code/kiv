@@ -7,7 +7,7 @@ import type {
 	PaletteItem,
 	ShortcutDef,
 	ToolbarButton,
-} from "@kiv/engine";
+} from "@kivcode/engine";
 import { shallowReactive } from "vue";
 
 /**

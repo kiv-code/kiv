@@ -1,7 +1,27 @@
 {
-	"name": "@kiv/engine",
-	"version": "0.0.0",
+	"name": "@kivcode/engine",
+	"version": "0.1.0",
+	"description": "Headless, JSON-driven document engine for the Kiv visual page-builder — document model, registry, field schema, history, and plugin system. No UI framework dependency.",
+	"license": "MIT",
 	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kiv-code/kiv.git",
+		"directory": "packages/engine"
+	},
+	"homepage": "https://github.com/kiv-code/kiv/tree/main/packages/engine#readme",
+	"bugs": "https://github.com/kiv-code/kiv/issues",
+	"keywords": [
+		"kiv",
+		"page-builder",
+		"visual-editor",
+		"headless-cms",
+		"json-schema"
+	],
+	"author": "Kivcode",
+	"publishConfig": {
+		"access": "public"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",

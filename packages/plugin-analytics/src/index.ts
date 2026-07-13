@@ -1,10 +1,10 @@
-import type { KivPlugin, PluginContext } from "@kiv/engine";
+import type { KivPlugin, PluginContext } from "@kivcode/engine";
 
 /**
- * @kiv/plugin-analytics
+ * @kivcode/plugin-analytics
  *
  * A minimal example plugin that proves the engine's event-driven architecture:
- * it hooks into the bus WITHOUT touching @kiv/engine. Any event emitted anywhere
+ * it hooks into the bus WITHOUT touching @kivcode/engine. Any event emitted anywhere
  * (by a node, a renderer, the app) flows to this plugin via `bus.on("*")`.
  *
  * This is "the exam of the architecture" from the project's north star:

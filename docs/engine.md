@@ -17,7 +17,7 @@
 - `createEngine()` — todas las opciones (`media`, `services`, `plugins`, tema) con
   un ejemplo end-to-end.
 - `renderToHtml()` — cómo y cuándo usarlo (SSR/export/email), diferencias con el
-  render de `@kiv/vue`.
+  render de `@kivcode/vue`.
 - `MediaProvider`/`ServicesContainer` — contratos completos con un ejemplo de
   implementación real (no solo el tipo).
 - Resolución `Responsive<T>` → `Localizable<T>`: orden exacto, comportamiento de

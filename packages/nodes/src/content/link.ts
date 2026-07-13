@@ -1,4 +1,4 @@
-import { defineNode, f } from "@kiv/engine";
+import { defineNode, f } from "@kivcode/engine";
 import { escapeHtml, styleToString } from "../html-utils";
 import { BUTTON_RADIUS, BUTTON_SIZE, BUTTON_VARIANT } from "../scales";
 

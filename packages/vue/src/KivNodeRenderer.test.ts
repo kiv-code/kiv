@@ -1,4 +1,4 @@
-import type { KivNode } from "@kiv/engine";
+import type { KivNode } from "@kivcode/engine";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import { KIV_CONTEXT_KEY } from "./context";

@@ -8,8 +8,8 @@ import type {
 	Responsive,
 	SeoMeta,
 	ServicesContainer,
-} from "@kiv/engine";
-import { EditorEngine } from "@kiv/engine";
+} from "@kivcode/engine";
+import { EditorEngine } from "@kivcode/engine";
 import { computed, ref } from "vue";
 import { findNodeById } from "../utils/tree";
 

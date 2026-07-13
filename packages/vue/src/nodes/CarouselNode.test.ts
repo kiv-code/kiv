@@ -1,4 +1,4 @@
-import { carouselNode } from "@kiv/nodes-interactive";
+import { carouselNode } from "@kivcode/nodes-interactive";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { h } from "vue";

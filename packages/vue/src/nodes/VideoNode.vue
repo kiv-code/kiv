@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RADIUS, SHADOW } from "@kiv/nodes";
+import { RADIUS, SHADOW } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

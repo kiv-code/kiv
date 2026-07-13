@@ -1,4 +1,4 @@
-import type { MediaProvider } from "@kiv/engine";
+import type { MediaProvider } from "@kivcode/engine";
 import type { InjectionKey } from "vue";
 
 /**

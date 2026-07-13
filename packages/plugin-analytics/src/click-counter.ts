@@ -1,4 +1,4 @@
-import type { KivPlugin, PluginContext } from "@kiv/engine";
+import type { KivPlugin, PluginContext } from "@kivcode/engine";
 
 /**
  * A second example plugin — showing a DIFFERENT shape than analyticsPlugin:
@@ -8,7 +8,7 @@ import type { KivPlugin, PluginContext } from "@kiv/engine";
  *  - It reports changes through a callback.
  *
  * Same architectural guarantee: it plugs into the bus without touching
- * @kiv/engine. Two plugins can listen to the same event independently.
+ * @kivcode/engine. Two plugins can listen to the same event independently.
  */
 
 /** Map of button nodeId (or label) → number of clicks. */
@@ -28,7 +28,7 @@ export function clickCounterPlugin(
 		name: "click-counter",
 		install(ctx: PluginContext): void {
 			ctx.bus.on("button.clicked", (payload) => {
-				// This plugin doesn't depend on @kiv/vue (a plugin must not depend
+				// This plugin doesn't depend on @kivcode/vue (a plugin must not depend
 				// on a renderer), so we read the payload defensively.
 				const p = (payload ?? {}) as {
 					nodeId?: string;

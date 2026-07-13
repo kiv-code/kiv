@@ -1,7 +1,27 @@
 {
-	"name": "@kiv/vue",
-	"version": "0.0.0",
+	"name": "@kivcode/vue",
+	"version": "0.1.0",
+	"description": "Vue 3 renderer for the Kiv visual page-builder — a component per node type, plus KivRenderer/KivNodeRenderer to walk and render a KivDocument.",
+	"license": "MIT",
 	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kiv-code/kiv.git",
+		"directory": "packages/vue"
+	},
+	"homepage": "https://github.com/kiv-code/kiv/tree/main/packages/vue#readme",
+	"bugs": "https://github.com/kiv-code/kiv/issues",
+	"keywords": [
+		"kiv",
+		"page-builder",
+		"visual-editor",
+		"vue",
+		"vue3"
+	],
+	"author": "Kivcode",
+	"publishConfig": {
+		"access": "public"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -18,12 +38,11 @@
 		"typecheck": "vue-tsc --noEmit"
 	},
 	"dependencies": {
-		"@kiv/engine": "workspace:*",
-		"@kiv/nodes": "workspace:*",
-		"vue": "^3.5.17"
+		"@kivcode/engine": "workspace:*",
+		"@kivcode/nodes": "workspace:*"
 	},
 	"devDependencies": {
-		"@kiv/nodes-interactive": "workspace:*",
+		"@kivcode/nodes-interactive": "workspace:*",
 		"@vitejs/plugin-vue": "^5.2.4",
 		"@vue/test-utils": "^2.4.11",
 		"happy-dom": "^20.10.6",

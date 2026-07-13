@@ -1,4 +1,4 @@
-import type { FieldDescriptor } from "@kiv/engine";
+import type { FieldDescriptor } from "@kivcode/engine";
 import { z } from "zod";
 
 /** Shared shape for any field that can be a solid color OR a linear gradient. */

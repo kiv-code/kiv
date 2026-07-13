@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FieldDescriptor, MediaAsset } from "@kiv/engine";
+import type { FieldDescriptor, MediaAsset } from "@kivcode/engine";
 import { computed, inject, ref } from "vue";
 import KivMediaBrowser from "../../components/KivMediaBrowser.vue";
 import { EDITOR_STORE_KEY } from "../../store/context";

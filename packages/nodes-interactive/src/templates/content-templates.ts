@@ -1,4 +1,4 @@
-import type { KivNode } from "@kiv/engine";
+import type { KivNode } from "@kivcode/engine";
 
 /**
  * Each template call gets its own counter, so ids are deterministic and

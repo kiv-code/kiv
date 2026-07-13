@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GAP, RADIUS } from "@kiv/nodes";
+import { GAP, RADIUS } from "@kivcode/nodes";
 import { computed, inject, onMounted, provide, ref } from "vue";
 import { KIV_BUS_KEY } from "../bus";
 import {
@@ -7,7 +7,7 @@ import {
 	type AccordionContext,
 } from "./accordion-context";
 
-declare module "@kiv/engine" {
+declare module "@kivcode/engine" {
 	interface KivEventMap {
 		"accordion.itemToggled": {
 			nodeId?: string;

@@ -1,4 +1,4 @@
-import { type FieldDescriptor, f } from "@kiv/engine";
+import { type FieldDescriptor, f } from "@kivcode/engine";
 import { type SpacingBoxValue, spacingBoxField } from "./spacing-field";
 
 export interface SpacingFields {

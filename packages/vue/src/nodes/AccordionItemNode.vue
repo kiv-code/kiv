@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RADIUS, SPACING } from "@kiv/nodes";
+import { RADIUS, SPACING } from "@kivcode/nodes";
 import { computed, inject, onBeforeUnmount, onMounted } from "vue";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
 import { ACCORDION_CONTEXT_KEY } from "./accordion-context";

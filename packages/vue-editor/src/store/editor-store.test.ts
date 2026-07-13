@@ -1,5 +1,5 @@
-import type { KivDocument, KivNode } from "@kiv/engine";
-import { createEventBus, createRegistry } from "@kiv/engine";
+import type { KivDocument, KivNode } from "@kivcode/engine";
+import { createEventBus, createRegistry } from "@kivcode/engine";
 import { describe, expect, it, vi } from "vitest";
 import { useEditorStore } from "./editor-store";
 

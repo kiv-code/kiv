@@ -2,8 +2,8 @@
  * Shared, framework-agnostic style scales.
  *
  * These are the single source of truth for spacing / radius / shadow / gap /
- * typography scales that every renderer (@kiv/vue, @kiv/react, …) must resolve
- * identically. A node definition lives here in @kiv/nodes; each renderer imports
+ * typography scales that every renderer (@kivcode/vue, @kivcode/react, …) must resolve
+ * identically. A node definition lives here in @kivcode/nodes; each renderer imports
  * these maps so a `paddingY: "lg"` renders the SAME pixels in Vue and React.
  *
  * Values are raw CSS strings (px / unitless). They are intentionally NOT theme

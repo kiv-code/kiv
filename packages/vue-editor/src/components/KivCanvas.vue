@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Breakpoint, KivNode, Registry } from "@kiv/engine";
+import type { Breakpoint, KivNode, Registry } from "@kivcode/engine";
 import {
 	cloneNodeTree,
 	deserializeNode,
 	findNode,
 	serializeNode,
-} from "@kiv/engine";
-import type { VueRegistry } from "@kiv/vue";
-import { KivRenderer } from "@kiv/vue";
+} from "@kivcode/engine";
+import type { VueRegistry } from "@kivcode/vue";
+import { KivRenderer } from "@kivcode/vue";
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
 import { useInlineEdit } from "../composables/useInlineEdit";
 import {

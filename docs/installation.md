@@ -2,8 +2,8 @@
 
 ## Estado actual: paquetes no publicados
 
-Los paquetes de Kiv (`@kiv/engine`, `@kiv/nodes`, `@kiv/nodes-interactive`,
-`@kiv/vue`, `@kiv/vue-editor`, `@kiv/plugin-seo`, `@kiv/plugin-a11y`) están todos
+Los paquetes de Kiv (`@kivcode/engine`, `@kivcode/nodes`, `@kivcode/nodes-interactive`,
+`@kivcode/vue`, `@kivcode/vue-editor`, `@kivcode/plugin-seo`, `@kivcode/plugin-a11y`) están todos
 en versión `0.0.0` y **aún no se publican a npm**. Hasta que eso ocurra, hay dos
 formas de consumir Kiv desde otro proyecto.
 
@@ -23,10 +23,10 @@ packages:
 // package.json de tu proyecto
 {
   "dependencies": {
-    "@kiv/engine": "workspace:*",
-    "@kiv/nodes": "workspace:*",
-    "@kiv/vue": "workspace:*",
-    "@kiv/vue-editor": "workspace:*"
+    "@kivcode/engine": "workspace:*",
+    "@kivcode/nodes": "workspace:*",
+    "@kivcode/vue": "workspace:*",
+    "@kivcode/vue-editor": "workspace:*"
   }
 }
 ```
@@ -41,7 +41,7 @@ cd /path/to/tu-proyecto && pnpm install
 ```
 
 Si editas algo dentro de Kiv, tienes que volver a correr `pnpm build` en el
-paquete tocado (o `pnpm --filter @kiv/nodes build`) para que el cambio se vea del
+paquete tocado (o `pnpm --filter @kivcode/nodes build`) para que el cambio se vea del
 otro lado — no hay watch-mode automático entre repos hoy.
 
 ### Opción B — Dependencia `file:`/`link:` sin workspace compartido
@@ -51,10 +51,10 @@ Si no quieres modificar la configuración de workspace de tu proyecto:
 ```json
 {
   "dependencies": {
-    "@kiv/engine": "file:../kiv/packages/engine",
-    "@kiv/nodes": "file:../kiv/packages/nodes",
-    "@kiv/vue": "file:../kiv/packages/vue",
-    "@kiv/vue-editor": "file:../kiv/packages/vue-editor"
+    "@kivcode/engine": "file:../kiv/packages/engine",
+    "@kivcode/nodes": "file:../kiv/packages/nodes",
+    "@kivcode/vue": "file:../kiv/packages/vue",
+    "@kivcode/vue-editor": "file:../kiv/packages/vue-editor"
   }
 }
 ```
@@ -67,7 +67,7 @@ instalar.
 Cuando Kiv se publique, la instalación será la estándar:
 
 ```bash
-npm install @kiv/engine @kiv/nodes @kiv/vue @kiv/vue-editor
+npm install @kivcode/engine @kivcode/nodes @kivcode/vue @kivcode/vue-editor
 ```
 
 Este documento se actualizará con el registro exacto (npm público vs. registro
@@ -75,31 +75,31 @@ privado de la organización) cuando eso ocurra.
 
 ## Requisitos
 
-- **Vue 3.5+** (peer dependency de `@kiv/vue` y `@kiv/vue-editor`).
+- **Vue 3.5+** (peer dependency de `@kivcode/vue` y `@kivcode/vue-editor`).
 - **Node 18+** / cualquier bundler moderno (Vite, Rollup) — los paquetes se
   publican solo como ESM (`"type": "module"`, `dist/index.mjs`).
 - TypeScript recomendado pero no obligatorio — cada paquete trae sus `.d.ts`.
 
-`@kiv/engine` en sí **no depende de Vue** — su única dependencia es
+`@kivcode/engine` en sí **no depende de Vue** — su única dependencia es
 `@vue/reactivity` (para el sistema reactivo interno del document model). Si solo
 necesitas el motor headless (por ejemplo, para generar HTML server-side sin
-editor visual), puedes instalar únicamente `@kiv/engine` + `@kiv/nodes`.
+editor visual), puedes instalar únicamente `@kivcode/engine` + `@kivcode/nodes`.
 
 ## Instalación mínima según tu caso de uso
 
 | Quiero... | Instala |
 |---|---|
-| Solo renderizar documentos Kiv a HTML estático (SSR/email/export) | `@kiv/engine`, `@kiv/nodes` |
-| Renderizar documentos Kiv como Vue en mi app (sin editor) | + `@kiv/vue` |
-| Dar a mis usuarios un editor visual completo | + `@kiv/vue-editor` |
-| Nodos interactivos (Accordion/Tabs/Modal/Carousel) | + `@kiv/nodes-interactive` |
-| SEO / accesibilidad automatizada | + `@kiv/plugin-seo` y/o `@kiv/plugin-a11y` |
+| Solo renderizar documentos Kiv a HTML estático (SSR/email/export) | `@kivcode/engine`, `@kivcode/nodes` |
+| Renderizar documentos Kiv como Vue en mi app (sin editor) | + `@kivcode/vue` |
+| Dar a mis usuarios un editor visual completo | + `@kivcode/vue-editor` |
+| Nodos interactivos (Accordion/Tabs/Modal/Carousel) | + `@kivcode/nodes-interactive` |
+| SEO / accesibilidad automatizada | + `@kivcode/plugin-seo` y/o `@kivcode/plugin-a11y` |
 
 ## Verificación rápida
 
 ```ts
-import { createEngine } from "@kiv/engine";
-import { ALL_NODES } from "@kiv/nodes";
+import { createEngine } from "@kivcode/engine";
+import { ALL_NODES } from "@kivcode/nodes";
 
 const engine = createEngine();
 engine.registry.registerMany([...ALL_NODES]);

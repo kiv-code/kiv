@@ -16,7 +16,7 @@ Candidatos ya identificados para esta sección:
    [Migración](./migration.md) sobre qué no integrar de `apps/demos/`).
 2. **Exportar una página a HTML estático** (`renderToHtml()`) — flujo real del
    botón "Export HTML" del demo.
-3. **Un nodo con estado propio** completo — `modal` (`@kiv/nodes-interactive`)
+3. **Un nodo con estado propio** completo — `modal` (`@kivcode/nodes-interactive`)
    como referencia, incluyendo auto-open y el patrón de placeholder en modo
    editor (agregado en esta auditoría) como ejemplo de "UX de configuración que
    se explica sola dentro del propio canvas".
@@ -24,8 +24,8 @@ Candidatos ya identificados para esta sección:
    integración con KMJK Events tenga al menos su Fase 0-1 completa, referenciar
    el adaptador real como el ejemplo de referencia de
    [Migración](./migration.md).
-5. **Un plugin real de punta a punta** — usando `@kiv/plugin-seo` o
-   `@kiv/plugin-a11y` como caso de estudio (no `@kiv/plugin-analytics`, que es
+5. **Un plugin real de punta a punta** — usando `@kivcode/plugin-seo` o
+   `@kivcode/plugin-a11y` como caso de estudio (no `@kivcode/plugin-analytics`, que es
    deliberadamente minimalista).
 
 ## Referencias mientras se redacta

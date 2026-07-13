@@ -1,7 +1,25 @@
 {
-	"name": "@kiv/nodes-interactive",
-	"version": "0.0.0",
+	"name": "@kivcode/nodes-interactive",
+	"version": "0.1.0",
+	"description": "Stateful interactive nodes (Accordion, Tabs, Modal, Carousel) and the content-block template library for the Kiv visual page-builder.",
+	"license": "MIT",
 	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kiv-code/kiv.git",
+		"directory": "packages/nodes-interactive"
+	},
+	"homepage": "https://github.com/kiv-code/kiv/tree/main/packages/nodes-interactive#readme",
+	"bugs": "https://github.com/kiv-code/kiv/issues",
+	"keywords": [
+		"kiv",
+		"page-builder",
+		"visual-editor"
+	],
+	"author": "Kivcode",
+	"publishConfig": {
+		"access": "public"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -17,8 +35,8 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@kiv/engine": "workspace:*",
-		"@kiv/nodes": "workspace:*"
+		"@kivcode/engine": "workspace:*",
+		"@kivcode/nodes": "workspace:*"
 	},
 	"devDependencies": {
 		"typescript": "^6.0.3",

@@ -1,15 +1,15 @@
-import type { KivDocument, KivPlugin, PluginContext } from "@kiv/engine";
+import type { KivDocument, KivPlugin, PluginContext } from "@kivcode/engine";
 import A11yPanel from "./A11yPanel.vue";
 import { checkDocument } from "./rules";
 
-declare module "@kiv/engine" {
+declare module "@kivcode/engine" {
 	interface KivEventMap {
 		"a11y.checked": { issues: import("./rules").A11yIssue[] };
 	}
 }
 
 /**
- * @kiv/plugin-a11y
+ * @kivcode/plugin-a11y
  *
  * Registers an "Accessibility" inspector tab listing WCAG-adjacent issues
  * (missing alt text, skipped heading levels, low-contrast text, links/buttons

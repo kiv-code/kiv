@@ -8,7 +8,7 @@ Kiv tiene **dos sistemas de templates distintos** — este documento debe dejar
 clara la diferencia desde la primera línea, es la fuente de confusión más
 probable:
 
-### 1. Templates de página completa (`@kiv/engine`)
+### 1. Templates de página completa (`@kivcode/engine`)
 
 - `PageTemplate` (`id`, `name`, `description`, `category`, `thumbnail`, un
   `KivDocument` completo) — reemplazan el documento entero al aplicarse.
@@ -21,7 +21,7 @@ probable:
   como referencia de estilo — cada nodo tiene un id legible, no generado
   aleatoriamente).
 
-### 2. Templates de bloque de contenido (`@kiv/nodes-interactive`)
+### 2. Templates de bloque de contenido (`@kivcode/nodes-interactive`)
 
 - `ContentTemplate` (`id`, `label`, `description`, `category`, `icon`, `create()`
   que devuelve un subárbol `KivNode`) — se **insertan** junto a la selección
@@ -34,7 +34,7 @@ probable:
   `insertNodeNearSelection()`.
 - **Por qué son composición pura, nunca lógica nueva**: cada `ContentTemplate`
   debe construirse exclusivamente combinando nodos ya existentes de
-  `@kiv/nodes`/`@kiv/nodes-interactive` — si un template "necesita" un concepto
+  `@kivcode/nodes`/`@kivcode/nodes-interactive` — si un template "necesita" un concepto
   que ningún nodo cubre, la respuesta es escribir el nodo que falta primero (ver
   [Crear un Node](./creating-a-node.md)), nunca improvisar props ad-hoc dentro
   del template que ningún nodo real interpreta (bug real encontrado y corregido en

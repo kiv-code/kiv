@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Breakpoint, FieldDescriptor } from "@kiv/engine";
+import type { Breakpoint, FieldDescriptor } from "@kivcode/engine";
 import { inject } from "vue";
 import { EDITOR_EXTENSIONS_KEY } from "../store/context";
 import BooleanControl from "./controls/BooleanControl.vue";

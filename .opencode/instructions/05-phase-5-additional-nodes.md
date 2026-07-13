@@ -3,8 +3,8 @@
 ## Goal
 Round out the node library with the remaining high-value building blocks every real
 landing/marketing/portfolio page needs: forms, social proof, structured content, and
-small layout utilities. All nodes live in `@kiv/nodes` (pure definitions, no components)
-with Vue components in `@kiv/vue`, following the exact pattern already used by the
+small layout utilities. All nodes live in `@kivcode/nodes` (pure definitions, no components)
+with Vue components in `@kivcode/vue`, following the exact pattern already used by the
 existing content nodes (`button`, `heading`, `richtext`, etc.) — check
 `packages/nodes/src/content/button.ts` for the real `defineNode`/`f.*` shape and
 `packages/nodes/src/html-utils.ts`/`scales.ts` for shared helpers before writing new code.
@@ -320,7 +320,7 @@ export const tableNode = defineNode({
   wants a repeatable list (Social Icons, Table), use a validated JSON text field, exactly
   as sketched above, and document that choice in your report — do not silently invent a
   different data shape than what's specified here.
-- Register every new node type in `@kiv/vue`'s component registry (same place the Phase 4
+- Register every new node type in `@kivcode/vue`'s component registry (same place the Phase 4
   interactive nodes were registered) and in the demo app's node list, so they're reachable
   for manual verification.
 - Every node needs: a schema-defaults-satisfy-schema test in `packages/nodes/src/nodes.test.ts`
@@ -338,7 +338,7 @@ export const tableNode = defineNode({
 - [x] Spacer renders an empty, scale-driven height block, editor-only guide outline doesn't leak into export
 - [x] Custom Embed never renders raw HTML/script outside a sandboxed iframe, in both editor and `toHtml()`
 - [x] Table renders a real semantic `<table>`, invalid JSON never throws
-- [x] All new nodes registered in `@kiv/vue` + demo app, all have schema and component tests
+- [x] All new nodes registered in `@kivcode/vue` + demo app, all have schema and component tests
 - [x] `pnpm biome check --write .` passes
 - [x] `pnpm typecheck` passes
 - [x] `pnpm test` passes

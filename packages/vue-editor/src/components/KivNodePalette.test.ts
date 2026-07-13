@@ -1,5 +1,5 @@
-import { createRegistry } from "@kiv/engine";
-import { ALL_NODES } from "@kiv/nodes";
+import { createRegistry } from "@kivcode/engine";
+import { ALL_NODES } from "@kivcode/nodes";
 import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import KivNodePalette from "./KivNodePalette.vue";

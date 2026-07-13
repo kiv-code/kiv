@@ -7,7 +7,7 @@ import {
 	resolveSpacingStyle,
 	SECTION_SPACING,
 	SHADOW,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 import { computed } from "vue";
 
 function isGradient(value: unknown): boolean {

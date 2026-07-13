@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { KivDocument } from "@kiv/engine";
+import type { KivDocument } from "@kivcode/engine";
 import { computed } from "vue";
 import { type A11yIssue, checkDocument } from "./rules";
 

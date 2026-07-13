@@ -1,4 +1,4 @@
-import type { SeoMeta } from "@kiv/engine";
+import type { SeoMeta } from "@kivcode/engine";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import SeoInspectorTab from "./SeoInspectorTab.vue";

@@ -1,4 +1,4 @@
-import type { ResolveContext } from "@kiv/engine";
+import type { ResolveContext } from "@kivcode/engine";
 import type { ComputedRef, InjectionKey } from "vue";
 import type { VueRegistry } from "./registry";
 

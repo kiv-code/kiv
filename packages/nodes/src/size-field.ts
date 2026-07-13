@@ -1,4 +1,4 @@
-import type { FieldDescriptor } from "@kiv/engine";
+import type { FieldDescriptor } from "@kivcode/engine";
 import { z } from "zod";
 
 export interface SizeUnitConfig {

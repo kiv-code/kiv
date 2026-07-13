@@ -10,7 +10,7 @@ export interface I18nConfig {
 /**
  * Page-level SEO metadata. Lives on the document (not a node's props) because
  * it describes the PAGE as a whole — one title/description/canonical URL per
- * document, independent of which nodes it contains. Consumed by @kiv/plugin-seo.
+ * document, independent of which nodes it contains. Consumed by @kivcode/plugin-seo.
  */
 export interface SeoMeta {
 	title?: string;
@@ -40,6 +40,6 @@ export interface KivDocument {
 	i18n: I18nConfig;
 	/** Document-level theme overrides (optional). */
 	theme?: Record<string, unknown>;
-	/** Page-level SEO metadata (optional). See @kiv/plugin-seo. */
+	/** Page-level SEO metadata (optional). See @kivcode/plugin-seo. */
 	seo?: SeoMeta;
 }

@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import type { MediaAsset, MediaListQuery, MediaProvider } from "@kiv/engine";
+import type {
+	MediaAsset,
+	MediaListQuery,
+	MediaProvider,
+} from "@kivcode/engine";
 import { computed, nextTick, ref, watch } from "vue";
 
 const props = defineProps<{

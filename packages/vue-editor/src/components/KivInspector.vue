@@ -4,7 +4,7 @@ import type {
 	FieldDescriptor,
 	KivNode,
 	Registry,
-} from "@kiv/engine";
+} from "@kivcode/engine";
 import { computed, inject, ref, watch } from "vue";
 import { useResizablePanel } from "../composables/useResizablePanel";
 import FieldControl from "../inspector/FieldControl.vue";

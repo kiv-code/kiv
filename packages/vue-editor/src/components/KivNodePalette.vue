@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { KivNode, Registry } from "@kiv/engine";
+import type { KivNode, Registry } from "@kivcode/engine";
 import { computed, inject, nextTick, ref, watch } from "vue";
 import { EDITOR_EXTENSIONS_KEY } from "../store/context";
 import { getNodeLabel } from "../utils/node-labels";

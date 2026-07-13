@@ -1,4 +1,4 @@
-import type { KivNode, Registry } from "@kiv/engine";
+import type { KivNode, Registry } from "@kivcode/engine";
 
 export interface PaletteItem {
 	type: string;
@@ -11,7 +11,7 @@ export interface PaletteItem {
 // Display order for the built-in palette, plus the one thing the registry
 // can't express: whether a freshly-created node needs a seeded empty default
 // slot. Label/description/category are the node's own `defineNode()` fields
-// (single source of truth, see `@kiv/nodes`) — looked up via `buildPalette`.
+// (single source of truth, see `@kivcode/nodes`) — looked up via `buildPalette`.
 const PALETTE_ORDER: ReadonlyArray<{ type: string; hasDefaultSlot: boolean }> =
 	[
 		{ type: "section", hasDefaultSlot: true },

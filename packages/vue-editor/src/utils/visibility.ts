@@ -1,4 +1,4 @@
-import type { Breakpoint, Responsive } from "@kiv/engine";
+import type { Breakpoint, Responsive } from "@kivcode/engine";
 
 const ORDER: readonly Breakpoint[] = ["base", "sm", "md", "lg", "xl"];
 

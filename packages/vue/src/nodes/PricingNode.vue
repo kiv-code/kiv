@@ -5,7 +5,7 @@ import {
 	RADIUS,
 	resolveBackgroundPaint,
 	resolveSolidColor,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GAP } from "@kiv/nodes";
+import { GAP } from "@kivcode/nodes";
 import { computed, inject, ref } from "vue";
 import { KIV_SERVICES_KEY } from "../services";
 

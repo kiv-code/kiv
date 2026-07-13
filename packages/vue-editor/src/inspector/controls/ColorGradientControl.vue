@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import type { ColorOrGradientValue } from "@kiv/nodes";
-import { normalizeColorOrGradient, resolveBackgroundPaint } from "@kiv/nodes";
+import type { ColorOrGradientValue } from "@kivcode/nodes";
+import {
+	normalizeColorOrGradient,
+	resolveBackgroundPaint,
+} from "@kivcode/nodes";
 import { computed, inject } from "vue";
 import { useContinuousEdit } from "../../composables/useContinuousEdit";
 import { EDITOR_STORE_KEY } from "../../store/context";
@@ -16,7 +19,7 @@ const { start, end } = useContinuousEdit(store);
 // Handles legacy plain-string values (pre-dating this field type) safely —
 // never spread `modelValue` directly, since spreading a STRING iterates its
 // characters as array indices and corrupts the object (see
-// normalizeColorOrGradient's doc comment in @kiv/nodes).
+// normalizeColorOrGradient's doc comment in @kivcode/nodes).
 const value = computed(() => normalizeColorOrGradient(props.modelValue));
 
 function patch(partial: Partial<ColorOrGradientValue>) {

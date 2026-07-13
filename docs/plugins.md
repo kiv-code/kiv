@@ -7,8 +7,8 @@
 - Qué es un plugin en Kiv — un paquete que se pasa a `createEngine({ plugins:
   [...] })` y recibe un `PluginContext` (`editor`, `media`, `services`, `bus`).
 - Los dos plugins reales existentes como referencia de patrón:
-  `@kiv/plugin-seo` y `@kiv/plugin-a11y` (leer su código como los dos ejemplos
-  "de producción"; `@kiv/plugin-analytics` es deliberadamente un ejemplo/demo
+  `@kivcode/plugin-seo` y `@kivcode/plugin-a11y` (leer su código como los dos ejemplos
+  "de producción"; `@kivcode/plugin-analytics` es deliberadamente un ejemplo/demo
   minimalista, útil para el primer contacto pero no representativo de un plugin
   real).
 - Qué puede hacer un plugin hoy: registrar controles de campo custom, botones de
@@ -20,7 +20,7 @@
   [Crear un Node](./creating-a-node.md)) y "escribir un plugin" — un plugin no
   necesariamente trae nodos nuevos, y un paquete de nodos nuevos no
   necesariamente necesita ser un plugin formal (puede ser simplemente un paquete
-  de `@kiv/nodes`-compatible que se registra a mano).
+  de `@kivcode/nodes`-compatible que se registra a mano).
 
 ## Referencias mientras se redacta
 

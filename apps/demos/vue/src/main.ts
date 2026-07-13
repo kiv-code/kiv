@@ -1,7 +1,7 @@
-import "@kiv/vue-editor/style";
-import "@kiv/vue/style";
-import "@kiv/plugin-seo/style";
-import "@kiv/plugin-a11y/style";
+import "@kivcode/vue-editor/style";
+import "@kivcode/vue/style";
+import "@kivcode/plugin-seo/style";
+import "@kivcode/plugin-a11y/style";
 import { createApp } from "vue";
 import App from "./App.vue";
 

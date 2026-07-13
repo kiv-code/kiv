@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SeoMeta } from "@kiv/engine";
+import type { SeoMeta } from "@kivcode/engine";
 import { computed } from "vue";
 import { generateStructuredData, resolveCanonicalUrl } from "./meta";
 

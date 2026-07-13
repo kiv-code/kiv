@@ -1,4 +1,4 @@
-import { defineNode, f } from "@kiv/engine";
+import { defineNode, f } from "@kivcode/engine";
 import { escapeHtml } from "../html-utils";
 
 export const pageNode = defineNode({

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { resolveIcon } from "@kiv/nodes";
+import { resolveIcon } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

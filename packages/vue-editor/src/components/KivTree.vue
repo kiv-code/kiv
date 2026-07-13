@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { KivNode } from "@kiv/engine";
+import type { KivNode } from "@kivcode/engine";
 import { computed, inject, nextTick, provide, ref, watch } from "vue";
 import { useResizablePanel } from "../composables/useResizablePanel";
 import {

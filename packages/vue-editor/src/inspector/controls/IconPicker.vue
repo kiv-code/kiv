@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { FieldDescriptor } from "@kiv/engine";
+import type { FieldDescriptor } from "@kivcode/engine";
 import {
 	getIconSets,
 	type IconSet,
 	type ResolvedIcon,
 	resolveIconInfo,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 import { computed, inject, ref } from "vue";
 import { EDITOR_STORE_KEY } from "../../store/context";
 

@@ -1,7 +1,25 @@
 {
-	"name": "@kiv/nodes",
-	"version": "0.0.0",
+	"name": "@kivcode/nodes",
+	"version": "0.1.0",
+	"description": "Pure node schema and defaults for the Kiv visual page-builder — layout, content, and media node definitions with no rendering components.",
+	"license": "MIT",
 	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kiv-code/kiv.git",
+		"directory": "packages/nodes"
+	},
+	"homepage": "https://github.com/kiv-code/kiv/tree/main/packages/nodes#readme",
+	"bugs": "https://github.com/kiv-code/kiv/issues",
+	"keywords": [
+		"kiv",
+		"page-builder",
+		"visual-editor"
+	],
+	"author": "Kivcode",
+	"publishConfig": {
+		"access": "public"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -23,7 +41,7 @@
 		"@iconify-json/lucide": "^1.2.116",
 		"@iconify/types": "^2.0.0",
 		"@iconify/utils": "^3.1.4",
-		"@kiv/engine": "workspace:*",
+		"@kivcode/engine": "workspace:*",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {

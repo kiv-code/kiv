@@ -4,7 +4,7 @@ import {
 	LETTER_SPACING,
 	LINE_HEIGHT,
 	resolveTextPaintStyle,
-} from "@kiv/nodes";
+} from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

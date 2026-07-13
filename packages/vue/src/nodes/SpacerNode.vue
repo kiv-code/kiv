@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SPACING } from "@kiv/nodes";
+import { SPACING } from "@kivcode/nodes";
 import { computed, inject } from "vue";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
 

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { RADIUS, renderStars, resolveIcon, SHADOW, SPACING } from "@kiv/nodes";
+import {
+	RADIUS,
+	renderStars,
+	resolveIcon,
+	SHADOW,
+	SPACING,
+} from "@kivcode/nodes";
 import { computed, inject } from "vue";
 import { KIV_MEDIA_KEY } from "../media";
 

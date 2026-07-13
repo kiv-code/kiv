@@ -1,4 +1,4 @@
-import type { KivNode } from "@kiv/engine";
+import type { KivNode } from "@kivcode/engine";
 import { ref } from "vue";
 import type { EditorStore } from "../store/editor-store";
 

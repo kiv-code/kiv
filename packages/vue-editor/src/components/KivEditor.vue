@@ -7,11 +7,11 @@ import type {
 	KivNode,
 	PageTemplate,
 	Registry,
-} from "@kiv/engine";
-import { BUILT_IN_TEMPLATES, cloneNodeTree } from "@kiv/engine";
-import type { ContentTemplate } from "@kiv/nodes-interactive";
-import { CONTENT_TEMPLATES } from "@kiv/nodes-interactive";
-import type { VueRegistry } from "@kiv/vue";
+} from "@kivcode/engine";
+import { BUILT_IN_TEMPLATES, cloneNodeTree } from "@kivcode/engine";
+import type { ContentTemplate } from "@kivcode/nodes-interactive";
+import { CONTENT_TEMPLATES } from "@kivcode/nodes-interactive";
+import type { VueRegistry } from "@kivcode/vue";
 import { computed, onMounted, onUnmounted, provide, ref, watch } from "vue";
 import { EditorExtensions } from "../extensions";
 import ColorGradientControl from "../inspector/controls/ColorGradientControl.vue";

@@ -1,6 +1,6 @@
 /**
  * Extensible via module augmentation in packages that add events:
- *   declare module "@kiv/engine" { interface KivEventMap { "modal.opened": { id: string } } }
+ *   declare module "@kivcode/engine" { interface KivEventMap { "modal.opened": { id: string } } }
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface KivEventMap {

@@ -1,4 +1,8 @@
-import type { MediaAsset, MediaProvider, StorageProvider } from "@kiv/engine";
+import type {
+	MediaAsset,
+	MediaProvider,
+	StorageProvider,
+} from "@kivcode/engine";
 
 /**
  * Minimal StorageProvider backed by localStorage — a stand-in for a real

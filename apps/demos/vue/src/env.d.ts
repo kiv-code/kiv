@@ -1,2 +1,2 @@
-declare module "@kiv/vue-editor/style" {}
-declare module "@kiv/vue/style" {}
+declare module "@kivcode/vue-editor/style" {}
+declare module "@kivcode/vue/style" {}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { resolveSpacingStyle, SPACING } from "@kiv/nodes";
+import { resolveSpacingStyle, SPACING } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

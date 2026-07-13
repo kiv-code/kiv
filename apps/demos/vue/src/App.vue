@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { Breakpoint, KivDocument, KivPlugin } from "@kiv/engine";
-import { createEngine, renderToHtml } from "@kiv/engine";
-import { ALL_NODES, HOVER_EFFECTS_CSS } from "@kiv/nodes";
-import { ALL_INTERACTIVE_NODES } from "@kiv/nodes-interactive";
-import { a11yPlugin } from "@kiv/plugin-a11y";
+import type { Breakpoint, KivDocument, KivPlugin } from "@kivcode/engine";
+import { createEngine, renderToHtml } from "@kivcode/engine";
+import { ALL_NODES, HOVER_EFFECTS_CSS } from "@kivcode/nodes";
+import { ALL_INTERACTIVE_NODES } from "@kivcode/nodes-interactive";
+import { a11yPlugin } from "@kivcode/plugin-a11y";
 import {
 	type AnalyticsEvent,
 	analyticsPlugin,
 	type ClickCounts,
 	clickCounterPlugin,
-} from "@kiv/plugin-analytics";
-import { seoPlugin } from "@kiv/plugin-seo";
-import { createDefaultVueRegistry, KivRenderer } from "@kiv/vue";
-import { KivEditor } from "@kiv/vue-editor";
+} from "@kivcode/plugin-analytics";
+import { seoPlugin } from "@kivcode/plugin-seo";
+import { createDefaultVueRegistry, KivRenderer } from "@kivcode/vue";
+import { KivEditor } from "@kivcode/vue-editor";
 import { computed, onBeforeUnmount, ref, shallowRef } from "vue";
 import { demoDocument } from "./demo-document";
 import { clearPage, loadPage, savePage } from "./persistence";

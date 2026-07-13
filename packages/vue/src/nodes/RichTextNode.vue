@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LETTER_SPACING, LINE_HEIGHT } from "@kiv/nodes";
+import { LETTER_SPACING, LINE_HEIGHT } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

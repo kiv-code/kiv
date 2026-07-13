@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { GAP, RADIUS, resolveSpacingStyle, SHADOW, SPACING } from "@kiv/nodes";
+import {
+	GAP,
+	RADIUS,
+	resolveSpacingStyle,
+	SHADOW,
+	SPACING,
+} from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

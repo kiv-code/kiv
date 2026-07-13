@@ -28,7 +28,7 @@ superseded; kept below only for history, do not trust it as current status.
 | 2.x | `locked` / `visible` wired into renderer + editor UI (pulled in early from Phase 2) | ✅ |
 
 Deferred on purpose: `PluginContext.editor` UI hooks (`addToolbarButton`, `addPaletteItem`,
-`onNodeSelect`, etc.) — needs real registries inside `@kiv/editor` to back them; scoped as
+`onNodeSelect`, etc.) — needs real registries inside `@kivcode/editor` to back them; scoped as
 its own follow-up, not started.
 
 ---
@@ -44,7 +44,7 @@ its own follow-up, not started.
 
 **Editor package:** `editor-store.ts` rewritten to wrap `EditorEngine` instead of owning state
 directly — public `EditorStore` API unchanged, so no Vue component needed to change.
-Removed the now-duplicate `packages/editor/src/utils/document-ops.ts` (re-exported from `@kiv/engine` instead).
+Removed the now-duplicate `packages/editor/src/utils/document-ops.ts` (re-exported from `@kivcode/engine` instead).
 
 Tests: +33 (engine).
 
@@ -89,21 +89,21 @@ Tests: +6.
 
 ## Step 7 — English-only sweep
 
-Ran 4 parallel agents (one per package). Real Spanish content was concentrated in `@kiv/engine`
+Ran 4 parallel agents (one per package). Real Spanish content was concentrated in `@kivcode/engine`
 (18 files: JSDoc + `[kiv]` error messages + test assertions kept in sync) and one message in
-`@kiv/vue`'s `registry.ts`. `@kiv/nodes` and `@kiv/editor` were already fully English.
+`@kivcode/vue`'s `registry.ts`. `@kivcode/nodes` and `@kivcode/editor` were already fully English.
 One intentional exception left as-is: `"Título"`/`"Hola"` values inside i18n test *fixtures*
 (data demonstrating the localization feature, not comments/errors).
 
 ## Step 8 — Test coverage
 
-**Infra:** added `@vue/test-utils` + `happy-dom` to `@kiv/vue`/`@kiv/editor`; `vite.config.ts` in
+**Infra:** added `@vue/test-utils` + `happy-dom` to `@kivcode/vue`/`@kivcode/editor`; `vite.config.ts` in
 both switched to `defineConfig` from `vitest/config` so build and test share the Vue plugin.
 
 **Coverage added:**
-- `@kiv/nodes`: systematic "every node's defaults satisfy its own schema" check.
-- `@kiv/vue`: all 10 node components + `KivRenderer`/`KivNodeRenderer` (52 tests, was 0).
-- `@kiv/editor`: `KivCanvas` interactions (select/delete/duplicate/undo/redo/escape, input-focus guard) + `KivNodePalette` (25 tests, was 10).
+- `@kivcode/nodes`: systematic "every node's defaults satisfy its own schema" check.
+- `@kivcode/vue`: all 10 node components + `KivRenderer`/`KivNodeRenderer` (52 tests, was 0).
+- `@kivcode/editor`: `KivCanvas` interactions (select/delete/duplicate/undo/redo/escape, input-focus guard) + `KivNodePalette` (25 tests, was 10).
 
 **Bug found and fixed while writing tests:** `ContainerNode.vue`'s `centered` prop never
 centered by default. Vue coerces an omitted `boolean`-typed prop to `false` (not `undefined`)
@@ -120,7 +120,7 @@ omitted. Fixed with `withDefaults(defineProps<...>(), { centered: true })`.
 - **Shared bus:** `useEditorStore()` and `<KivEditor bus="...">` now accept an external `EventBus`,
   so a plugin installed via `createEngine({ plugins })` can observe live editor mutations
   (`node.propsChanged`, etc.) through `ctx.bus` — previously the editor ran on its own private bus.
-- **`toHtml()` on all 10 `@kiv/nodes`:** each mirrors its Vue component's exact style logic
+- **`toHtml()` on all 10 `@kivcode/nodes`:** each mirrors its Vue component's exact style logic
   (`packages/nodes/src/html-utils.ts` has the shared `styleToString`/`escapeHtml` helpers).
   Verified the exported HTML matches the live-rendered look pixel-for-pixel (padding, colors, layout).
 - **`services`/`media` example:** `apps/demos/vue/src/services.ts` — a localStorage-backed
@@ -223,7 +223,7 @@ that needs solid-or-gradient paint (text, background, buttons, and future nodes 
   a single composite prop instead of N raw fields with manual `showIf` wiring.
 - `colorOrGradientField(opts)` — a `FieldDescriptor` factory with `pluginControl: "color-gradient"`,
   following the exact same plugin-control pattern as the earlier `icon-picker` (Golden Rule #7: no
-  `@kiv/engine` changes needed — `FieldControl`'s `pluginControl` override already supported this).
+  `@kivcode/engine` changes needed — `FieldControl`'s `pluginControl` override already supported this).
 - `resolveBackgroundPaint(value, fallback)` — solid or gradient, both valid as a plain `background`.
 - `resolveSolidColor(value, fallback)` — ignores gradient state; for contexts that can't render a
   gradient (icon inheritance, borders).
@@ -242,7 +242,7 @@ same mechanism as `icon-picker`.
 `gradientFrom`, `gradientMiddle`, `gradientTo`, `gradientAngle`, `customColor`) with 2 composite
 fields (`background`, `textColor`). `ButtonNode.vue` and `toHtml` both updated to call the shared
 resolvers instead of hand-rolling gradient CSS. `packages/nodes` gained a direct `zod` dependency
-(previously only re-exported `FieldDescriptor`'s type from `@kiv/engine`, never constructed a
+(previously only re-exported `FieldDescriptor`'s type from `@kivcode/engine`, never constructed a
 schema itself).
 
 **Bug found while wiring this up:** `styleToString`'s `kebabCase()` converts `webkitBackgroundClip`
@@ -339,7 +339,7 @@ worse, silent data-corruption bug — unrelated to the opacity work itself.
   alongside the default object's `type`/`solid`/`alpha` keys. The corrupted shape then got written
   straight back to the document on the next edit (even an unrelated one, e.g. typing a background
   image URL), permanently replacing the clean string with garbage.
-  Fixed by exporting `normalizeColorOrGradient()` from `@kiv/nodes` (the same string/object/undefined
+  Fixed by exporting `normalizeColorOrGradient()` from `@kivcode/nodes` (the same string/object/undefined
   handling the resolvers already used internally) and having the control call that instead of
   spreading `modelValue` directly — legacy plain-string props now normalize cleanly into
   `{ type: "solid", solid: "#0f172a", ... }` without ever touching the raw value unsafely.
@@ -428,7 +428,7 @@ silently again; (2) added `"Spacing"` and `"Spacing (advanced)"` to the curated 
 after `"Layout"`) so they get sensible positioning instead of always trailing at the end.
 
 Verified live: added a new Group node, set `Padding top: 40px` → confirmed
-`getComputedStyle(el).paddingTop === "40px"` (after rebuilding `@kiv/vue`'s dist — a second instance
+`getComputedStyle(el).paddingTop === "40px"` (after rebuilding `@kivcode/vue`'s dist — a second instance
 this session of forgetting the build step after a source edit, since the demo app consumes the built
 dist, not source). Set `Border top: 2`, `Border left: 4`, `Border color: #ff0066` → confirmed
 `borderTop: "2px solid rgb(255, 0, 102)"`, `borderLeft: "4px solid rgb(255, 0, 102)"`,
@@ -448,7 +448,7 @@ Test count by package: engine 110, nodes 24, plugin-analytics 9, vue 55, editor 
 ## Not done yet (as of Phase 1 — STALE, see Phase 2-4 below)
 
 - `PluginContext.editor` hooks (`addToolbarButton`, `addPaletteItem`, `onNodeSelect`,
-  `onNodeCreate`, `onDocumentChange`) — deferred, needs real UI-extension registries in `@kiv/editor`.
+  `onNodeCreate`, `onDocumentChange`) — deferred, needs real UI-extension registries in `@kivcode/editor`.
 - Everything in `PLAN.md` Phases 2 (rest of it) through 6 — `locked`/`visible` was the only
   Phase 2 item pulled forward.
 
@@ -470,8 +470,8 @@ checked off there, that's the source of truth, not a duplicate list here:
 - `.opencode/instructions/03-phase-3-content-media.md` — RichText inline editing, Video
   html5/loom+poster/caption, Link made slot-capable, MediaProvider + media browser +
   responsive images.
-- `.opencode/instructions/04-phase-4-interactive-plugins.md` — `@kiv/nodes-interactive`
-  (Carousel/Accordion/Tabs/Modal), `@kiv/plugin-seo`, `@kiv/plugin-a11y`, page templates.
+- `.opencode/instructions/04-phase-4-interactive-plugins.md` — `@kivcode/nodes-interactive`
+  (Carousel/Accordion/Tabs/Modal), `@kivcode/plugin-seo`, `@kivcode/plugin-a11y`, page templates.
 - `.opencode/instructions/05-phase-5-additional-nodes.md` (new spec, authored this pass) —
   Form, Testimonial, Card, Countdown, Stat Counter, Social Icons, Spacer, Custom Embed, Table.
 

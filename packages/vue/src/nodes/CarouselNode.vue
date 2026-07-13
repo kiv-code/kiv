@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RADIUS } from "@kiv/nodes";
+import { RADIUS } from "@kivcode/nodes";
 import {
 	computed,
 	inject,
@@ -14,7 +14,7 @@ import {
 import { KIV_BUS_KEY } from "../bus";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
 
-declare module "@kiv/engine" {
+declare module "@kivcode/engine" {
 	interface KivEventMap {
 		"carousel.slideChanged": {
 			nodeId?: string;

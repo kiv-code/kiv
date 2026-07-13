@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { KivNode } from "@kiv/engine";
+import type { KivNode } from "@kivcode/engine";
 import { computed, inject, ref } from "vue";
 import { EDITOR_STORE_KEY, KIV_TREE_FILTER_KEY } from "../store/context";
 import { getNodeCategoryTint, getNodeLabel } from "../utils/node-labels";

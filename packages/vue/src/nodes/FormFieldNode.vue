@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { parseSelectOptions } from "@kiv/nodes";
+import { parseSelectOptions } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

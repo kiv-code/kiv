@@ -1,7 +1,27 @@
 {
-	"name": "@kiv/plugin-seo",
-	"version": "0.0.0",
+	"name": "@kivcode/plugin-seo",
+	"version": "0.1.0",
+	"description": "SEO plugin for Kiv — meta tags, Open Graph, canonical URLs, and sitemap priority driven by a KivDocument's page-level SeoMeta.",
+	"license": "MIT",
 	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kiv-code/kiv.git",
+		"directory": "packages/plugin-seo"
+	},
+	"homepage": "https://github.com/kiv-code/kiv/tree/main/packages/plugin-seo#readme",
+	"bugs": "https://github.com/kiv-code/kiv/issues",
+	"keywords": [
+		"kiv",
+		"page-builder",
+		"visual-editor",
+		"seo",
+		"plugin"
+	],
+	"author": "Kivcode",
+	"publishConfig": {
+		"access": "public"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -18,8 +38,7 @@
 		"typecheck": "vue-tsc --noEmit"
 	},
 	"dependencies": {
-		"@kiv/engine": "workspace:*",
-		"vue": "^3.5.17"
+		"@kivcode/engine": "workspace:*"
 	},
 	"devDependencies": {
 		"@vitejs/plugin-vue": "^5.2.4",

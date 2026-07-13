@@ -1,4 +1,4 @@
-import type { SeoMeta } from "@kiv/engine";
+import type { SeoMeta } from "@kivcode/engine";
 
 export interface MetaTag {
 	tag: "title" | "meta" | "link";

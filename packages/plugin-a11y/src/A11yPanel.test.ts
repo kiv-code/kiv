@@ -1,4 +1,4 @@
-import type { KivDocument } from "@kiv/engine";
+import type { KivDocument } from "@kivcode/engine";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import A11yPanel from "./A11yPanel.vue";

@@ -1,4 +1,4 @@
-export type { KivNode } from "@kiv/engine";
+export type { KivNode } from "@kivcode/engine";
 
 export {
 	agendaScheduleTemplate,
@@ -36,7 +36,7 @@ export interface ContentTemplate {
 		| "form"
 		| "comparison";
 	icon: string;
-	create: () => import("@kiv/engine").KivNode;
+	create: () => import("@kivcode/engine").KivNode;
 }
 
 import {

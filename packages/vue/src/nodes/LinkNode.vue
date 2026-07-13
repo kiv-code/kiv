@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BUTTON_RADIUS, BUTTON_SIZE, BUTTON_VARIANT } from "@kiv/nodes";
+import { BUTTON_RADIUS, BUTTON_SIZE, BUTTON_VARIANT } from "@kivcode/nodes";
 import { computed, getCurrentInstance } from "vue";
 
 const props = defineProps<{

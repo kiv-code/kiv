@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GAP, RADIUS } from "@kiv/nodes";
+import { GAP, RADIUS } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

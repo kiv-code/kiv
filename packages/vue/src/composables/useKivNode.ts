@@ -1,5 +1,5 @@
-import type { KivNode } from "@kiv/engine";
-import { resolveNode } from "@kiv/engine";
+import type { KivNode } from "@kivcode/engine";
+import { resolveNode } from "@kivcode/engine";
 import type { ComputedRef } from "vue";
 import { computed, inject } from "vue";
 import type { KivRenderContext } from "../context";

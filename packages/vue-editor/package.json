@@ -1,7 +1,27 @@
 {
-	"name": "@kiv/vue-editor",
-	"version": "0.0.0",
+	"name": "@kivcode/vue-editor",
+	"version": "0.1.0",
+	"description": "The Kiv visual page-builder editor UI — canvas, structure tree, inspector, drag & drop, undo/redo, node palette, and content-block library.",
+	"license": "MIT",
 	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kiv-code/kiv.git",
+		"directory": "packages/vue-editor"
+	},
+	"homepage": "https://github.com/kiv-code/kiv/tree/main/packages/vue-editor#readme",
+	"bugs": "https://github.com/kiv-code/kiv/issues",
+	"keywords": [
+		"kiv",
+		"page-builder",
+		"visual-editor",
+		"vue",
+		"vue3"
+	],
+	"author": "Kivcode",
+	"publishConfig": {
+		"access": "public"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -18,11 +38,10 @@
 		"typecheck": "vue-tsc --noEmit"
 	},
 	"dependencies": {
-		"@kiv/engine": "workspace:*",
-		"@kiv/nodes": "workspace:*",
-		"@kiv/nodes-interactive": "workspace:*",
-		"@kiv/vue": "workspace:*",
-		"vue": "^3.5.17"
+		"@kivcode/engine": "workspace:*",
+		"@kivcode/nodes": "workspace:*",
+		"@kivcode/nodes-interactive": "workspace:*",
+		"@kivcode/vue": "workspace:*"
 	},
 	"devDependencies": {
 		"@tailwindcss/vite": "^4.3.2",

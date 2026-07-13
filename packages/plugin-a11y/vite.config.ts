@@ -4,7 +4,13 @@ import dts from "vite-plugin-dts";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-	plugins: [vue(), dts({ tsconfigPath: "./tsconfig.json" })],
+	plugins: [
+		vue(),
+		dts({
+			tsconfigPath: "./tsconfig.json",
+			exclude: ["**/*.test.ts", "**/*.test.vue"],
+		}),
+	],
 	test: {
 		environment: "happy-dom",
 	},
@@ -16,7 +22,7 @@ export default defineConfig({
 			formats: ["es"],
 		},
 		rollupOptions: {
-			external: ["vue", "@kiv/engine", "@kiv/nodes"],
+			external: ["vue", "@kivcode/engine", "@kivcode/nodes"],
 			output: {
 				globals: { vue: "Vue" },
 			},

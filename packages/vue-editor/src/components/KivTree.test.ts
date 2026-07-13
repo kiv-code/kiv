@@ -1,4 +1,4 @@
-import type { KivDocument } from "@kiv/engine";
+import type { KivDocument } from "@kivcode/engine";
 import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { EDITOR_STORE_KEY } from "../store/context";

@@ -1,4 +1,4 @@
-import type { KivDocument } from "@kiv/engine";
+import type { KivDocument } from "@kivcode/engine";
 
 // Demo document with localized content (en / es / fr) using the `$t` shape.
 // Any prop can be either a plain value OR { $t: { <locale>: value } }.

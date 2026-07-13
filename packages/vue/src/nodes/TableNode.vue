@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { parseTableData } from "@kiv/nodes";
+import { parseTableData } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = withDefaults(

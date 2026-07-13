@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RADIUS, resolveBackgroundPaint } from "@kiv/nodes";
+import { RADIUS, resolveBackgroundPaint } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{

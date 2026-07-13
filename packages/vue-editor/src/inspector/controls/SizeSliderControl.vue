@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FieldDescriptor } from "@kiv/engine";
+import type { FieldDescriptor } from "@kivcode/engine";
 import { computed, inject, ref, watch } from "vue";
 import { useContinuousEdit } from "../../composables/useContinuousEdit";
 import { EDITOR_STORE_KEY } from "../../store/context";

@@ -1,4 +1,4 @@
-import type { KivNode } from "@kiv/engine";
+import type { KivNode } from "@kivcode/engine";
 
 export interface ParentLocation {
 	parent: KivNode;

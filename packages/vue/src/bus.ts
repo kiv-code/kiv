@@ -1,11 +1,11 @@
-import type { EventBus } from "@kiv/engine";
+import type { EventBus } from "@kivcode/engine";
 import type { InjectionKey } from "vue";
 
 /**
  * Declare the events this renderer emits so `bus.emit`/`bus.on` are fully typed.
- * This is module augmentation — adding an event never touches @kiv/engine.
+ * This is module augmentation — adding an event never touches @kivcode/engine.
  */
-declare module "@kiv/engine" {
+declare module "@kivcode/engine" {
 	interface KivEventMap {
 		"button.clicked": {
 			nodeId?: string;

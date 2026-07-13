@@ -6,9 +6,9 @@ import { defineNode } from "../schema";
 import type { KivDocument, KivNode } from "../types";
 import { BUILT_IN_TEMPLATES } from "./built-in";
 
-// The real node types @kiv/nodes registers (see packages/nodes/src/index.ts).
-// Hardcoded here rather than imported — @kiv/engine must never depend on
-// @kiv/nodes (nodes depends on engine, not the other way around) — so this
+// The real node types @kivcode/nodes registers (see packages/nodes/src/index.ts).
+// Hardcoded here rather than imported — @kivcode/engine must never depend on
+// @kivcode/nodes (nodes depends on engine, not the other way around) — so this
 // list is the guardrail that built-in templates only use types that actually
 // exist in the first-party node package, without creating that dependency.
 const REAL_NODE_TYPES = new Set([
@@ -43,7 +43,7 @@ function collectIds(node: KivNode, ids: string[]): void {
 	}
 }
 
-/** A pass-through stub for whichever node types a template happens to use — enough to exercise the real resolver/renderToHtml pipeline without importing @kiv/nodes. */
+/** A pass-through stub for whichever node types a template happens to use — enough to exercise the real resolver/renderToHtml pipeline without importing @kivcode/nodes. */
 function stubRegistryFor(doc: KivDocument) {
 	const types = new Set<string>();
 	collectTypes(doc.root, types);

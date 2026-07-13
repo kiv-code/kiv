@@ -1,2 +1,21 @@
-@import "tailwindcss";
+/*
+ * Intentionally NOT `@import "tailwindcss";` here. This package's templates
+ * use Tailwind utility classes, but bundling a full compiled Tailwind build
+ * into this package's own CSS meant shipping unscoped, unprefixed generic
+ * classes (`.hidden`, `.flex`, `.p-4`, ...) that silently collide with
+ * whatever Tailwind utilities the CONSUMING app generates for itself (CSS's
+ * "unlayered beats layered" rule made kiv's copy win regardless of the
+ * host app's responsive variants — see the kmjkevents integration incident
+ * where this broke an `md:flex` sidebar toggle).
+ *
+ * Fix: this package requires the consuming app to have Tailwind CSS
+ * installed and configured, and to add a `@source` glob pointing at this
+ * package's `dist` folder (see README) so the HOST app's own Tailwind build
+ * generates the utility classes these components reference — using the
+ * host's own theme (colors/spacing/breakpoints), with no duplicate utility
+ * set and no possibility of collision.
+ *
+ * Only genuinely custom, hand-written, `.kiv-*`-scoped CSS belongs in this
+ * file (see ./editor.css) — never a compiled Tailwind utility set.
+ */
 @import "./editor.css";

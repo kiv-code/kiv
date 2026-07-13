@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/vue-editor",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "The Kiv visual page-builder editor UI — canvas, structure tree, inspector, drag & drop, undo/redo, node palette, and content-block library.",
 	"license": "MIT",
 	"type": "module",
@@ -44,11 +44,9 @@
 		"@kivcode/vue": "workspace:*"
 	},
 	"devDependencies": {
-		"@tailwindcss/vite": "^4.3.2",
 		"@vitejs/plugin-vue": "^5.2.4",
 		"@vue/test-utils": "^2.4.11",
 		"happy-dom": "^20.10.6",
-		"tailwindcss": "^4.3.2",
 		"typescript": "^6.0.3",
 		"vite": "^6.3.5",
 		"vite-plugin-dts": "^4.5.4",

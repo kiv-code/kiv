@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/vue",
-	"version": "0.1.0",
+	"version": "0.1.5",
 	"description": "Vue 3 renderer for the Kiv visual page-builder — a component per node type, plus KivRenderer/KivNodeRenderer to walk and render a KivDocument.",
 	"license": "MIT",
 	"type": "module",

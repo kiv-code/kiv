@@ -15,6 +15,9 @@ const props = defineProps<{
 	highlightColor?: string;
 	stripeColor?: unknown;
 	stripeTextColor?: string;
+	stripeFontSize?: string;
+	titleFontSize?: string;
+	descriptionFontSize?: string;
 	hasSpeaker?: boolean;
 	speakerLabel?: string;
 	speakerName?: string;
@@ -43,70 +46,42 @@ const isStripe = computed(
 const isCard = computed(() => layout.value === "card");
 const isCompact = computed(() => layout.value === "compact");
 
+// Layout (flex-direction, padding, alignment) now lives in the scoped
+// <style> below, driven by classes, so the max-width:640px rule there can
+// actually take effect — an inline `:style` always outranks an external
+// stylesheet rule regardless of specificity or media query, so anything
+// that needs to change on mobile (this used to set flex-direction/padding/
+// align-items inline) has to be a class, not a bound style. Only genuinely
+// per-instance PAINT (colors driven by node props) stays inline.
 const wrapStyle = computed(() => {
-	const base: Record<string, string | number | undefined> = {
-		borderRadius: "var(--kiv-agenda-item-radius, 8px)",
-		overflow: "hidden",
-	};
-
+	const base: Record<string, string | undefined> = {};
 	if (props.highlight) {
 		base.borderLeft = `4px solid ${props.highlightColor || "#6366f1"}`;
 	}
-
-	if (isCard.value) {
-		base.display = "flex";
-		base.flexDirection = "column";
-		base.background = "#fff";
-		base.boxShadow = "0 1px 4px rgba(0,0,0,0.08)";
-	} else if (isCompact.value) {
-		base.display = "flex";
-		base.alignItems = "center";
-		base.gap = "16px";
-		base.padding = "10px 16px";
-		base.background = "#fff";
-		base.borderBottom = "1px solid #e2e8f0";
-	} else {
-		base.display = "flex";
-	}
-
 	return base;
 });
 
-const stripeStyle = computed(() => ({
-	flex: isStripe.value
-		? "0 0 var(--kiv-agenda-stripe-width, 150px)"
-		: undefined,
-	display: "flex" as const,
-	alignItems: "center" as const,
-	justifyContent: "center" as const,
-	textAlign: "center" as const,
-	fontWeight: "800",
-	fontSize: "0.85rem",
-	padding: "12px",
-	lineHeight: "1.3",
+const stripePaintStyle = computed(() => ({
 	background: resolveBackgroundPaint(props.stripeColor, "#e2e8f0"),
 	color: props.stripeTextColor || "#0f172a",
+	fontSize: props.stripeFontSize || undefined,
 }));
 
-const compactTimeStyle = computed(() => ({
-	flex: "0 0 auto",
-	fontWeight: "700",
-	fontSize: "0.82rem",
+const compactTimePaintStyle = computed(() => ({
 	color: resolveBackgroundPaint(props.stripeColor, "#6366f1"),
-	minWidth: "80px",
+	fontSize: props.stripeFontSize || undefined,
 }));
 
-const bodyStyle = computed(() => ({
-	flex: isStripe.value ? "1" : undefined,
+const bodyPaintStyle = computed(() => ({
 	background: props.bodyBackground || "var(--kiv-agenda-body-bg, #eceefb)",
-	padding: isCard.value ? "0" : "14px 20px",
-	display: "flex" as const,
-	alignItems: (props.hasSpeaker ? "flex-start" : "center") as
-		| "flex-start"
-		| "center",
-	justifyContent: "space-between" as const,
-	gap: "20px",
-	flexWrap: "wrap" as const,
+}));
+
+const titlePaintStyle = computed(() => ({
+	fontSize: props.titleFontSize || undefined,
+}));
+
+const descriptionPaintStyle = computed(() => ({
+	fontSize: props.descriptionFontSize || undefined,
 }));
 
 const cardImageStyle = {
@@ -134,29 +109,57 @@ const tagsList = computed(() => {
 </script>
 
 <template>
-	<article data-kiv-type="agenda-item" :style="wrapStyle">
+	<!--
+		Self-contained container query context — `agenda-item` is DESIGNED to
+		live inside an `Agenda` (which names its own container "kiv-agenda"
+		for exactly this purpose), but the editor doesn't actually enforce
+		that: nothing stops someone from dropping an agenda-item straight
+		into a Tab Panel, Container, or Stack instead. When that happens
+		there's no ancestor container to respond to, and the item is stuck
+		in its desktop row layout forever, at ANY viewport width (reported
+		against a real kmjkevents page — a Tab Panel had 3 bare agenda-items
+		with no Agenda wrapper). Wrapping every instance in its OWN
+		containment context — independent of whatever it's actually nested
+		in — makes each agenda-item responsive on its own, with no
+		dependency on being correctly parented.
+	-->
+	<div class="kiv-agenda-item__container">
+		<article
+			data-kiv-type="agenda-item"
+			class="kiv-agenda-item"
+			:class="{
+				'kiv-agenda-item--stripe': isStripe,
+				'kiv-agenda-item--card': isCard,
+				'kiv-agenda-item--compact': isCompact,
+			}"
+			:style="wrapStyle"
+		>
 		<!-- Card layout: image on top -->
 		<template v-if="isCard && image">
 			<img :src="image" :alt="title" :style="cardImageStyle" />
 		</template>
 
 		<!-- Stripe / Timeline layout: left time block -->
-		<div v-if="isStripe" :style="stripeStyle">
+		<div v-if="isStripe" class="kiv-agenda-item__stripe" :style="stripePaintStyle">
 			<template v-if="label">{{ label }}<br />{{ time }}</template>
 			<template v-else>{{ time }}</template>
 		</div>
 
 		<!-- Compact layout: inline time -->
-		<span v-if="isCompact" :style="compactTimeStyle">
+		<span v-if="isCompact" class="kiv-agenda-item__compact-time" :style="compactTimePaintStyle">
 			<template v-if="label">{{ label }}<br />{{ time }}</template>
 			<template v-else>{{ time }}</template>
 		</span>
 
 		<!-- Body content -->
-		<div :style="bodyStyle">
+		<div
+			class="kiv-agenda-item__body"
+			:class="{ 'kiv-agenda-item__body--has-speaker': hasSpeaker }"
+			:style="bodyPaintStyle"
+		>
 			<div class="kiv-agenda-item__main">
-				<p v-if="title" class="kiv-agenda-item__title">{{ title }}</p>
-				<p v-if="description" class="kiv-agenda-item__desc">{{ description }}</p>
+				<p v-if="title" class="kiv-agenda-item__title" :style="titlePaintStyle">{{ title }}</p>
+				<p v-if="description" class="kiv-agenda-item__desc" :style="descriptionPaintStyle">{{ description }}</p>
 				<span v-if="location && !isCompact" class="kiv-agenda-item__loc">
 					<svg width="12" height="12" viewBox="0 0 24 24" fill="#ff5a3c"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" /></svg>
 					{{ location }}
@@ -177,9 +180,119 @@ const tagsList = computed(() => {
 			</div>
 		</div>
 	</article>
+	</div>
 </template>
 
 <style scoped>
+.kiv-agenda-item__container {
+	container-type: inline-size;
+	container-name: kiv-agenda-item;
+}
+.kiv-agenda-item {
+	border-radius: var(--kiv-agenda-item-radius, 8px);
+	overflow: hidden;
+}
+.kiv-agenda-item--stripe {
+	display: flex;
+	flex-direction: row;
+}
+.kiv-agenda-item--card {
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.kiv-agenda-item--compact {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 10px 16px;
+	background: #fff;
+	border-bottom: 1px solid #e2e8f0;
+}
+.kiv-agenda-item__stripe {
+	flex: 0 0 var(--kiv-agenda-stripe-width, 150px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	font-weight: 800;
+	font-size: 0.85rem;
+	padding: 12px;
+	line-height: 1.3;
+}
+.kiv-agenda-item__compact-time {
+	flex: 0 0 auto;
+	font-weight: 700;
+	font-size: 0.82rem;
+	min-width: 80px;
+}
+.kiv-agenda-item__body {
+	flex: 1;
+	padding: 14px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	flex-wrap: wrap;
+}
+.kiv-agenda-item--card .kiv-agenda-item__body {
+	padding: 0;
+}
+.kiv-agenda-item__body--has-speaker {
+	align-items: flex-start;
+}
+
+/* Stripe layout is a 2-column row (time | content) at desktop/tablet widths.
+   Below 640px it stacks — time becomes a compact header bar above the
+   content instead of a tall centered block, which is what actually breaks
+   down at phone widths (see kmjkevents integration report).
+
+   @container, not @media — this needs to react to the item's own rendered
+   width (see .kiv-agenda-item__container above), not the browser viewport.
+   A media query can't see the kiv editor's simulated mobile/tablet canvas
+   (a width-constrained <div>, not a real narrower viewport); querying the
+   item's OWN wrapper (rather than relying on an Agenda ancestor) also means
+   this keeps working even if the item ends up parented somewhere other
+   than an Agenda (a Tab Panel, a Container, ...) — nothing in the editor
+   currently stops that, and when it happens there'd otherwise be no
+   container to respond to at all, leaving the item stuck in desktop
+   layout at any width. */
+@container kiv-agenda-item (max-width: 640px) {
+	.kiv-agenda-item--stripe {
+		flex-direction: column;
+	}
+	.kiv-agenda-item--stripe .kiv-agenda-item__stripe {
+		flex: 0 0 auto;
+		width: 100%;
+		justify-content: flex-start;
+		text-align: left;
+		padding: 8px 14px;
+		font-size: 0.8rem;
+	}
+	.kiv-agenda-item__body {
+		padding: 12px 14px;
+		align-items: flex-start;
+	}
+	/* With a speaker card, `.main` (min-width:0, flex:1) and `.speaker`
+	   (flex-shrink:0, fixed avatar + role text) fight for the same row —
+	   `.main` has no floor on how far it can shrink, so it gets squeezed
+	   down to the width of its single longest word (title/description wrap
+	   one word per line) instead of wrapping onto its own line below the
+	   speaker. Forcing a column stack here — full width each, speaker below
+	   the text — is what "stacks on mobile" actually needs for this variant. */
+	.kiv-agenda-item__body--has-speaker {
+		flex-direction: column;
+	}
+	.kiv-agenda-item__body--has-speaker .kiv-agenda-item__main,
+	.kiv-agenda-item__body--has-speaker .kiv-agenda-item__speaker {
+		width: 100%;
+	}
+	.kiv-agenda-item--compact {
+		flex-wrap: wrap;
+	}
+}
+
 .kiv-agenda-item__main {
 	display: flex;
 	flex-direction: column;

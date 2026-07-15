@@ -110,7 +110,7 @@ export const agendaItemNode = defineNode({
 			justifyContent: "center",
 			textAlign: "center",
 			fontWeight: "800",
-			fontSize: "0.85rem",
+			fontSize: String(props.stripeFontSize || "0.85rem"),
 			padding: "12px",
 			lineHeight: "1.3",
 			background: resolveBackgroundPaint(props.stripeColor, "#e2e8f0"),
@@ -120,7 +120,7 @@ export const agendaItemNode = defineNode({
 		const title = props.title !== undefined ? escapeHtml(props.title) : "";
 		const description =
 			props.description !== undefined && props.description !== ""
-				? `<p style="${styleToString({ margin: "0", fontSize: "0.82rem", color: "#475569", lineHeight: "1.5" })}">${escapeHtml(props.description)}</p>`
+				? `<p style="${styleToString({ margin: "0", fontSize: String(props.descriptionFontSize || "0.82rem"), color: "#475569", lineHeight: "1.5" })}">${escapeHtml(props.description)}</p>`
 				: "";
 		const location =
 			props.location !== undefined && props.location !== ""
@@ -217,7 +217,7 @@ export const agendaItemNode = defineNode({
 		return (
 			`<article data-kiv-type="agenda-item" style="${wrapStyle}${highlight}">` +
 			`<div style="${stripeStyle}">${stripeText}</div>` +
-			`<div style="${bodyStyle}"><div style="${mainStyle}">${imageHtml}<p style="margin:0;font-weight:700;font-size:0.95rem;">${title}</p>${description}${location}${tagsHtml}</div>${speakerHtml}</div>` +
+			`<div style="${bodyStyle}"><div style="${mainStyle}">${imageHtml}<p style="margin:0;font-weight:700;font-size:${escapeHtml(String(props.titleFontSize || "0.95rem"))};">${title}</p>${description}${location}${tagsHtml}</div>${speakerHtml}</div>` +
 			`</article>`
 		);
 	},
@@ -290,6 +290,33 @@ export const agendaItemNode = defineNode({
 			label: "Stripe Text Color",
 			default: "#0f172a",
 			group: "Style",
+		}),
+		stripeFontSize: sizeField({
+			label: "Time/Label Font Size",
+			default: "0.85rem",
+			group: "Style",
+			units: [
+				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
+				{ unit: "px", min: 8, max: 32, step: 1 },
+			],
+		}),
+		titleFontSize: sizeField({
+			label: "Title Font Size",
+			default: "0.95rem",
+			group: "Style",
+			units: [
+				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
+				{ unit: "px", min: 8, max: 32, step: 1 },
+			],
+		}),
+		descriptionFontSize: sizeField({
+			label: "Description Font Size",
+			default: "0.82rem",
+			group: "Style",
+			units: [
+				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
+				{ unit: "px", min: 8, max: 32, step: 1 },
+			],
 		}),
 		hasSpeaker: f.boolean({
 			label: "Has Speaker",

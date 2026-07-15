@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/nodes",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Pure node schema and defaults for the Kiv visual page-builder — layout, content, and media node definitions with no rendering components.",
 	"license": "MIT",
 	"type": "module",

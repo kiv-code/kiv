@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/vue-editor",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"description": "The Kiv visual page-builder editor UI — canvas, structure tree, inspector, drag & drop, undo/redo, node palette, and content-block library.",
 	"license": "MIT",
 	"type": "module",

@@ -138,7 +138,15 @@ const tablistStyle = computed(() => {
 		display: "flex" as const,
 		flexDirection: "row" as const,
 		gap: props.tabGap || "4px",
-		flexWrap: "wrap" as const,
+		// Was `flexWrap: "wrap"` — with default flex-shrink (1) on the tab
+		// buttons, browsers prefer shrinking every tab on one line over
+		// wrapping, so a long tab set just squeezed into unreadable slivers
+		// instead of wrapping OR scrolling (reported against the kmjkevents
+		// integration). `nowrap` + horizontal overflow (see
+		// .kiv-tabs__tablist below) + `flexShrink:0` on each button (see
+		// tabButtonStyle) together make it scroll instead of both.
+		flexWrap: "nowrap" as const,
+		overflowX: "auto" as const,
 		borderBottom:
 			props.tabVariant === "underline" ? "1px solid #e2e8f0" : undefined,
 	};
@@ -216,6 +224,12 @@ function tabButtonStyle(panel: TabPanelMeta) {
 	const base: Record<string, string | undefined> = {
 		...tabPaddingStyle.value,
 		flex: props.stretch || props.fullWidth ? "1" : undefined,
+		// Without this, default flex-shrink:1 lets long tab sets compress
+		// into unreadable slivers instead of scrolling (see tablistStyle).
+		// Stretch/fullWidth mode is exempt — there tabs are meant to shrink
+		// and grow together to exactly fill the row, no scrolling involved.
+		flexShrink: props.stretch || props.fullWidth ? undefined : "0",
+		whiteSpace: "nowrap",
 		justifyContent: props.stretch || props.fullWidth ? "center" : undefined,
 		border: "none",
 		background: "transparent",
@@ -265,7 +279,7 @@ function tabButtonStyle(panel: TabPanelMeta) {
 
 <template>
 	<div :style="wrapStyle" data-kiv-type="tabs">
-		<div role="tablist" :style="tablistStyle">
+		<div role="tablist" class="kiv-tabs__tablist" :style="tablistStyle">
 			<button
 				v-for="panel in panelData"
 				:key="panel.id"
@@ -294,6 +308,17 @@ function tabButtonStyle(panel: TabPanelMeta) {
 </template>
 
 <style scoped>
+.kiv-tabs__tablist {
+	/* Horizontal scroll affordance instead of a squeeze/wrap — scrollbar is
+	   hidden (touch/trackpad drag and wheel scroll still work) since a
+	   visible scrollbar under a tab row reads as a stray UI element rather
+	   than "there's more, swipe". */
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.kiv-tabs__tablist::-webkit-scrollbar {
+	display: none;
+}
 .kiv-tab__icon {
 	display: inline-flex;
 	align-items: center;

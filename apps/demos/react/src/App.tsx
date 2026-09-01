@@ -5,17 +5,17 @@ import { ALL_INTERACTIVE_NODES } from "@kivcode/nodes-interactive";
 import type { AnalyticsEvent, ClickCounts } from "@kivcode/plugin-analytics";
 import { analyticsPlugin, clickCounterPlugin } from "@kivcode/plugin-analytics";
 import { createDefaultReactRegistry, KivRenderer } from "@kivcode/react";
+import { KivEditor } from "@kivcode/react-editor";
+import "@kivcode/react-editor/style";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { demoDocument } from "./demo-document";
-import { clearPage, loadPage } from "./persistence";
+import { clearPage, loadPage, savePage } from "./persistence";
 import { localStorageService, mockMediaProvider } from "./services";
 
-// There's no @kivcode/react-editor yet — the editor UI stays Vue-only for
-// now (see packages/vue-editor). This demo is PREVIEW-ONLY: it proves the
-// React renderer draws every node type identically to the Vue one, reacts
-// to the same engine.bus events, and resolves locale/breakpoint correctly.
-// Editing a document still happens in the Vue demo; this one only loads
-// whatever was last saved there (same `kiv:demo:page` localStorage key).
+// Both the renderer (KivRenderer) and the editor (KivEditor) are exercised
+// here — same `engine`, same document, same localStorage key as the Vue
+// demo (`kiv:demo:page`), so switching between the two demos mid-edit picks
+// up right where the other left off.
 
 // A stable, module-level registry — it holds no state, just a type→component
 // map, so there's no reason to recreate it per render or per App instance.
@@ -30,6 +30,7 @@ function breakpointForWidth(w: number): Breakpoint {
 }
 
 export function App() {
+	const [mode, setMode] = useState<"preview" | "editor">("editor");
 	const [doc, setDoc] = useState<KivDocument>(() => loadPage() ?? demoDocument);
 	const [previewLocale, setPreviewLocale] = useState(() => doc.i18n.default);
 	const [exportBreakpoint, setExportBreakpoint] = useState<Breakpoint>("base");
@@ -105,6 +106,11 @@ export function App() {
 		setEvents([]);
 	}
 
+	function onDocumentChange(next: KivDocument) {
+		setDoc(next);
+		savePage(next);
+	}
+
 	// Export the current document to static HTML via renderToHtml() — each
 	// node type's own toHtml() renders itself; unregistered types fall back
 	// to a div. Same helper the Vue demo uses (renderToHtml is framework-
@@ -132,12 +138,48 @@ export function App() {
 		[clickCounts],
 	);
 
+	if (mode === "editor") {
+		return (
+			<div className="demo">
+				<div className="demo-bar">
+					<div className="demo-bar__brand">Kiv Demo · React editor</div>
+					<div className="demo-bar__spacer" />
+					<button
+						type="button"
+						className="demo-reset"
+						onClick={() => setMode("preview")}
+					>
+						Switch to preview
+					</button>
+				</div>
+				<div style={{ flex: "1", minHeight: 0 }}>
+					<KivEditor
+						document={doc}
+						registry={engine.registry}
+						reactRegistry={reactRegistry}
+						bus={engine.bus}
+						engine={engine}
+						title="Kiv Demo"
+						onDocumentChange={onDocumentChange}
+					/>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="demo">
 			<div className="demo-bar">
 				<div className="demo-bar__brand">Kiv Demo · React renderer</div>
 				<div className="demo-bar__spacer" />
 
+				<button
+					type="button"
+					className="demo-reset"
+					onClick={() => setMode("editor")}
+				>
+					Switch to editor
+				</button>
 				<button type="button" className="demo-reset" onClick={reloadFromSaved}>
 					Reload saved page
 				</button>

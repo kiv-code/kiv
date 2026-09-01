@@ -1,0 +1,62 @@
+{
+	"name": "@kivcode/react-editor",
+	"version": "0.2.0",
+	"description": "The Kiv visual page-builder editor UI for React — canvas, structure tree, inspector, drag & drop, undo/redo, node palette, and content-block library.",
+	"license": "MIT",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kiv-code/kiv.git",
+		"directory": "packages/react-editor"
+	},
+	"homepage": "https://github.com/kiv-code/kiv/tree/main/packages/react-editor#readme",
+	"bugs": "https://github.com/kiv-code/kiv/issues",
+	"keywords": [
+		"kiv",
+		"page-builder",
+		"visual-editor",
+		"react",
+		"react19",
+		"nextjs"
+	],
+	"author": "Kivcode",
+	"publishConfig": {
+		"access": "public"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs"
+		},
+		"./style": "./dist/react-editor.css"
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "vite build",
+		"test": "vitest run --passWithNoTests",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@kivcode/engine": "workspace:*",
+		"@kivcode/nodes": "workspace:*",
+		"@kivcode/nodes-interactive": "workspace:*",
+		"@kivcode/react": "workspace:*"
+	},
+	"devDependencies": {
+		"@testing-library/react": "^16.1.0",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"@vitejs/plugin-react": "^4.3.4",
+		"happy-dom": "^20.10.6",
+		"typescript": "^6.0.3",
+		"vite": "^6.3.5",
+		"vite-plugin-dts": "^4.5.4",
+		"vitest": "^4.1.9"
+	},
+	"peerDependencies": {
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0"
+	}
+}

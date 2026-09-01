@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FieldDescriptor, MediaAsset } from "@kivcode/engine";
 import { computed, inject, ref } from "vue";
+import FileTypeIcon from "../../components/FileTypeIcon.vue";
 import KivMediaBrowser from "../../components/KivMediaBrowser.vue";
 import { EDITOR_STORE_KEY } from "../../store/context";
 
@@ -20,10 +21,18 @@ const store = inject(EDITOR_STORE_KEY, null);
 const media = computed(() => store?.media ?? null);
 const browserOpen = ref(false);
 
-// This same control is used for both image AND video fields (e.g. the
-// `video` node's `src`/`poster`) — an <img> preview of a video URL just
-// shows a broken-image icon, so branch on the extension.
-const isVideo = computed(() => /\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i.test(props.modelValue));
+// This same control is used for image, video, AND non-visual media fields
+// (e.g. a PDF/DOC attachment link) — an <img> preview of a non-image URL
+// just shows a broken-image icon with no indication of what the file even
+// is, so branch on the extension instead of assuming everything is an image.
+const isVideo = computed(() =>
+	/\.(mp4|webm|mov|m4v|ogv|avi)(\?.*)?$/i.test(props.modelValue),
+);
+const isOtherFile = computed(() =>
+	/\.(pdf|docx?|xlsx?|csv|pptx?|zip|rar|7z|tar|gz|txt|md|mp3|wav|ogg|m4a|flac)(\?.*)?$/i.test(
+		props.modelValue,
+	),
+);
 
 function selectAsset(asset: MediaAsset) {
 	emit("update:modelValue", asset.url);
@@ -39,6 +48,9 @@ function clear() {
 	<div class="kiv-media-picker">
 		<div v-if="modelValue" class="kiv-media-picker__preview">
 			<video v-if="isVideo" :src="modelValue" muted class="kiv-media-picker__thumb" />
+			<div v-else-if="isOtherFile" class="kiv-media-picker__thumb kiv-media-picker__thumb--file">
+				<FileTypeIcon :url="modelValue" />
+			</div>
 			<img v-else :src="modelValue" alt="" class="kiv-media-picker__thumb" />
 			<button
 				type="button"
@@ -96,6 +108,11 @@ function clear() {
 	height: 100%;
 	object-fit: cover;
 	display: block;
+}
+.kiv-media-picker__thumb--file {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 .kiv-media-picker__clear {
 	position: absolute;

@@ -1,8 +1,8 @@
-# @kivcode/vue-editor
+# @kivcode/react
 
-## 0.1.5
+## 0.1.0
 
-### Patch Changes
+### Minor Changes
 
 - Add the React 19 renderer (`@kivcode/react`) — a full port of the Vue renderer covering all 25 base nodes and the 9 interactive nodes, with a `KivRenderer`/`KivNodeRenderer` pair, a registry, and context-based bus/media/services/editor-mode/link injection matching the Vue renderer's contract.
 
@@ -10,21 +10,7 @@
 
   Fix the media library browser (`@kivcode/vue-editor`) to show a distinct, colored icon per file type (PDF, DOC, XLS, PPT, ZIP, TXT, audio, video) instead of a single generic emoji or a broken image, in both the library grid and the single-asset field preview. Widen the upload `accept` filter to include non-image/video file types.
 
-- Updated dependencies
-  - @kivcode/engine@0.2.0
-
-## 0.1.0
-
-### Minor Changes
-
-- Initial public release of the Kiv visual page-builder — headless engine, node
-  schema, Vue 3 renderer, editor UI, interactive nodes + content-block template
-  library, and SEO/accessibility plugins.
-
 ### Patch Changes
 
 - Updated dependencies
-  - @kivcode/engine@0.1.0
-  - @kivcode/nodes@0.1.0
-  - @kivcode/nodes-interactive@0.1.0
-  - @kivcode/vue@0.1.0
+  - @kivcode/engine@0.2.0

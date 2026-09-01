@@ -1,0 +1,269 @@
+/*
+ * The Vue renderer's <style scoped> blocks get extracted automatically by
+ * the Vue SFC compiler; React has no equivalent, so this file consolidates
+ * every rule that can't be expressed as an inline `style` prop instead —
+ * mainly CSS reaching into markup injected via `dangerouslySetInnerHTML`
+ * (resolved icon/SVG strings, rich-text HTML), which React's style prop
+ * can't target since it isn't real React-owned content. Everything else
+ * (layout, color, spacing) is inlined directly in each node component, same
+ * as the Vue renderer's own non-`<style>` bindings.
+ */
+
+/* IconNode: resolved SVG or <i> markup injected via dangerouslySetInnerHTML */
+[data-kiv-type="icon"] svg {
+	width: 1em;
+	height: 1em;
+	display: block;
+	flex-shrink: 0;
+}
+[data-kiv-type="icon"] i {
+	display: block;
+	flex-shrink: 0;
+}
+
+/* ButtonNode: icon markup injected via dangerouslySetInnerHTML */
+.kiv-btn-icon svg {
+	width: 1em;
+	height: 1em;
+	display: block;
+	vertical-align: middle;
+}
+
+/* ModalNode: trigger icon markup injected via dangerouslySetInnerHTML */
+.kiv-modal__trigger-icon svg {
+	width: 1em;
+	height: 1em;
+}
+
+/* TabsNode: tab icon markup injected via dangerouslySetInnerHTML */
+.kiv-tab__icon svg {
+	width: 1em;
+	height: 1em;
+}
+
+/* SocialIconsNode: platform icon markup injected via dangerouslySetInnerHTML */
+.kiv-social-icons__svg svg {
+	width: 1em;
+	height: 1em;
+	display: block;
+}
+
+/* TestimonialNode: quote icon markup injected via dangerouslySetInnerHTML */
+.kiv-testimonial__quote-icon svg {
+	width: 1em;
+	height: 1em;
+}
+
+/* RichTextNode: content is raw HTML injected via dangerouslySetInnerHTML,
+   so its own tags (p/ul/ol/li/a) can only be styled from outside. */
+.kiv-rich-text p {
+	margin: 0 0 0.5em;
+}
+.kiv-rich-text p:last-child {
+	margin-bottom: 0;
+}
+.kiv-rich-text ul,
+.kiv-rich-text ol {
+	padding-left: 1.5em;
+	margin: 0.5em 0;
+}
+.kiv-rich-text li {
+	margin-bottom: 0.25em;
+}
+.kiv-rich-text a {
+	color: #6366f1;
+	text-decoration: underline;
+}
+
+/* FormFieldNode: base field styling — the only node in the package whose
+   look depends entirely on external CSS rather than inline styles, since
+   its native <input>/<select>/<textarea> are otherwise unstyled. */
+.kiv-form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+.kiv-form-field label {
+	font-size: 13px;
+	font-weight: 600;
+}
+.kiv-form-field input,
+.kiv-form-field select,
+.kiv-form-field textarea {
+	font: inherit;
+	padding: 8px 10px;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+}
+
+/* TabsNode: hide the tablist's scrollbar (horizontal-scroll affordance
+   instead of squeeze/wrap) while keeping touch/trackpad/wheel scroll. */
+.kiv-tabs__tablist {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.kiv-tabs__tablist::-webkit-scrollbar {
+	display: none;
+}
+
+/* AgendaItemNode: the responsive stripe/card/compact layouts and their
+   @container breakpoint all live here — they change on the item's own
+   rendered width, which an inline `style` prop can't express (no media/
+   container-query support), so this one section stays a real stylesheet
+   rather than following the rest of the package's "inline by default"
+   convention. */
+.kiv-agenda-item__container {
+	container-type: inline-size;
+	container-name: kiv-agenda-item;
+}
+.kiv-agenda-item {
+	border-radius: var(--kiv-agenda-item-radius, 8px);
+	overflow: hidden;
+}
+.kiv-agenda-item--stripe {
+	display: flex;
+	flex-direction: row;
+}
+.kiv-agenda-item--card {
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.kiv-agenda-item--compact {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 10px 16px;
+	background: #fff;
+	border-bottom: 1px solid #e2e8f0;
+}
+.kiv-agenda-item__stripe {
+	flex: 0 0 var(--kiv-agenda-stripe-width, 150px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	font-weight: 800;
+	font-size: 0.85rem;
+	padding: 12px;
+	line-height: 1.3;
+}
+.kiv-agenda-item__compact-time {
+	flex: 0 0 auto;
+	font-weight: 700;
+	font-size: 0.82rem;
+	min-width: 80px;
+}
+.kiv-agenda-item__body {
+	flex: 1;
+	padding: 14px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	flex-wrap: wrap;
+}
+.kiv-agenda-item--card .kiv-agenda-item__body {
+	padding: 0;
+}
+.kiv-agenda-item__body--has-speaker {
+	align-items: flex-start;
+}
+/* @container, not @media — this needs to react to the item's own rendered
+   width, not the browser viewport, and keeps working even if an item ends
+   up parented outside an Agenda (a Tab Panel, a Container, ...). */
+@container kiv-agenda-item (max-width: 640px) {
+	.kiv-agenda-item--stripe {
+		flex-direction: column;
+	}
+	.kiv-agenda-item--stripe .kiv-agenda-item__stripe {
+		flex: 0 0 auto;
+		width: 100%;
+		justify-content: flex-start;
+		text-align: left;
+		padding: 8px 14px;
+		font-size: 0.8rem;
+	}
+	.kiv-agenda-item__body {
+		padding: 12px 14px;
+		align-items: flex-start;
+	}
+	.kiv-agenda-item__body--has-speaker {
+		flex-direction: column;
+	}
+	.kiv-agenda-item__body--has-speaker .kiv-agenda-item__main,
+	.kiv-agenda-item__body--has-speaker .kiv-agenda-item__speaker {
+		width: 100%;
+	}
+	.kiv-agenda-item--compact {
+		flex-wrap: wrap;
+	}
+}
+.kiv-agenda-item__main {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+	flex: 1;
+}
+.kiv-agenda-item__title {
+	margin: 0;
+	font-weight: 700;
+	font-size: 0.95rem;
+}
+.kiv-agenda-item__desc {
+	margin: 0;
+	font-size: 0.82rem;
+	color: #475569;
+	line-height: 1.5;
+}
+.kiv-agenda-item__loc {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 0.8rem;
+	color: #64748b;
+}
+.kiv-agenda-item__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-top: 4px;
+}
+.kiv-agenda-item__tag {
+	font-size: 0.68rem;
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 9999px;
+	background: #e0e7ff;
+	color: #4338ca;
+}
+.kiv-agenda-item__speaker {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-shrink: 0;
+}
+.kiv-agenda-item__speaker-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.kiv-agenda-item__speaker-label {
+	font-size: 0.68rem;
+	font-weight: 700;
+	color: #ff1d96;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+.kiv-agenda-item__speaker-name {
+	font-weight: 700;
+	font-size: 0.88rem;
+}
+.kiv-agenda-item__speaker-role {
+	font-size: 0.76rem;
+	color: #64748b;
+	max-width: 24ch;
+	line-height: 1.35;
+}

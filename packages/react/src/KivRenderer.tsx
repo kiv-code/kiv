@@ -1,0 +1,89 @@
+import type {
+	Breakpoint,
+	EventBus,
+	KivDocument,
+	MediaProvider,
+	ServicesContainer,
+} from "@kivcode/engine";
+import { HOVER_EFFECTS_CSS } from "@kivcode/nodes";
+import { type ComponentType, useEffect, useMemo } from "react";
+import { KivBusContext } from "./bus";
+import { KivContext } from "./context";
+import { KivEditorModeContext } from "./editor-mode";
+import { KivNodeRenderer } from "./KivNodeRenderer";
+import type { KivLinkComponentProps } from "./link";
+import { KivLinkContext } from "./link";
+import { KivMediaContext } from "./media";
+import type { ReactRegistry } from "./registry";
+import { KivServicesContext } from "./services";
+
+export interface KivRendererProps {
+	document: KivDocument;
+	registry: ReactRegistry;
+	locale?: string;
+	breakpoint?: Breakpoint;
+	editorMode?: boolean;
+	/** Optional event bus (from engine.bus). When passed, interactive nodes emit events. */
+	bus?: EventBus | null;
+	/** Optional MediaProvider (from engine.media). When passed, ImageNode resolves responsive srcset. */
+	media?: MediaProvider | null;
+	/** Optional services container (from engine.services). When passed, FormNode submits via services.api. */
+	services?: ServicesContainer | null;
+	/** Router-aware link component (e.g. Next.js's `Link`) for internal navigation. Falls back to `<a>`. */
+	linkComponent?: ComponentType<KivLinkComponentProps> | null;
+}
+
+const HOVER_CSS_ID = "kiv-hover-effects-css";
+
+export function KivRenderer({
+	document: doc,
+	registry,
+	locale,
+	breakpoint,
+	editorMode = false,
+	bus = null,
+	media = null,
+	services = null,
+	linkComponent = null,
+}: KivRendererProps) {
+	// Reactive-by-dependency-array — updates when locale/breakpoint props change.
+	const ctx = useMemo(
+		() => ({
+			registry,
+			resolveCtx: {
+				locale: locale ?? doc.i18n.default,
+				breakpoint: (breakpoint ?? "base") as Breakpoint,
+				fallbackLocale: doc.i18n.fallback,
+			},
+		}),
+		[registry, locale, breakpoint, doc.i18n.default, doc.i18n.fallback],
+	);
+
+	// Hover presets (.kiv-hover-*) need real CSS — `:hover` can't be inlined.
+	// Inject it once per document so every KivRenderer instance works out of
+	// the box without consumers having to wire it in themselves. useEffect
+	// only runs client-side, so this is inert during SSR (Next.js).
+	useEffect(() => {
+		if (document.getElementById(HOVER_CSS_ID)) return;
+		const styleEl = document.createElement("style");
+		styleEl.id = HOVER_CSS_ID;
+		styleEl.textContent = HOVER_EFFECTS_CSS;
+		document.head.appendChild(styleEl);
+	}, []);
+
+	return (
+		<KivContext.Provider value={ctx}>
+			<KivEditorModeContext.Provider value={editorMode}>
+				<KivBusContext.Provider value={bus}>
+					<KivMediaContext.Provider value={media}>
+						<KivServicesContext.Provider value={services}>
+							<KivLinkContext.Provider value={linkComponent}>
+								<KivNodeRenderer node={doc.root} />
+							</KivLinkContext.Provider>
+						</KivServicesContext.Provider>
+					</KivMediaContext.Provider>
+				</KivBusContext.Provider>
+			</KivEditorModeContext.Provider>
+		</KivContext.Provider>
+	);
+}

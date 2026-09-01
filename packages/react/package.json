@@ -1,0 +1,61 @@
+{
+	"name": "@kivcode/react",
+	"version": "0.1.0",
+	"description": "React 19 renderer for the Kiv visual page-builder — a component per node type, plus KivRenderer/KivNodeRenderer to walk and render a KivDocument.",
+	"license": "MIT",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kiv-code/kiv.git",
+		"directory": "packages/react"
+	},
+	"homepage": "https://github.com/kiv-code/kiv/tree/main/packages/react#readme",
+	"bugs": "https://github.com/kiv-code/kiv/issues",
+	"keywords": [
+		"kiv",
+		"page-builder",
+		"visual-editor",
+		"react",
+		"react19",
+		"nextjs"
+	],
+	"author": "Kivcode",
+	"publishConfig": {
+		"access": "public"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs"
+		},
+		"./style": "./dist/react.css"
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "vite build",
+		"test": "vitest run --passWithNoTests",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@kivcode/engine": "workspace:*",
+		"@kivcode/nodes": "workspace:*"
+	},
+	"devDependencies": {
+		"@kivcode/nodes-interactive": "workspace:*",
+		"@testing-library/react": "^16.1.0",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"@vitejs/plugin-react": "^4.3.4",
+		"happy-dom": "^20.10.6",
+		"typescript": "^6.0.3",
+		"vite": "^6.3.5",
+		"vite-plugin-dts": "^4.5.4",
+		"vitest": "^4.1.9"
+	},
+	"peerDependencies": {
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0"
+	}
+}

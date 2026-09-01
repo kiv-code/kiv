@@ -4,6 +4,11 @@ export interface MediaAsset {
 	type: "image" | "video" | "file";
 	width?: number;
 	height?: number;
+	/** The original filename, e.g. "Q3-report.pdf" — used to infer file type
+	 * (icon, extension) for non-image assets. Distinct from `alt`: `alt` is
+	 * accessibility/SEO text a user may edit or leave empty, `filename` is
+	 * the actual uploaded name and should always be set by the provider. */
+	filename?: string;
 	alt?: string;
 	meta?: Record<string, unknown>;
 }

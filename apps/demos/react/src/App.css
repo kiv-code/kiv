@@ -1,0 +1,240 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+html,
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background: #0f1117;
+}
+.demo {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Top bar */
+.demo-bar {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	height: 40px;
+	padding: 0 12px;
+	background: #16181f;
+	border-bottom: 1px solid #1e2130;
+	color: #e2e8f0;
+	flex-shrink: 0;
+}
+.demo-bar__brand {
+	font-size: 0.8rem;
+	font-weight: 700;
+}
+.demo-bar__spacer {
+	flex: 1;
+}
+.demo-bar__locales {
+	display: flex;
+	gap: 2px;
+	background: #0d0f17;
+	border: 1px solid #1e2130;
+	border-radius: 7px;
+	padding: 2px;
+}
+.demo-bar__locales button {
+	padding: 4px 12px;
+	border: none;
+	border-radius: 5px;
+	background: transparent;
+	color: #94a3b8;
+	font-size: 0.72rem;
+	font-weight: 600;
+	font-family: inherit;
+	cursor: pointer;
+}
+.demo-bar__locales button.active {
+	background: rgba(99, 102, 241, 0.2);
+	color: #a5b4fc;
+}
+
+.demo-reset {
+	padding: 4px 10px;
+	border: 1px solid #1e2130;
+	border-radius: 6px;
+	background: transparent;
+	color: #94a3b8;
+	font-size: 0.7rem;
+	font-family: inherit;
+	cursor: pointer;
+}
+.demo-reset:hover {
+	background: #1a1d2a;
+	color: #e2e8f0;
+}
+.demo-export-bp {
+	padding: 4px 8px;
+	border: 1px solid #1e2130;
+	border-radius: 6px;
+	background: #0d0f17;
+	color: #94a3b8;
+	font-size: 0.7rem;
+	font-family: inherit;
+	cursor: pointer;
+}
+
+/* Preview */
+.demo-preview {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+}
+.demo-preview__stage {
+	flex: 1;
+	overflow: auto;
+	background: #fff;
+}
+.demo-events {
+	width: 320px;
+	flex-shrink: 0;
+	background: #13151c;
+	border-left: 1px solid #1e2130;
+	color: #e2e8f0;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+}
+.demo-events__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 12px;
+	border-bottom: 1px solid #1e2130;
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #b0bdd0;
+}
+.demo-events__header button {
+	border: none;
+	background: transparent;
+	color: #64748b;
+	font-size: 0.66rem;
+	cursor: pointer;
+	font-family: inherit;
+}
+.demo-events__header button:hover {
+	color: #e2e8f0;
+}
+.demo-events__hint {
+	padding: 10px 12px;
+	margin: 0;
+	font-size: 0.68rem;
+	line-height: 1.4;
+	color: #64748b;
+	border-bottom: 1px solid #1e2130;
+}
+.demo-events__hint code {
+	color: #a5b4fc;
+	font-size: 0.64rem;
+}
+.demo-events__list {
+	list-style: none;
+	margin: 0;
+	padding: 6px;
+	overflow-y: auto;
+	flex: 1;
+}
+.demo-events__empty {
+	padding: 16px 8px;
+	text-align: center;
+	color: #475569;
+	font-size: 0.72rem;
+}
+.demo-events__item {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 7px 8px;
+	border-radius: 6px;
+	background: #1a1d2a;
+	margin-bottom: 4px;
+}
+.demo-events__name {
+	font-size: 0.72rem;
+	font-weight: 600;
+	color: #6ee7b7;
+}
+.demo-events__payload {
+	font-size: 0.64rem;
+	color: #94a3b8;
+	word-break: break-all;
+}
+
+/* Per-plugin panel */
+.demo-panel {
+	border-bottom: 1px solid #1e2130;
+	padding: 8px 6px 10px;
+}
+.demo-panel__title {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 6px 8px;
+	font-size: 0.64rem;
+	color: #94a3b8;
+}
+.demo-panel__title code {
+	color: #a5b4fc;
+	font-size: 0.62rem;
+}
+.demo-panel__dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+.demo-panel__dot--count {
+	background: #fb923c;
+}
+.demo-panel__dot--events {
+	background: #34d399;
+}
+
+/* Click counts */
+.demo-counts {
+	list-style: none;
+	margin: 0;
+	padding: 0 6px;
+}
+.demo-counts__item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 6px 8px;
+	border-radius: 6px;
+	background: #1a1d2a;
+	margin-bottom: 4px;
+}
+.demo-counts__key {
+	font-size: 0.72rem;
+	color: #e2e8f0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.demo-counts__badge {
+	flex-shrink: 0;
+	min-width: 22px;
+	text-align: center;
+	padding: 1px 7px;
+	border-radius: 10px;
+	background: rgba(251, 146, 60, 0.18);
+	color: #fdba74;
+	font-size: 0.68rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}

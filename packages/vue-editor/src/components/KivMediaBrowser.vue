@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MediaAsset, MediaProvider } from "@kivcode/engine";
 import { computed, nextTick, ref, watch } from "vue";
+import FileTypeIcon from "./FileTypeIcon.vue";
 import { mediaListCache } from "./media-list-cache";
 
 const props = defineProps<{
@@ -120,9 +121,12 @@ function thumbSrc(asset: MediaAsset): string {
 // `asset.url` is frequently a data: URI (mock providers, inline SVG
 // placeholders) — slicing after the last "/" on one of those tears into the
 // base64 payload instead of finding a filename, since base64 itself can
-// contain "/". Prefer `alt`, and only fall back to path-parsing for URLs
-// that actually look like paths.
+// contain "/". `filename` (the real uploaded name) wins when the provider
+// sets it; `alt` is accessibility text and only a fallback proxy for it —
+// path-parsing the URL is the last resort, for older assets/providers that
+// predate `filename`.
 function assetLabel(asset: MediaAsset): string {
+	if (asset.filename) return asset.filename;
 	if (asset.alt) return asset.alt;
 	if (asset.url.startsWith("data:")) return asset.id;
 	const withoutQuery = asset.url.split("?")[0] ?? asset.url;
@@ -242,7 +246,7 @@ function onKeydown(e: KeyboardEvent) {
 							type="file"
 							multiple
 							class="kiv-media-modal__file-input"
-							accept="image/*,video/*"
+							accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.zip,.txt,.md"
 							@change="onFileChange"
 						/>
 					</div>
@@ -270,7 +274,7 @@ function onKeydown(e: KeyboardEvent) {
 										loading="lazy"
 									/>
 									<div v-else class="kiv-media-modal__thumb kiv-media-modal__thumb--placeholder">
-										{{ asset.type === "video" ? "🎬" : "📄" }}
+										<FileTypeIcon :url="asset.url" :filename="asset.filename ?? asset.alt" :asset-type="asset.type" />
 									</div>
 									<span class="kiv-media-modal__card-name">{{ assetLabel(asset) }}</span>
 								</button>

@@ -20,6 +20,7 @@ export interface SizeFieldOptions {
 	responsive?: boolean;
 	hint?: string;
 	units?: SizeUnitConfig[];
+	showIf?: { field: string; equals: string | string[] };
 }
 
 /**
@@ -40,6 +41,7 @@ export function sizeField(
 		group: opts.group,
 		responsive: opts.responsive ?? true,
 		hint: opts.hint,
+		showIf: opts.showIf,
 		sliderUnits: opts.units ?? DEFAULT_UNITS,
 	};
 }

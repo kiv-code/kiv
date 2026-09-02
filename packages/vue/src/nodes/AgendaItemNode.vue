@@ -16,13 +16,68 @@ const props = defineProps<{
 	stripeColor?: unknown;
 	stripeTextColor?: string;
 	stripeFontSize?: string;
+	stripeFontWeight?: string;
 	titleFontSize?: string;
+	titleFontWeight?: string;
+	titleColor?: string;
 	descriptionFontSize?: string;
+	descriptionFontWeight?: string;
+	descriptionColor?: string;
 	hasSpeaker?: boolean;
+	speakerCount?: string;
+	speakersPerRow?: string;
 	speakerLabel?: string;
+	speakerLabelFontSize?: string;
+	speakerLabelColor?: string;
+	speakerLabelFontWeight?: string;
 	speakerName?: string;
+	speakerNameFontSize?: string;
+	speakerNameColor?: string;
+	speakerNameFontWeight?: string;
 	speakerRole?: string;
+	speakerTitleFontSize?: string;
+	speakerTitleColor?: string;
+	speakerTitleFontWeight?: string;
+	speakerCompany?: string;
+	speakerCompanyFontSize?: string;
+	speakerCompanyColor?: string;
+	speakerCompanyFontWeight?: string;
 	speakerAvatar?: string;
+	speaker2Label?: string;
+	speaker2Name?: string;
+	speaker2Role?: string;
+	speaker2Company?: string;
+	speaker2Avatar?: string;
+	speaker3Label?: string;
+	speaker3Name?: string;
+	speaker3Role?: string;
+	speaker3Company?: string;
+	speaker3Avatar?: string;
+	speaker4Label?: string;
+	speaker4Name?: string;
+	speaker4Role?: string;
+	speaker4Company?: string;
+	speaker4Avatar?: string;
+	speaker5Label?: string;
+	speaker5Name?: string;
+	speaker5Role?: string;
+	speaker5Company?: string;
+	speaker5Avatar?: string;
+	speaker6Label?: string;
+	speaker6Name?: string;
+	speaker6Role?: string;
+	speaker6Company?: string;
+	speaker6Avatar?: string;
+	speaker7Label?: string;
+	speaker7Name?: string;
+	speaker7Role?: string;
+	speaker7Company?: string;
+	speaker7Avatar?: string;
+	speaker8Label?: string;
+	speaker8Name?: string;
+	speaker8Role?: string;
+	speaker8Company?: string;
+	speaker8Avatar?: string;
 }>();
 
 const layout = computed(() => {
@@ -45,6 +100,7 @@ const isStripe = computed(
 );
 const isCard = computed(() => layout.value === "card");
 const isCompact = computed(() => layout.value === "compact");
+const hasTime = computed(() => Boolean(props.time || props.label));
 
 // Layout (flex-direction, padding, alignment) now lives in the scoped
 // <style> below, driven by classes, so the max-width:640px rule there can
@@ -65,11 +121,13 @@ const stripePaintStyle = computed(() => ({
 	background: resolveBackgroundPaint(props.stripeColor, "#e2e8f0"),
 	color: props.stripeTextColor || "#0f172a",
 	fontSize: props.stripeFontSize || undefined,
+	fontWeight: props.stripeFontWeight || undefined,
 }));
 
 const compactTimePaintStyle = computed(() => ({
 	color: resolveBackgroundPaint(props.stripeColor, "#6366f1"),
 	fontSize: props.stripeFontSize || undefined,
+	fontWeight: props.stripeFontWeight || undefined,
 }));
 
 const bodyPaintStyle = computed(() => ({
@@ -78,10 +136,38 @@ const bodyPaintStyle = computed(() => ({
 
 const titlePaintStyle = computed(() => ({
 	fontSize: props.titleFontSize || undefined,
+	fontWeight: props.titleFontWeight || undefined,
+	color: props.titleColor || undefined,
 }));
 
 const descriptionPaintStyle = computed(() => ({
 	fontSize: props.descriptionFontSize || undefined,
+	fontWeight: props.descriptionFontWeight || undefined,
+	color: props.descriptionColor || undefined,
+}));
+
+const speakerLabelPaintStyle = computed(() => ({
+	fontSize: props.speakerLabelFontSize || undefined,
+	color: props.speakerLabelColor || undefined,
+	fontWeight: props.speakerLabelFontWeight || undefined,
+}));
+
+const speakerNamePaintStyle = computed(() => ({
+	fontSize: props.speakerNameFontSize || undefined,
+	color: props.speakerNameColor || undefined,
+	fontWeight: props.speakerNameFontWeight || undefined,
+}));
+
+const speakerTitlePaintStyle = computed(() => ({
+	fontSize: props.speakerTitleFontSize || undefined,
+	color: props.speakerTitleColor || undefined,
+	fontWeight: props.speakerTitleFontWeight || undefined,
+}));
+
+const speakerCompanyPaintStyle = computed(() => ({
+	fontSize: props.speakerCompanyFontSize || undefined,
+	color: props.speakerCompanyColor || undefined,
+	fontWeight: props.speakerCompanyFontWeight || undefined,
 }));
 
 const cardImageStyle = {
@@ -106,6 +192,76 @@ const tagsList = computed(() => {
 		.map((t: string) => t.trim())
 		.filter(Boolean);
 });
+
+const speakersList = computed(() => {
+	const count = Math.min(
+		8,
+		Math.max(1, Number(props.speakerCount ?? "1") || 1),
+	);
+	const all = [
+		{
+			label: props.speakerLabel,
+			name: props.speakerName,
+			role: props.speakerRole,
+			company: props.speakerCompany,
+			avatar: props.speakerAvatar,
+		},
+		{
+			label: props.speaker2Label,
+			name: props.speaker2Name,
+			role: props.speaker2Role,
+			company: props.speaker2Company,
+			avatar: props.speaker2Avatar,
+		},
+		{
+			label: props.speaker3Label,
+			name: props.speaker3Name,
+			role: props.speaker3Role,
+			company: props.speaker3Company,
+			avatar: props.speaker3Avatar,
+		},
+		{
+			label: props.speaker4Label,
+			name: props.speaker4Name,
+			role: props.speaker4Role,
+			company: props.speaker4Company,
+			avatar: props.speaker4Avatar,
+		},
+		{
+			label: props.speaker5Label,
+			name: props.speaker5Name,
+			role: props.speaker5Role,
+			company: props.speaker5Company,
+			avatar: props.speaker5Avatar,
+		},
+		{
+			label: props.speaker6Label,
+			name: props.speaker6Name,
+			role: props.speaker6Role,
+			company: props.speaker6Company,
+			avatar: props.speaker6Avatar,
+		},
+		{
+			label: props.speaker7Label,
+			name: props.speaker7Name,
+			role: props.speaker7Role,
+			company: props.speaker7Company,
+			avatar: props.speaker7Avatar,
+		},
+		{
+			label: props.speaker8Label,
+			name: props.speaker8Name,
+			role: props.speaker8Role,
+			company: props.speaker8Company,
+			avatar: props.speaker8Avatar,
+		},
+	];
+	return all.slice(0, count);
+});
+
+const speakersGridStyle = computed(() => ({
+	gridTemplateColumns: `repeat(${Math.min(5, Math.max(1, Number(props.speakersPerRow ?? "3") || 3))}, 1fr)`,
+}));
 </script>
 
 <template>
@@ -139,14 +295,16 @@ const tagsList = computed(() => {
 			<img :src="image" :alt="title" :style="cardImageStyle" />
 		</template>
 
-		<!-- Stripe / Timeline layout: left time block -->
-		<div v-if="isStripe" class="kiv-agenda-item__stripe" :style="stripePaintStyle">
+		<!-- Stripe / Timeline layout: left time block — omitted entirely when
+			no time/label is set, so the item can be used as a pure content
+			(+ speakers) card without an empty time block eating space. -->
+		<div v-if="isStripe && hasTime" class="kiv-agenda-item__stripe" :style="stripePaintStyle">
 			<template v-if="label">{{ label }}<br />{{ time }}</template>
 			<template v-else>{{ time }}</template>
 		</div>
 
 		<!-- Compact layout: inline time -->
-		<span v-if="isCompact" class="kiv-agenda-item__compact-time" :style="compactTimePaintStyle">
+		<span v-if="isCompact && hasTime" class="kiv-agenda-item__compact-time" :style="compactTimePaintStyle">
 			<template v-if="label">{{ label }}<br />{{ time }}</template>
 			<template v-else>{{ time }}</template>
 		</span>
@@ -169,13 +327,16 @@ const tagsList = computed(() => {
 				</div>
 				<slot />
 			</div>
-			<div v-if="hasSpeaker" class="kiv-agenda-item__speaker">
-				<img v-if="speakerAvatar" :src="speakerAvatar" :alt="speakerName" :style="avatarStyle" />
-				<div v-else :style="avatarStyle" />
-				<div class="kiv-agenda-item__speaker-meta">
-					<span class="kiv-agenda-item__speaker-label">{{ speakerLabel || "Speaker" }}</span>
-					<span class="kiv-agenda-item__speaker-name">{{ speakerName }}</span>
-					<span class="kiv-agenda-item__speaker-role">{{ speakerRole }}</span>
+			<div v-if="hasSpeaker" class="kiv-agenda-item__speakers" :style="speakersGridStyle">
+				<div v-for="(speaker, i) in speakersList" :key="i" class="kiv-agenda-item__speaker">
+					<img v-if="speaker.avatar" :src="speaker.avatar" :alt="speaker.name" :style="avatarStyle" />
+					<div v-else :style="avatarStyle" />
+					<div class="kiv-agenda-item__speaker-meta">
+						<span v-if="speaker.label" class="kiv-agenda-item__speaker-label" :style="speakerLabelPaintStyle">{{ speaker.label }}</span>
+						<span class="kiv-agenda-item__speaker-name" :style="speakerNamePaintStyle">{{ speaker.name }}</span>
+						<span v-if="speaker.role" class="kiv-agenda-item__speaker-role" :style="speakerTitlePaintStyle">{{ speaker.role }}</span>
+						<span v-if="speaker.company" class="kiv-agenda-item__speaker-company" :style="speakerCompanyPaintStyle">{{ speaker.company }}</span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -285,11 +446,26 @@ const tagsList = computed(() => {
 		flex-direction: column;
 	}
 	.kiv-agenda-item__body--has-speaker .kiv-agenda-item__main,
-	.kiv-agenda-item__body--has-speaker .kiv-agenda-item__speaker {
+	.kiv-agenda-item__body--has-speaker .kiv-agenda-item__speakers {
 		width: 100%;
 	}
 	.kiv-agenda-item--compact {
 		flex-wrap: wrap;
+	}
+}
+
+/* Forcing every speaker card to 1-per-row belongs to an actual phone-width
+   container, not the 640px threshold above (that one's tuned for the time
+   stripe stacking). Reusing 640px for this too meant an agenda-item nested
+   inside anything narrower than that — e.g. one of several parallel-session
+   Tabs inside another agenda-item, a Column, a split layout — would always
+   collapse to 1 column, even while the canvas itself is in the Desktop/Wide
+   view, silently overriding the "Speakers Per Row" setting. A tighter,
+   independent threshold lets that setting actually hold until the container
+   is genuinely phone-narrow. */
+@container kiv-agenda-item (max-width: 380px) {
+	.kiv-agenda-item__speakers {
+		grid-template-columns: 1fr !important;
 	}
 }
 
@@ -332,16 +508,22 @@ const tagsList = computed(() => {
 	background: #e0e7ff;
 	color: #4338ca;
 }
+.kiv-agenda-item__speakers {
+	display: grid;
+	gap: 16px;
+	flex: 1 1 100%;
+}
 .kiv-agenda-item__speaker {
 	display: flex;
 	align-items: center;
 	gap: 12px;
-	flex-shrink: 0;
+	min-width: 0;
 }
 .kiv-agenda-item__speaker-meta {
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
+	min-width: 0;
 }
 .kiv-agenda-item__speaker-label {
 	font-size: 0.68rem;
@@ -357,7 +539,13 @@ const tagsList = computed(() => {
 .kiv-agenda-item__speaker-role {
 	font-size: 0.76rem;
 	color: #64748b;
-	max-width: 24ch;
 	line-height: 1.35;
+	overflow-wrap: break-word;
+}
+.kiv-agenda-item__speaker-company {
+	font-size: 0.76rem;
+	color: #64748b;
+	line-height: 1.35;
+	overflow-wrap: break-word;
 }
 </style>

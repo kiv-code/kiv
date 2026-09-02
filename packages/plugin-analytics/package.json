@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/plugin-analytics",
-	"version": "0.0.0",
+	"version": "0.3.0",
 	"private": true,
 	"description": "Minimal example plugin (click counter) demonstrating the Kiv plugin API. Not published — see docs/plugins.md for real plugin examples (@kivcode/plugin-seo, @kivcode/plugin-a11y).",
 	"type": "module",
@@ -19,7 +19,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@kivcode/engine": "workspace:*"
+		"@kivcode/engine": "workspace:^"
 	},
 	"devDependencies": {
 		"typescript": "^6.0.3",

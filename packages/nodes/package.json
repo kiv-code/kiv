@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/nodes",
-	"version": "0.1.2",
+	"version": "0.3.0",
 	"description": "Pure node schema and defaults for the Kiv visual page-builder — layout, content, and media node definitions with no rendering components.",
 	"license": "MIT",
 	"type": "module",
@@ -41,7 +41,7 @@
 		"@iconify-json/lucide": "^1.2.116",
 		"@iconify/types": "^2.0.0",
 		"@iconify/utils": "^3.1.4",
-		"@kivcode/engine": "workspace:*",
+		"@kivcode/engine": "workspace:^",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {

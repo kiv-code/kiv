@@ -1,5 +1,18 @@
 # @kivcode/demo-react
 
+## 0.3.0
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+  - @kivcode/engine@0.3.0
+  - @kivcode/nodes@0.3.0
+  - @kivcode/nodes-interactive@0.3.0
+  - @kivcode/react@0.3.0
+  - @kivcode/react-editor@0.3.0
+  - @kivcode/plugin-analytics@0.3.0
+
 ## 0.0.3
 
 ### Patch Changes

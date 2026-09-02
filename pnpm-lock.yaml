@@ -147,7 +147,7 @@ importers:
         specifier: ^3.1.4
         version: 3.1.4
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
       zod:
         specifier: ^4.4.3
@@ -166,10 +166,10 @@ importers:
   packages/nodes-interactive:
     dependencies:
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
       '@kivcode/nodes':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes
     devDependencies:
       typescript:
@@ -185,10 +185,10 @@ importers:
   packages/plugin-a11y:
     dependencies:
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
       '@kivcode/nodes':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes
       vue:
         specifier: ^3.5.0
@@ -222,7 +222,7 @@ importers:
   packages/plugin-analytics:
     dependencies:
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
     devDependencies:
       typescript:
@@ -238,7 +238,7 @@ importers:
   packages/plugin-seo:
     dependencies:
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
       vue:
         specifier: ^3.5.0
@@ -272,10 +272,10 @@ importers:
   packages/react:
     dependencies:
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
       '@kivcode/nodes':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes
       react:
         specifier: ^19.0.0
@@ -285,7 +285,7 @@ importers:
         version: 19.2.8(react@19.2.8)
     devDependencies:
       '@kivcode/nodes-interactive':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes-interactive
       '@testing-library/react':
         specifier: ^16.1.0
@@ -318,16 +318,16 @@ importers:
   packages/react-editor:
     dependencies:
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
       '@kivcode/nodes':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes
       '@kivcode/nodes-interactive':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes-interactive
       '@kivcode/react':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../react
       react:
         specifier: ^19.0.0
@@ -367,17 +367,17 @@ importers:
   packages/vue:
     dependencies:
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
       '@kivcode/nodes':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes
       vue:
         specifier: ^3.5.0
         version: 3.5.39(typescript@6.0.3)
     devDependencies:
       '@kivcode/nodes-interactive':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes-interactive
       '@vitejs/plugin-vue':
         specifier: ^5.2.4
@@ -407,16 +407,16 @@ importers:
   packages/vue-editor:
     dependencies:
       '@kivcode/engine':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../engine
       '@kivcode/nodes':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes
       '@kivcode/nodes-interactive':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../nodes-interactive
       '@kivcode/vue':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../vue
       vue:
         specifier: ^3.5.0

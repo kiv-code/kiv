@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/plugin-a11y",
-	"version": "0.1.0",
+	"version": "0.3.0",
 	"description": "Accessibility auditing plugin for Kiv — flags missing alt text, heading-level skips, and other a11y issues on a KivDocument.",
 	"license": "MIT",
 	"type": "module",
@@ -39,8 +39,8 @@
 		"typecheck": "vue-tsc --noEmit"
 	},
 	"dependencies": {
-		"@kivcode/engine": "workspace:*",
-		"@kivcode/nodes": "workspace:*"
+		"@kivcode/engine": "workspace:^",
+		"@kivcode/nodes": "workspace:^"
 	},
 	"devDependencies": {
 		"@vitejs/plugin-vue": "^5.2.4",

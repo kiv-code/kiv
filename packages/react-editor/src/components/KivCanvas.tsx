@@ -852,6 +852,7 @@ function KivCanvasInner({
 						locale={locale}
 						editorMode
 						media={store.media}
+						fonts={store.fonts}
 						services={store.services}
 					/>
 				</div>

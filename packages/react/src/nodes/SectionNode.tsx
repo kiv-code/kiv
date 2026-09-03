@@ -28,11 +28,8 @@ export interface SectionNodeProps extends KivNodeComponentProps {
 	overlayColor?: unknown;
 	blur?: string;
 	opacity?: number;
-	paddingY?: string;
-	paddingX?: string;
-	paddingBox?: unknown;
-	marginY?: string;
-	marginBox?: unknown;
+	padding?: unknown;
+	margin?: unknown;
 	borderWidth?: string;
 	borderColor?: string;
 	borderRadius?: string;
@@ -53,11 +50,8 @@ export function SectionNode({
 	overlayColor,
 	blur,
 	opacity,
-	paddingY,
-	paddingX,
-	paddingBox,
-	marginY,
-	marginBox,
+	padding,
+	margin,
 	borderWidth,
 	borderColor,
 	borderRadius,
@@ -96,30 +90,12 @@ export function SectionNode({
 		if (opacity !== undefined && opacity !== 1) {
 			s.opacity = String(opacity);
 		}
-		const py =
-			paddingY && paddingY !== "none"
-				? (SECTION_SPACING[paddingY] ?? paddingY)
-				: undefined;
-		const px =
-			paddingX && paddingX !== "none"
-				? (SECTION_SPACING[paddingX] ?? paddingX)
-				: undefined;
-		const my =
-			marginY && marginY !== "none"
-				? (SECTION_SPACING[marginY] ?? marginY)
-				: undefined;
-		// Per-side overrides, shared with every other node that needs this
-		// escape hatch (see packages/nodes/src/spacing-field.ts). Empty side
-		// falls back to the Padding/Margin X/Y shorthand above.
+		// Section keeps its own, larger rhythm: the same `lg` token is 64px here
+		// and 32px on a Stack, which is why the scale travels with the field.
 		Object.assign(
 			s,
-			resolveSpacingStyle("padding", paddingBox, {
-				top: py,
-				right: px,
-				bottom: py,
-				left: px,
-			}),
-			resolveSpacingStyle("margin", marginBox, { top: my, bottom: my }),
+			resolveSpacingStyle("padding", padding, {}, SECTION_SPACING),
+			resolveSpacingStyle("margin", margin, {}, SECTION_SPACING),
 		);
 		if (borderWidth && borderWidth !== "0") {
 			s.borderWidth = `${borderWidth}px`;
@@ -150,11 +126,8 @@ export function SectionNode({
 		backgroundSize,
 		backgroundPosition,
 		opacity,
-		paddingY,
-		paddingX,
-		paddingBox,
-		marginY,
-		marginBox,
+		padding,
+		margin,
 		borderWidth,
 		borderColor,
 		borderRadius,

@@ -7,8 +7,8 @@ import {
 import { hoverEffectClass, hoverGlowStyle } from "../hover-effects";
 import { hoverFields } from "../hover-field";
 import { styleToString } from "../html-utils";
-import { RADIUS, SHADOW, SPACING } from "../scales";
-import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
+import { fromScale, RADIUS, SHADOW } from "../scales";
+import { resolveSpacingStyle, spacingField } from "../spacing-field";
 
 const hover = hoverFields({ effects: ["none", "lift", "grow", "glow"] });
 const border = borderVisualFields({
@@ -31,12 +31,13 @@ export const cardNode = defineNode({
 		default: ["heading", "text", "button", "icon", "image", "stack", "divider"],
 	},
 	toHtml(props, children) {
-		const padding = SPACING[String(props.padding ?? "lg")] ?? "32px";
 		const style = styleToString({
 			background: resolveBackgroundPaint(props.background, "#ffffff"),
-			borderRadius: RADIUS[String(props.borderRadius ?? "lg")] ?? "16px",
-			...resolveSpacingStyle("padding", props.paddingBox, padding),
-			boxShadow: SHADOW[String(props.shadow ?? "md")] ?? "none",
+			borderRadius: fromScale(RADIUS, props.borderRadius ?? "lg", "16px"),
+			// A legacy string value ("lg") normalizes to a uniform box, so old
+			// documents keep rendering without a migration step.
+			...resolveSpacingStyle("padding", props.padding, "32px"),
+			boxShadow: fromScale(SHADOW, props.shadow ?? "md", "none"),
 			borderWidth: props.borderWidth ? `${props.borderWidth}px` : undefined,
 			borderStyle: props.borderWidth ? "solid" : undefined,
 			borderColor: props.borderWidth
@@ -53,15 +54,10 @@ export const cardNode = defineNode({
 	fields: {
 		background: colorOrGradientField({ label: "Background", group: "Style" }),
 		borderRadius: border.borderRadius,
-		padding: f.select(["sm", "md", "lg", "xl"], {
+		padding: spacingField({
 			label: "Padding",
-			default: "lg",
 			group: "Style",
-		}),
-		paddingBox: spacingBoxField({
-			label: "Padding (per side)",
-			group: "Style",
-			hint: "Overrides Padding for individual sides. Empty side = use the shorthand above.",
+			default: { top: "lg", right: "lg", bottom: "lg", left: "lg" },
 		}),
 		shadow: border.shadow,
 		borderWidth: borderUniform.borderWidth,

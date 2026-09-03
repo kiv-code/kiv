@@ -5,7 +5,6 @@ import {
 	resolveBackgroundPaint,
 	resolveSpacingStyle,
 	SHADOW,
-	SPACING,
 } from "@kivcode/nodes";
 import { useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
@@ -13,8 +12,7 @@ import type { KivNodeComponentProps } from "../node-props";
 export interface CardNodeProps extends KivNodeComponentProps {
 	background?: unknown;
 	borderRadius?: string;
-	padding?: string;
-	paddingBox?: unknown;
+	padding?: unknown;
 	shadow?: string;
 	borderWidth?: number;
 	borderColor?: string;
@@ -27,7 +25,6 @@ export function CardNode({
 	background,
 	borderRadius,
 	padding,
-	paddingBox,
 	shadow,
 	borderWidth,
 	borderColor,
@@ -43,14 +40,9 @@ export function CardNode({
 		() => ({
 			background: resolveBackgroundPaint(background, "#ffffff"),
 			borderRadius: RADIUS[borderRadius ?? "lg"] ?? "16px",
-			// Per-side override, shared with every other node that needs this
-			// escape hatch (see packages/nodes/src/spacing-field.ts). Empty side
-			// falls back to the Padding shorthand above.
-			...resolveSpacingStyle(
-				"padding",
-				paddingBox,
-				SPACING[padding ?? "lg"] ?? "32px",
-			),
+			// A legacy string value ("lg") normalizes to a uniform box, so old
+			// documents keep rendering without a migration step.
+			...resolveSpacingStyle("padding", padding, "32px"),
 			boxShadow: SHADOW[shadow ?? "md"] ?? "none",
 			borderWidth: borderWidth ? `${borderWidth}px` : undefined,
 			borderStyle: borderWidth ? ("solid" as const) : undefined,
@@ -64,7 +56,6 @@ export function CardNode({
 			background,
 			borderRadius,
 			padding,
-			paddingBox,
 			shadow,
 			borderWidth,
 			borderColor,

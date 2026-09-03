@@ -2,6 +2,7 @@ import { defineNode, f } from "@kivcode/engine";
 import {
 	colorOrGradientField,
 	escapeHtml,
+	linkFields,
 	spacingBoxField,
 	styleToString,
 } from "@kivcode/nodes";
@@ -235,26 +236,12 @@ export const modalNode = defineNode({
 			showIf: { field: "showTrigger", equals: "true" },
 		}),
 
-		// ── Click action (when trigger acts as a link) ──
-		clickAction: f.select(["none", "internal", "external", "anchor"], {
-			label: "Click Action",
-			default: "none",
+		// ── Click action (when the trigger also acts as a link) ──
+		// Same helper as Button/Link, so "anchor" means the same thing here as
+		// it does everywhere else. `none` just opens the modal.
+		...linkFields({
 			group: "Action",
-			hint: "What happens on click. none = open modal. Others navigate AND open.",
-			showIf: { field: "showTrigger", equals: "true" },
-		}),
-		actionHref: f.text({
-			label: "URL / Anchor",
-			default: "#",
-			group: "Action",
-			showIf: { field: "showTrigger", equals: "true" },
-			hint: "Internal path, external URL, or anchor (#section-id).",
-		}),
-		actionTarget: f.select(["_self", "_blank"], {
-			label: "Open In",
-			default: "_self",
-			group: "Action",
-			showIf: { field: "showTrigger", equals: "true" },
+			hrefLabel: "Destination",
 		}),
 	},
 });

@@ -1,8 +1,32 @@
 import { defineNode, f } from "@kivcode/engine";
 import { styleToString } from "../html-utils";
-import { MAX_WIDTH, SPACING } from "../scales";
-import { resolveSpacingStyle } from "../spacing-field";
-import { spacingFields } from "../spacing-fields";
+import { fromScale, MAX_WIDTH } from "../scales";
+import { resolveSpacingStyle, spacingField } from "../spacing-field";
+
+/**
+ * The node's style, computed once and shared by every renderer — `toHtml`, the
+ * Vue component and the React component all call this instead of each keeping
+ * its own copy of the same arithmetic. Changing the visual contract here
+ * updates all three at once.
+ */
+export function containerStyle(
+	props: Record<string, unknown>,
+): Record<string, string | undefined> {
+	return {
+		maxWidth: fromScale(MAX_WIDTH, props.maxWidth ?? "lg", "1024px"),
+		marginLeft: props.centered !== false ? "auto" : undefined,
+		marginRight: props.centered !== false ? "auto" : undefined,
+		width: "100%",
+		// One spacing field covers both the uniform and the per-side case;
+		// each side holds a scale token or a raw CSS length.
+		...resolveSpacingStyle("padding", props.padding, {
+			top: "0",
+			right: "16px",
+			bottom: "0",
+			left: "16px",
+		}),
+	};
+}
 
 export const containerNode = defineNode({
 	type: "container",
@@ -10,24 +34,7 @@ export const containerNode = defineNode({
 	label: "Container",
 	description: "Centered max-width content wrapper",
 	toHtml(props, children) {
-		const paddingX = SPACING[String(props.paddingX ?? "md")] ?? "16px";
-		const paddingY = SPACING[String(props.paddingY ?? "none")] ?? "0";
-		const style = styleToString({
-			maxWidth: MAX_WIDTH[String(props.maxWidth ?? "lg")] ?? "1024px",
-			marginLeft: props.centered !== false ? "auto" : undefined,
-			marginRight: props.centered !== false ? "auto" : undefined,
-			width: "100%",
-			// Per-side override, shared with every other node that needs this
-			// escape hatch (see packages/nodes/src/spacing-field.ts). Empty side
-			// falls back to the Padding X/Y shorthand above.
-			...resolveSpacingStyle("padding", props.paddingBox, {
-				top: paddingY,
-				right: paddingX,
-				bottom: paddingY,
-				left: paddingX,
-			}),
-		});
-		return `<div style="${style}" data-kiv-type="container">${children.default ?? ""}</div>`;
+		return `<div style="${styleToString(containerStyle(props))}" data-kiv-type="container">${children.default ?? ""}</div>`;
 	},
 	fields: {
 		// Responsive: a wide container on desktop can still want a narrower one
@@ -38,7 +45,11 @@ export const containerNode = defineNode({
 			responsive: true,
 			group: "Layout",
 		}),
-		...spacingFields({ group: "Layout", paddingXDefault: "md" }),
+		padding: spacingField({
+			label: "Padding",
+			group: "Layout",
+			default: { right: "md", left: "md" },
+		}),
 		centered: f.boolean({ label: "Centered", default: true, group: "Layout" }),
 	},
 });

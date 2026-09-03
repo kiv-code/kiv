@@ -4,7 +4,14 @@ export function styleToString(
 ): string {
 	const declarations = Object.entries(style)
 		.filter(
-			([, value]) => value !== undefined && value !== null && value !== "",
+			([, value]) =>
+				value !== undefined &&
+				value !== null &&
+				value !== "" &&
+				// A non-primitive would stringify to "[object Object]" and emit
+				// invalid CSS. Dropping the declaration degrades to the inherited
+				// value instead of visibly corrupting the render.
+				typeof value !== "object",
 		)
 		.map(([key, value]) => `${kebabCase(key)}: ${value}`);
 	return declarations.length ? `${declarations.join("; ")};` : "";
@@ -42,6 +49,29 @@ export function normalizeSvgIconSize(svg: string): string {
 		}
 		return `<svg${attrs} style="${sizeStyle}">`;
 	});
+}
+
+/**
+ * Narrows a full `resolveTypographyStyle()` result down to size/weight/color,
+ * dropping family/align/line-height/letter-spacing/transform/style/margin.
+ * Used by nodes that only exposed size+weight+color per text role before
+ * migrating onto the shared typography resolver, so consolidating onto it
+ * doesn't newly apply properties the node never rendered.
+ */
+export function pickTypographyCss(
+	resolved: Record<string, string | undefined>,
+): Record<string, string | undefined> {
+	const {
+		fontFamily: _fontFamily,
+		textAlign: _textAlign,
+		lineHeight: _lineHeight,
+		letterSpacing: _letterSpacing,
+		textTransform: _textTransform,
+		fontStyle: _fontStyle,
+		margin: _margin,
+		...rest
+	} = resolved;
+	return rest;
 }
 
 /** Escapes a value for safe use as HTML text content or a quoted attribute value. */

@@ -1,5 +1,26 @@
 import { defineNode, f } from "@kivcode/engine";
 import { escapeHtml, styleToString } from "../html-utils";
+import { resolveTypographyStyle, typographyFields } from "../typography-field";
+
+const typo = typographyFields({
+	group: "Style",
+	defaultSize: 13,
+	weightDefault: "600",
+});
+
+/** Resolves the field label's typography through the shared resolver. */
+export function resolveFormFieldTypographyStyle(props: {
+	fontFamily?: string;
+	size?: number;
+	weight?: string;
+	color?: unknown;
+}): Record<string, string | undefined> {
+	return resolveTypographyStyle(props, {
+		size: 13,
+		weight: "600",
+		colorFallback: "inherit",
+	});
+}
 
 export function parseSelectOptions(raw: unknown): string[] {
 	if (typeof raw !== "string") return [];
@@ -22,9 +43,21 @@ export const formFieldNode = defineNode({
 			props.placeholder !== undefined && props.placeholder !== ""
 				? ` placeholder="${escapeHtml(props.placeholder)}"`
 				: "";
+		const labelStyle = styleToString({
+			display: "block",
+			marginBottom: "4px",
+			...resolveFormFieldTypographyStyle(
+				props as {
+					fontFamily?: string;
+					size?: number;
+					weight?: string;
+					color?: unknown;
+				},
+			),
+		});
 		const labelHtml =
 			props.label !== undefined && props.label !== ""
-				? `<label for="${name}" style="${styleToString({ display: "block", marginBottom: "4px", fontSize: "13px", fontWeight: "600" })}">${escapeHtml(props.label)}</label>`
+				? `<label for="${name}" style="${labelStyle}">${escapeHtml(props.label)}</label>`
 				: "";
 
 		let controlHtml: string;
@@ -78,5 +111,9 @@ export const formFieldNode = defineNode({
 			group: "Content",
 			showIf: { field: "fieldType", equals: "select" },
 		}),
+		fontFamily: typo.fontFamily,
+		size: typo.size,
+		weight: typo.weight,
+		color: typo.color,
 	},
 });

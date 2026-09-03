@@ -15,6 +15,8 @@ import type { VueRegistry } from "@kivcode/vue";
 import { computed, onMounted, onUnmounted, provide, ref, watch } from "vue";
 import { EditorExtensions } from "../extensions";
 import ColorGradientControl from "../inspector/controls/ColorGradientControl.vue";
+import FontPicker from "../inspector/controls/FontPicker.vue";
+import FontWeightControl from "../inspector/controls/FontWeightControl.vue";
 import IconPicker from "../inspector/controls/IconPicker.vue";
 import MediaPicker from "../inspector/controls/MediaPicker.vue";
 import PricingEditor from "../inspector/controls/PricingEditor.vue";
@@ -57,12 +59,15 @@ const emit = defineEmits<{ "update:document": [doc: KivDocument] }>();
 const store = useEditorStore(props.document, props.registry, {
 	bus: props.bus,
 	media: props.engine?.media ?? null,
+	fonts: props.engine?.fonts ?? null,
 	services: props.engine?.services ?? null,
 });
 provide(EDITOR_STORE_KEY, store);
 
 const extensions = new EditorExtensions();
 extensions.addFieldControl("icon-picker", IconPicker);
+extensions.addFieldControl("font-picker", FontPicker);
+extensions.addFieldControl("font-weight", FontWeightControl);
 extensions.addFieldControl("color-gradient", ColorGradientControl);
 extensions.addFieldControl("size-slider", SizeSliderControl);
 extensions.addFieldControl("spacing-box", SpacingBoxControl);
@@ -135,7 +140,15 @@ const templatesOpen = ref(false);
 const blocksOpen = ref(false);
 
 function applyTemplate(template: PageTemplate): void {
-	store.loadDocument(template.document);
+	// A template supplies content, not language settings — every built-in ships
+	// a boilerplate `{ default: "en", supported: ["en"] }`. Taking it verbatim
+	// would collapse a multi-locale document to one locale, hiding the whole
+	// translation UI and making later edits overwrite existing `$t` values with
+	// plain strings. Keep the document's own i18n.
+	store.loadDocument({
+		...template.document,
+		i18n: store.document.value.i18n ?? template.document.i18n,
+	});
 }
 
 function insertBlock(template: ContentTemplate): void {

@@ -28,7 +28,7 @@ describe("ColumnNode", () => {
 
 	it("applies padding from the spacing scale", () => {
 		const wrapper = mount(ColumnNode, {
-			props: { paddingX: "md", paddingY: "sm" },
+			props: { padding: { top: "sm", right: "md", bottom: "sm", left: "md" } },
 		});
 		const style = wrapper.attributes("style") ?? "";
 		expect(style).toContain("padding: 8px 16px");

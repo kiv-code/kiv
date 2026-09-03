@@ -1,4 +1,4 @@
-import { parseTableData } from "@kivcode/nodes";
+import { parseTableData, resolveTableTypographyStyle } from "@kivcode/nodes";
 import { useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
 
@@ -9,6 +9,10 @@ export interface TableNodeProps extends KivNodeComponentProps {
 	compact?: boolean;
 	headerBackground?: string;
 	align?: string;
+	fontFamily?: string;
+	size?: number;
+	weight?: string;
+	color?: string;
 }
 
 export function TableNode({
@@ -18,6 +22,10 @@ export function TableNode({
 	compact,
 	headerBackground,
 	align,
+	fontFamily,
+	size,
+	weight,
+	color,
 	id,
 	style,
 	...rest
@@ -36,15 +44,19 @@ export function TableNode({
 		}),
 		[border, style],
 	);
+	const typoProps = useMemo(
+		() => ({ fontFamily, size, weight, color }),
+		[fontFamily, size, weight, color],
+	);
 	const thStyle = useMemo(
 		() => ({
 			textAlign: cellAlign,
 			padding: cellPadding,
 			background: headerBackground ?? "#f8fafc",
 			border,
-			fontWeight: "700" as const,
+			...resolveTableTypographyStyle(typoProps, true),
 		}),
-		[cellAlign, cellPadding, headerBackground, border],
+		[cellAlign, cellPadding, headerBackground, border, typoProps],
 	);
 
 	function cellStyle(rowIndex: number) {
@@ -54,6 +66,7 @@ export function TableNode({
 			border,
 			background:
 				striped && rowIndex % 2 === 1 ? "rgba(0,0,0,0.03)" : undefined,
+			...resolveTableTypographyStyle(typoProps, false),
 		};
 	}
 

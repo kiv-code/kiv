@@ -6,17 +6,8 @@ import { resolveTypographyStyle, typographyFields } from "../typography-field";
 
 const typo = typographyFields({
 	group: "Typography",
-	weightOptions: ["300", "400", "500", "600", "700", "800", "900"],
 	weightDefault: "700",
 	lineHeightDefault: "normal",
-	letterSpacingOptions: [
-		"tighter",
-		"tight",
-		"normal",
-		"wide",
-		"wider",
-		"widest",
-	],
 });
 
 export const headingNode = defineNode({
@@ -33,7 +24,6 @@ export const headingNode = defineNode({
 				colorFallback: "inherit",
 				lineHeightFallback: "normal",
 			}),
-			textTransform: String(props.transform ?? "none"),
 		});
 		const text = props.text !== undefined ? escapeHtml(props.text) : "";
 		return `<h${level} style="${style}" data-kiv-type="heading">${text}</h${level}>`;
@@ -50,6 +40,7 @@ export const headingNode = defineNode({
 			default: "2",
 			group: "Typography",
 		}),
+		fontFamily: typo.fontFamily,
 		size: typo.size,
 		weight: typo.weight,
 		color: colorOrGradientField({
@@ -60,10 +51,7 @@ export const headingNode = defineNode({
 		align: typo.align,
 		lineHeight: typo.lineHeight,
 		letterSpacing: typo.letterSpacing,
-		transform: f.select(["none", "uppercase", "lowercase", "capitalize"], {
-			label: "Transform",
-			default: "none",
-			group: "Typography",
-		}),
+		transform: typo.transform,
+		fontStyle: typo.fontStyle,
 	},
 });

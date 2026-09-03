@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SPACING } from "@kivcode/nodes";
+import { fromScale, SPACING } from "@kivcode/nodes";
 import { computed, inject } from "vue";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
 
@@ -14,7 +14,7 @@ const props = withDefaults(
 const isEditorMode = inject(KIV_EDITOR_MODE_KEY, false);
 
 const spacerStyle = computed(() => ({
-	height: SPACING[props.height ?? "md"] ?? "16px",
+	height: fromScale(SPACING, props.height ?? "16px", "16px"),
 	width: "100%",
 }));
 

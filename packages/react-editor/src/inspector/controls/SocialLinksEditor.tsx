@@ -1,6 +1,7 @@
 import type { FieldDescriptor } from "@kivcode/engine";
 import type { SocialLink } from "@kivcode/nodes";
 import { useMemo } from "react";
+import { IconPicker } from "./IconPicker";
 
 export interface SocialLinksEditorProps {
 	value?: string;
@@ -10,22 +11,6 @@ export interface SocialLinksEditorProps {
 	onChange: (value: string) => void;
 }
 
-// Every platform social-icons.ts knows how to render an icon for — kept in
-// sync with PLATFORM_ICON there. Showing only these options (instead of a
-// free-text platform field) means every link a user adds actually renders
-// with a real icon, never a blank/mystery entry.
-const PLATFORMS = [
-	{ value: "twitter", label: "X (Twitter)" },
-	{ value: "facebook", label: "Facebook" },
-	{ value: "instagram", label: "Instagram" },
-	{ value: "linkedin", label: "LinkedIn" },
-	{ value: "youtube", label: "YouTube" },
-	{ value: "github", label: "GitHub" },
-	{ value: "tiktok", label: "TikTok" },
-	{ value: "whatsapp", label: "WhatsApp" },
-	{ value: "email", label: "Email" },
-] as const;
-
 function parse(v: string | undefined): SocialLink[] {
 	if (!v) return [];
 	try {
@@ -34,8 +19,9 @@ function parse(v: string | undefined): SocialLink[] {
 		return parsed
 			.filter((item): item is SocialLink => !!item && typeof item === "object")
 			.map((item) => ({
-				platform: String(item.platform ?? "twitter"),
+				platform: String(item.platform ?? ""),
 				url: String(item.url ?? ""),
+				icon: typeof item.icon === "string" ? item.icon : "",
 			}));
 	} catch {
 		return [];
@@ -55,11 +41,11 @@ export function SocialLinksEditor({
 	}
 
 	function addLink(): void {
-		commit([...links, { platform: "twitter", url: "" }]);
+		commit([...links, { platform: "", url: "", icon: "" }]);
 	}
 
-	function updatePlatform(index: number, platform: string): void {
-		commit(links.map((l, i) => (i === index ? { ...l, platform } : l)));
+	function updateIcon(index: number, icon: string): void {
+		commit(links.map((l, i) => (i === index ? { ...l, icon } : l)));
 	}
 
 	function updateUrl(index: number, url: string): void {
@@ -81,17 +67,11 @@ export function SocialLinksEditor({
 					key={i}
 					className="kiv-social-links__row"
 				>
-					<select
-						className="kiv-select kiv-social-links__platform"
-						value={link.platform}
-						onChange={(e) => updatePlatform(i, e.target.value)}
-					>
-						{PLATFORMS.map((p) => (
-							<option key={p.value} value={p.value}>
-								{p.label}
-							</option>
-						))}
-					</select>
+					<IconPicker
+						value={link.icon ?? ""}
+						showExtras={false}
+						onChange={(icon) => updateIcon(i, icon)}
+					/>
 					<input
 						type="text"
 						className="kiv-input kiv-social-links__url"

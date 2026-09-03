@@ -125,9 +125,12 @@ describe("content nodes", () => {
 
 	it("button: type and navigation defaults", () => {
 		expect(buttonNode.type).toBe("button");
-		expect(buttonNode.defaults.href).toBe("#");
-		expect(buttonNode.defaults.target).toBe("_self");
-		expect(buttonNode.defaults.linkType).toBe("internal");
+		// A new button is inert until the author picks a destination — the old
+		// href="#" default rendered a link that scrolled to the top on click.
+		expect(buttonNode.defaults.href).toBe("");
+		expect(buttonNode.defaults.linkType).toBe("none");
+		// `target` is derived from linkType now, so it is no longer a field.
+		expect(buttonNode.defaults.target).toBeUndefined();
 		expect(buttonNode.defaults.variant).toBe("primary");
 	});
 });
@@ -652,8 +655,22 @@ describe("link", () => {
 		expect(html).not.toContain("fallback");
 	});
 
-	it("adds rel=noopener when target is _blank", () => {
-		const html = linkNode.toHtml?.({ target: "_blank" }, {}, ctx);
+	it("adds rel=noopener for an external link", () => {
+		const html = linkNode.toHtml?.(
+			{ linkType: "external", href: "https://x.com" },
+			{},
+			ctx,
+		);
+		expect(html).toContain('rel="noopener noreferrer"');
+		expect(html).toContain('target="_blank"');
+	});
+
+	it("still honours target=_blank from documents written before linkType", () => {
+		const html = linkNode.toHtml?.(
+			{ href: "https://x.com", target: "_blank" },
+			{},
+			ctx,
+		);
 		expect(html).toContain('rel="noopener noreferrer"');
 	});
 

@@ -773,6 +773,7 @@ const SHORTCUT_TABLE: { keys: string; action: string }[] = [
 					:locale="locale"
 					:editor-mode="true"
 					:media="store.media"
+					:fonts="store.fonts"
 					:services="store.services"
 				/>
 			</div>

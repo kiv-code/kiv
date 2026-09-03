@@ -1,5 +1,6 @@
 import type { EventBus } from "../events";
 import { createEventBus } from "../events";
+import { migrateDocument } from "../migrations";
 import type { KivDocument, KivNode, SeoMeta } from "../types";
 import {
 	addNode as addNodeOp,
@@ -38,9 +39,10 @@ export class EditorEngine implements DocumentMutations {
 
 	constructor(document: KivDocument, options: EditorEngineOptions = {}) {
 		this.bus = options.bus ?? createEventBus();
-		this.history = new HistoryManager(cloneDocument(document), {
-			limit: options.historyLimit,
-		});
+		this.history = new HistoryManager(
+			cloneDocument(migrateDocument(document)),
+			{ limit: options.historyLimit },
+		);
 		this.selection.onChange((ids) => {
 			this.bus.emit("selection.changed", { ids });
 		});
@@ -159,7 +161,9 @@ export class EditorEngine implements DocumentMutations {
 	 * document are no longer guaranteed to exist.
 	 */
 	loadDocument(document: KivDocument): void {
-		this.commit(cloneDocument(document), { type: "document.loaded" });
+		this.commit(cloneDocument(migrateDocument(document)), {
+			type: "document.loaded",
+		});
 		this.selection.clear();
 		this.bus.emit("document.loaded", { document: this.document });
 	}

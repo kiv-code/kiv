@@ -3,11 +3,14 @@ import { hoverEffectClass, hoverGlowStyle } from "../hover-effects";
 import { hoverFields } from "../hover-field";
 import { escapeHtml, normalizeSvgIconSize, styleToString } from "../html-utils";
 import { resolveIcon } from "../icons";
-import { GAP, RADIUS } from "../scales";
+import { fromScale, GAP, RADIUS } from "../scales";
 
 export interface SocialLink {
 	platform: string;
 	url: string;
+	/** Explicit icon pick from the shared icon picker. Falls back to
+	 * `PLATFORM_ICON[platform]` for links saved before this field existed. */
+	icon?: string;
 }
 
 const PLATFORM_ICON: Record<string, string> = {
@@ -22,6 +25,27 @@ const PLATFORM_ICON: Record<string, string> = {
 	whatsapp: "fa6-brands:whatsapp",
 	email: "fa6-regular:envelope",
 };
+
+/**
+ * The single source of truth for turning a link into an icon + accessible
+ * label — shared by `toHtml` and both framework renderers so they can never
+ * drift into re-implementing (and forgetting to update) this logic apart.
+ */
+export function resolveSocialLinkDisplay(link: SocialLink): {
+	svg: string | null;
+	label: string;
+} {
+	const iconSource = link.icon || PLATFORM_ICON[link.platform.toLowerCase()];
+	const svg = iconSource ? resolveIcon(iconSource) : null;
+	const colonIdx = iconSource?.indexOf(":") ?? -1;
+	const derivedName = iconSource
+		? colonIdx > 0
+			? iconSource.slice(colonIdx + 1)
+			: iconSource
+		: "";
+	const label = link.platform || derivedName || "Social link";
+	return { svg, label };
+}
 
 /** Leniently parses the links JSON text field — invalid/empty input never throws, it just renders nothing. */
 export function parseSocialLinks(raw: unknown): SocialLink[] {
@@ -68,15 +92,14 @@ export const socialIconsNode = defineNode({
 		const wrapperStyle = styleToString({
 			display: "flex",
 			alignItems: "center",
-			gap: GAP[String(props.gap ?? "sm")] ?? "8px",
+			gap: fromScale(GAP, props.gap ?? "sm", "8px"),
 		});
 		const itemsHtml = links
 			.map((link) => {
-				const iconName = PLATFORM_ICON[link.platform.toLowerCase()];
-				const svg = iconName ? resolveIcon(iconName) : null;
+				const { svg, label } = resolveSocialLinkDisplay(link);
 				const iconHtml = svg
 					? normalizeSvgIconSize(svg)
-					: `<span aria-hidden="true">${escapeHtml(link.platform.slice(0, 1).toUpperCase())}</span>`;
+					: `<span aria-hidden="true">${escapeHtml(label.slice(0, 1).toUpperCase())}</span>`;
 				const itemStyle = styleToString({
 					display: "inline-flex",
 					alignItems: "center",
@@ -90,7 +113,7 @@ export const socialIconsNode = defineNode({
 					...hoverGlowStyle(props.hoverGlowColor),
 				});
 				const classAttr = hoverClass ? ` class="${hoverClass}"` : "";
-				return `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(link.platform)}" style="${itemStyle}"${classAttr}>${iconHtml}</a>`;
+				return `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(label)}" style="${itemStyle}"${classAttr}>${iconHtml}</a>`;
 			})
 			.join("");
 		return `<div style="${wrapperStyle}" data-kiv-type="social-icons">${itemsHtml}</div>`;
@@ -99,7 +122,7 @@ export const socialIconsNode = defineNode({
 		links: f.text({
 			label: "Links",
 			default: "[]",
-			hint: "Pick a platform and paste its profile URL for each link.",
+			hint: "Pick an icon and paste the profile URL for each link.",
 			group: "Content",
 			pluginControl: "social-links-editor",
 		}),

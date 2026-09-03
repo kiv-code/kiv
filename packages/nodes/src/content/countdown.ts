@@ -1,6 +1,42 @@
 import { defineNode, f } from "@kivcode/engine";
 import { escapeHtml, styleToString } from "../html-utils";
 import { RADIUS } from "../scales";
+import { resolveTypographyStyle, typographyFields } from "../typography-field";
+
+const typo = typographyFields({
+	group: "Style",
+	defaultSize: 28,
+	weightDefault: "700",
+});
+
+/** Resolves the unit-number's font family/size/weight/color through the
+ * shared typography resolver. Replaces the old `sm`/`md`/`lg` size scale and
+ * hardcoded 700 weight. */
+export function resolveCountdownTypographyStyle(
+	props: Record<string, unknown> & { minimal: boolean },
+): Record<string, string | undefined> {
+	const typed = props as {
+		fontFamily?: string;
+		size?: number;
+		weight?: string;
+		color?: unknown;
+	};
+	const resolved = resolveTypographyStyle(
+		{
+			fontFamily: typed.fontFamily,
+			size: typed.size,
+			weight: typed.weight,
+			color: props.minimal ? undefined : typed.color,
+		},
+		{ size: 28, weight: "700", colorFallback: "inherit" },
+	);
+	return {
+		fontFamily: resolved.fontFamily,
+		fontSize: resolved.fontSize,
+		fontWeight: resolved.fontWeight,
+		color: resolved.color,
+	};
+}
 
 export interface CountdownParts {
 	days: number;
@@ -30,25 +66,16 @@ export function computeCountdownParts(
 	};
 }
 
-const COUNTDOWN_SIZE: Record<string, string> = {
-	sm: "18px",
-	md: "28px",
-	lg: "40px",
-};
-
 function unitBoxHtml(
 	value: number,
 	label: string,
 	showLabels: boolean,
 	style: string,
-	accentColor: string,
-	fontSize: string,
+	numberStyleProps: Record<string, string | undefined>,
 ): string {
 	const numberStyle = styleToString({
-		fontSize,
-		fontWeight: "700",
+		...numberStyleProps,
 		lineHeight: "1",
-		color: style === "minimal" ? "inherit" : accentColor,
 	});
 	const boxStyle =
 		style === "boxes"
@@ -80,8 +107,13 @@ export const countdownNode = defineNode({
 	toHtml(props) {
 		const style = String(props.countdownStyle ?? "boxes");
 		const showLabels = props.showLabels !== false;
-		const accentColor = String(props.accentColor ?? "#6366f1");
-		const fontSize = COUNTDOWN_SIZE[String(props.size ?? "md")] ?? "28px";
+		const numberStyleProps = resolveCountdownTypographyStyle({
+			fontFamily: props.fontFamily,
+			size: props.size,
+			weight: props.weight,
+			color: props.color,
+			minimal: style === "minimal",
+		});
 		const parts = computeCountdownParts(props.targetDate);
 
 		const daysLabel = String(props.daysLabel ?? "Days");
@@ -102,37 +134,21 @@ export const countdownNode = defineNode({
 		const separator =
 			style === "inline" ? '<span style="opacity:0.5;">:</span>' : "";
 		const units = [
-			unitBoxHtml(
-				parts.days,
-				daysLabel,
-				showLabels,
-				style,
-				accentColor,
-				fontSize,
-			),
-			unitBoxHtml(
-				parts.hours,
-				hoursLabel,
-				showLabels,
-				style,
-				accentColor,
-				fontSize,
-			),
+			unitBoxHtml(parts.days, daysLabel, showLabels, style, numberStyleProps),
+			unitBoxHtml(parts.hours, hoursLabel, showLabels, style, numberStyleProps),
 			unitBoxHtml(
 				parts.minutes,
 				minutesLabel,
 				showLabels,
 				style,
-				accentColor,
-				fontSize,
+				numberStyleProps,
 			),
 			unitBoxHtml(
 				parts.seconds,
 				secondsLabel,
 				showLabels,
 				style,
-				accentColor,
-				fontSize,
+				numberStyleProps,
 			),
 		];
 		return `<div style="${wrapperStyle}" data-kiv-type="countdown"><time datetime="${escapeHtml(props.targetDate ?? "")}" style="display:contents;">${units.join(separator)}</time></div>`;
@@ -179,16 +195,9 @@ export const countdownNode = defineNode({
 			default: "boxes",
 			group: "Style",
 		}),
-		size: f.select(["sm", "md", "lg"], {
-			label: "Size",
-			default: "md",
-			responsive: true,
-			group: "Style",
-		}),
-		accentColor: f.color({
-			label: "Accent Color",
-			default: "#6366f1",
-			group: "Style",
-		}),
+		fontFamily: typo.fontFamily,
+		size: typo.size,
+		weight: typo.weight,
+		color: { ...typo.color, label: "Accent Color", default: "#6366f1" },
 	},
 });

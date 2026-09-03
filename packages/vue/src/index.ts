@@ -3,6 +3,7 @@ export { useKivNode } from "./composables/useKivNode";
 export { KIV_CONTEXT_KEY } from "./context";
 export { createDefaultVueRegistry } from "./defaultRegistry";
 export { KIV_EDITOR_MODE_KEY } from "./editor-mode";
+export { KIV_FONTS_KEY } from "./fonts";
 export { default as KivNodeRenderer } from "./KivNodeRenderer.vue";
 export { default as KivRenderer } from "./KivRenderer.vue";
 export { KIV_MEDIA_KEY } from "./media";

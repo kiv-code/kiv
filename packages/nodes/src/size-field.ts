@@ -21,6 +21,9 @@ export interface SizeFieldOptions {
 	hint?: string;
 	units?: SizeUnitConfig[];
 	showIf?: { field: string; equals: string | string[] };
+	/** Offer an explicit "auto"/unset state (stored as an empty string). */
+	allowAuto?: boolean;
+	autoLabel?: string;
 }
 
 /**
@@ -43,5 +46,7 @@ export function sizeField(
 		hint: opts.hint,
 		showIf: opts.showIf,
 		sliderUnits: opts.units ?? DEFAULT_UNITS,
+		allowAuto: opts.allowAuto,
+		autoLabel: opts.autoLabel,
 	};
 }

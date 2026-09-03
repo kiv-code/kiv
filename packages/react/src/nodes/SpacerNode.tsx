@@ -1,4 +1,4 @@
-import { SPACING } from "@kivcode/nodes";
+import { fromScale, SPACING } from "@kivcode/nodes";
 import { useContext, useMemo } from "react";
 import { KivEditorModeContext } from "../editor-mode";
 import type { KivNodeComponentProps } from "../node-props";
@@ -19,7 +19,7 @@ export function SpacerNode({
 
 	const spacerStyle = useMemo(
 		() => ({
-			height: SPACING[height ?? "md"] ?? "16px",
+			height: fromScale(SPACING, height ?? "16px", "16px"),
 			width: "100%",
 			...(isEditorMode && showDividerOnCanvas
 				? {

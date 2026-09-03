@@ -83,10 +83,6 @@
 	flex-direction: column;
 	gap: 4px;
 }
-.kiv-form-field label {
-	font-size: 13px;
-	font-weight: 600;
-}
 .kiv-form-field input,
 .kiv-form-field select,
 .kiv-form-field textarea {

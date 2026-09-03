@@ -4,7 +4,7 @@ import type { PageTemplate } from "./types";
 const I18N: I18nConfig = { default: "en", supported: ["en"] };
 
 const blankDocument: KivDocument = {
-	schemaVersion: 1,
+	schemaVersion: 3,
 	i18n: I18N,
 	root: {
 		id: "root",
@@ -15,7 +15,7 @@ const blankDocument: KivDocument = {
 };
 
 const landingDocument: KivDocument = {
-	schemaVersion: 1,
+	schemaVersion: 3,
 	i18n: I18N,
 	root: {
 		id: "root",
@@ -28,8 +28,7 @@ const landingDocument: KivDocument = {
 					type: "section",
 					props: {
 						background: "#0f172a",
-						paddingY: "xl",
-						paddingX: "md",
+						padding: { top: "xl", right: "md", bottom: "xl", left: "md" },
 						fullWidth: true,
 					},
 					slots: {
@@ -95,8 +94,7 @@ const landingDocument: KivDocument = {
 					type: "section",
 					props: {
 						background: "#ffffff",
-						paddingY: "xl",
-						paddingX: "md",
+						padding: { top: "xl", right: "md", bottom: "xl", left: "md" },
 						fullWidth: true,
 					},
 					slots: {
@@ -192,8 +190,7 @@ const landingDocument: KivDocument = {
 					type: "section",
 					props: {
 						background: "#4338ca",
-						paddingY: "xl",
-						paddingX: "md",
+						padding: { top: "xl", right: "md", bottom: "xl", left: "md" },
 						fullWidth: true,
 					},
 					slots: {
@@ -248,7 +245,7 @@ const landingDocument: KivDocument = {
 };
 
 const aboutDocument: KivDocument = {
-	schemaVersion: 1,
+	schemaVersion: 3,
 	i18n: I18N,
 	root: {
 		id: "root",
@@ -261,8 +258,7 @@ const aboutDocument: KivDocument = {
 					type: "section",
 					props: {
 						background: "#f8fafc",
-						paddingY: "xl",
-						paddingX: "md",
+						padding: { top: "xl", right: "md", bottom: "xl", left: "md" },
 						fullWidth: true,
 					},
 					slots: {
@@ -317,8 +313,7 @@ const aboutDocument: KivDocument = {
 					type: "section",
 					props: {
 						background: "#ffffff",
-						paddingY: "xl",
-						paddingX: "md",
+						padding: { top: "xl", right: "md", bottom: "xl", left: "md" },
 						fullWidth: true,
 					},
 					slots: {
@@ -463,7 +458,7 @@ const aboutDocument: KivDocument = {
 };
 
 const contactDocument: KivDocument = {
-	schemaVersion: 1,
+	schemaVersion: 3,
 	i18n: I18N,
 	root: {
 		id: "root",
@@ -476,8 +471,7 @@ const contactDocument: KivDocument = {
 					type: "section",
 					props: {
 						background: "#ffffff",
-						paddingY: "xl",
-						paddingX: "md",
+						padding: { top: "xl", right: "md", bottom: "xl", left: "md" },
 						fullWidth: true,
 					},
 					slots: {
@@ -552,7 +546,7 @@ const contactDocument: KivDocument = {
 };
 
 const blogPostDocument: KivDocument = {
-	schemaVersion: 1,
+	schemaVersion: 3,
 	i18n: I18N,
 	root: {
 		id: "root",
@@ -565,8 +559,7 @@ const blogPostDocument: KivDocument = {
 					type: "section",
 					props: {
 						background: "#ffffff",
-						paddingY: "lg",
-						paddingX: "md",
+						padding: { top: "lg", right: "md", bottom: "lg", left: "md" },
 						fullWidth: true,
 					},
 					slots: {
@@ -612,8 +605,7 @@ const blogPostDocument: KivDocument = {
 					type: "section",
 					props: {
 						background: "#ffffff",
-						paddingY: "lg",
-						paddingX: "md",
+						padding: { top: "lg", right: "md", bottom: "lg", left: "md" },
 						fullWidth: true,
 					},
 					slots: {

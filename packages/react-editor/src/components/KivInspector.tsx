@@ -9,17 +9,31 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { useResizablePanel } from "../composables/useResizablePanel";
 import { FieldControl } from "../inspector/FieldControl";
 import { EditorExtensionsContext, EditorStoreContext } from "../store/context";
 import { getNodeLabel } from "../utils/node-labels";
-import { mergeResponsiveValue } from "../utils/responsive-value";
+import {
+	mergeResponsiveValue,
+	readResponsiveValue,
+} from "../utils/responsive-value";
 import { isHiddenAtBreakpoint } from "../utils/visibility";
 
 export interface KivInspectorProps {
 	registry: Registry;
+}
+
+// Plugins register with a raw key ("seo", "a11y") — shown to users as a real
+// label instead of the internal id.
+const PLUGIN_TAB_LABELS: Record<string, string> = {
+	seo: "SEO",
+	a11y: "Accessibility",
+};
+function pluginTabLabel(tabName: string): string {
+	return PLUGIN_TAB_LABELS[tabName] ?? tabName;
 }
 
 // A localized value in JSON looks like { $t: { en: "...", es: "..." } }
@@ -90,6 +104,7 @@ function isFieldVisible(node: KivNode, descriptor: FieldDescriptor): boolean {
 // Uses the same breakpoint as the canvas — changing it here also changes the canvas preview
 const BP_OPTIONS: { value: Breakpoint; label: string }[] = [
 	{ value: "base", label: "MB" },
+	{ value: "sm", label: "SM" },
 	{ value: "md", label: "MD" },
 	{ value: "lg", label: "LG" },
 	{ value: "xl", label: "XL" },
@@ -113,6 +128,7 @@ export function KivInspector({ registry }: KivInspectorProps) {
 		extensions ? Array.from(extensions.getInspectorTabs().keys()) : [],
 	);
 	const [activePluginTab, setActivePluginTab] = useState<string | null>(null);
+	const pageChecksRef = useRef<HTMLDetailsElement | null>(null);
 
 	useEffect(() => {
 		if (!extensions) return;
@@ -240,20 +256,7 @@ export function KivInspector({ registry }: KivInspectorProps) {
 			raw = fieldLocale in t ? t[fieldLocale] : Object.values(t)[0];
 		}
 		if (!descriptor.responsive) return raw;
-		// If already a responsive object, extract the value for the active breakpoint
-		if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-			const obj = raw as Record<string, unknown>;
-			// Mobile-first cascade: walk down from requested breakpoint to base
-			const ORDER = ["base", "sm", "md", "lg", "xl"] as const;
-			const target = ORDER.indexOf(fieldBreakpoint as (typeof ORDER)[number]);
-			for (let i = target; i >= 0; i--) {
-				const key = ORDER[i];
-				if (key && key in obj && obj[key] !== undefined) return obj[key];
-			}
-			return undefined;
-		}
-		// Flat value — return as-is (only set on base)
-		return raw;
+		return readResponsiveValue(raw, fieldBreakpoint);
 	}
 
 	function updateFieldValue(
@@ -351,6 +354,7 @@ export function KivInspector({ registry }: KivInspectorProps) {
 								key={`${field.key}-${fieldBreakpoint}-${fieldLocale}`}
 								fieldKey={field.key}
 								descriptor={field.descriptor}
+								nodeProps={activeNode?.props}
 								value={getFieldValue(field.key, field.descriptor)}
 								breakpoint={
 									field.descriptor.responsive ? fieldBreakpoint : undefined
@@ -681,24 +685,68 @@ export function KivInspector({ registry }: KivInspectorProps) {
 						</div>
 					</div>
 
-					{/* Plugin inspector tabs */}
+					{/* Plugin inspector tabs: page-level checks (SEO, a11y…), collapsed
+					    into one popover trigger instead of a permanently-visible button
+					    row — they apply to the whole document, not the selected node. */}
 					{pluginTabNames.length > 0 && (
-						<div className="kiv-inspector__tabs">
-							{pluginTabNames.map((tabName) => (
-								<button
-									key={tabName}
-									type="button"
-									className={`kiv-inspector__tab${activePluginTab === tabName ? " kiv-inspector__tab--active" : ""}`}
-									onClick={() =>
-										setActivePluginTab((prev) =>
-											prev === tabName ? null : tabName,
-										)
-									}
+						<details ref={pageChecksRef} className="kiv-inspector__page-checks">
+							<summary className="kiv-inspector__page-checks-trigger">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 13 13"
+									fill="none"
+									aria-hidden="true"
 								>
-									{tabName}
-								</button>
-							))}
-						</div>
+									<path
+										d="M2 3.5h9M2 6.5h9M2 9.5h5"
+										stroke="currentColor"
+										strokeWidth={1.2}
+										strokeLinecap="round"
+									/>
+								</svg>
+								<span>Page checks</span>
+								{activePluginTab && (
+									<span className="kiv-inspector__page-checks-badge">
+										{pluginTabLabel(activePluginTab)}
+									</span>
+								)}
+								<svg
+									className="kiv-inspector__page-checks-chevron"
+									width="9"
+									height="9"
+									viewBox="0 0 9 9"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M2 3.2 4.5 5.7 7 3.2"
+										stroke="currentColor"
+										strokeWidth={1.2}
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</svg>
+							</summary>
+							<div className="kiv-inspector__page-checks-menu">
+								{pluginTabNames.map((tabName) => (
+									<button
+										key={tabName}
+										type="button"
+										className={`kiv-inspector__page-checks-item${activePluginTab === tabName ? " kiv-inspector__page-checks-item--active" : ""}`}
+										onClick={() => {
+											setActivePluginTab((prev) =>
+												prev === tabName ? null : tabName,
+											);
+											if (pageChecksRef.current)
+												pageChecksRef.current.open = false;
+										}}
+									>
+										{pluginTabLabel(tabName)}
+									</button>
+								))}
+							</div>
+						</details>
 					)}
 
 					{/* Plugin tab content */}
@@ -712,6 +760,17 @@ export function KivInspector({ registry }: KivInspectorProps) {
 								| undefined;
 							return PluginTab ? (
 								<div className="kiv-inspector__plugin-tab">
+									<div className="kiv-inspector__plugin-tab-header">
+										<span>{pluginTabLabel(activePluginTab)}</span>
+										<button
+											type="button"
+											className="kiv-inspector__plugin-tab-close"
+											title="Back to node fields"
+											onClick={() => setActivePluginTab(null)}
+										>
+											✕
+										</button>
+									</div>
 									<PluginTab node={store?.selected ?? null} store={store} />
 								</div>
 							) : null;

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { resolveIcon } from "@kivcode/nodes";
+import { resolveIcon, resolveIconSize } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{
 	icon?: string;
-	iconSize?: number;
+	iconSize?: string | number;
 	iconColor?: string;
 }>();
 
@@ -15,7 +15,7 @@ const svgContent = computed(() => {
 });
 
 const spanStyle = computed(() => ({
-	fontSize: `${props.iconSize ?? 24}px`,
+	fontSize: resolveIconSize(props.iconSize),
 	color: props.iconColor || "currentColor",
 	display: "inline-flex" as const,
 	alignItems: "center" as const,

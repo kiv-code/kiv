@@ -15,6 +15,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorExtensions } from "../extensions/editor-extensions";
 import { useEditorExtensionsVersion } from "../extensions/use-editor-extensions";
 import { ColorGradientControl } from "../inspector/controls/ColorGradientControl";
+import { FontPicker } from "../inspector/controls/FontPicker";
+import { FontWeightControl } from "../inspector/controls/FontWeightControl";
 import { IconPicker } from "../inspector/controls/IconPicker";
 import { MediaPicker } from "../inspector/controls/MediaPicker";
 import { PricingEditor } from "../inspector/controls/PricingEditor";
@@ -82,12 +84,15 @@ export function KivEditor({
 	const store = useEditorStore(document, registry, {
 		bus,
 		media: engine?.media ?? null,
+		fonts: engine?.fonts ?? null,
 		services: engine?.services ?? null,
 	});
 
 	const [extensions] = useState(() => {
 		const ext = new EditorExtensions();
 		ext.addFieldControl("icon-picker", IconPicker);
+		ext.addFieldControl("font-picker", FontPicker);
+		ext.addFieldControl("font-weight", FontWeightControl);
 		ext.addFieldControl("color-gradient", ColorGradientControl);
 		ext.addFieldControl("size-slider", SizeSliderControl);
 		ext.addFieldControl("spacing-box", SpacingBoxControl);
@@ -157,7 +162,12 @@ export function KivEditor({
 	const [blocksOpen, setBlocksOpen] = useState(false);
 
 	function applyTemplate(template: PageTemplate): void {
-		store.loadDocument(template.document);
+		// Templates carry boilerplate single-locale i18n; taking it verbatim would
+		// collapse a multi-locale document and hide the translation UI. Keep ours.
+		store.loadDocument({
+			...template.document,
+			i18n: store.document.i18n ?? template.document.i18n,
+		});
 	}
 
 	function insertBlock(template: ContentTemplate): void {

@@ -1,10 +1,6 @@
-import {
-	HEADING_LEVEL_SIZE,
-	LETTER_SPACING,
-	LINE_HEIGHT,
-	resolveTextPaintStyle,
-} from "@kivcode/nodes";
+import { HEADING_LEVEL_SIZE } from "@kivcode/nodes";
 import { createElement, type ReactElement, useMemo } from "react";
+import { useKivTypography } from "../hooks/useKivTypography";
 import type { KivNodeComponentProps } from "../node-props";
 
 export interface HeadingNodeProps extends KivNodeComponentProps {
@@ -17,6 +13,8 @@ export interface HeadingNodeProps extends KivNodeComponentProps {
 	lineHeight?: string;
 	letterSpacing?: string;
 	transform?: string;
+	fontStyle?: string;
+	fontFamily?: string;
 }
 
 export function HeadingNode({
@@ -29,30 +27,18 @@ export function HeadingNode({
 	lineHeight,
 	letterSpacing,
 	transform,
+	fontStyle,
+	fontFamily,
 	id,
 	style,
 	...rest
 }: HeadingNodeProps): ReactElement {
 	const tag = `h${level ?? "2"}`;
 
-	const headingStyle = useMemo(
-		() => ({
-			fontSize: `${size ?? HEADING_LEVEL_SIZE[level ?? "2"] ?? 36}px`,
-			fontWeight: weight ?? "700",
-			...resolveTextPaintStyle(color, "inherit"),
-			textAlign: (align ?? "left") as "left" | "center" | "right" | "justify",
-			lineHeight: LINE_HEIGHT[lineHeight ?? "normal"] ?? "1.4",
-			letterSpacing: LETTER_SPACING[letterSpacing ?? "normal"] ?? "0em",
-			textTransform: (transform ?? "none") as
-				| "none"
-				| "uppercase"
-				| "lowercase"
-				| "capitalize",
-			margin: "0",
-			...style,
-		}),
-		[
-			level,
+	// Style comes from the shared typography resolver, so this component, the
+	// static HTML export and every other text node stay in agreement.
+	const resolved = useKivTypography(
+		{
 			size,
 			weight,
 			color,
@@ -60,8 +46,19 @@ export function HeadingNode({
 			lineHeight,
 			letterSpacing,
 			transform,
-			style,
-		],
+			fontStyle,
+			fontFamily,
+		},
+		{
+			size: HEADING_LEVEL_SIZE[level ?? "2"] ?? 36,
+			weight: "700",
+			colorFallback: "inherit",
+			lineHeightFallback: "normal",
+		},
+	);
+	const headingStyle = useMemo(
+		() => ({ ...resolved, ...style }),
+		[resolved, style],
 	);
 
 	return createElement(

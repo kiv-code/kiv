@@ -1,6 +1,7 @@
 import type {
 	Breakpoint,
 	EventBus,
+	FontProvider,
 	KivDocument,
 	KivNode,
 	MediaProvider,
@@ -20,6 +21,8 @@ export interface EditorStoreOptions {
 	bus?: EventBus;
 	/** MediaProvider (e.g. `engine.media`) so the canvas preview and the media-picker field control can resolve/browse assets. */
 	media?: MediaProvider | null;
+	/** FontProvider (e.g. `engine.fonts`) so the font picker offers only typefaces this project ships. */
+	fonts?: FontProvider | null;
 	/** Services container (e.g. `engine.services`) so the canvas preview's FormNode can submit via services.api. */
 	services?: ServicesContainer | null;
 }
@@ -41,6 +44,8 @@ export interface EditorStore {
 	bus: EventBus;
 	/** MediaProvider from `createEngine({ media })`, or null when none is configured. */
 	media: MediaProvider | null;
+	/** FontProvider from `createEngine({ fonts })`, or null when none is configured. */
+	fonts: FontProvider | null;
 	/** ServicesContainer from `createEngine({ services })`, or null when none is configured. */
 	services: ServicesContainer | null;
 	/** Replaces the whole selection with a single id (or clears it with null). */
@@ -278,6 +283,7 @@ export function useEditorStore(
 		zoom,
 		bus: engine.bus,
 		media: options.media ?? null,
+		fonts: options.fonts ?? null,
 		services: options.services ?? null,
 		registry,
 		select,

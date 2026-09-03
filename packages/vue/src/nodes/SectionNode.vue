@@ -28,11 +28,8 @@ const props = defineProps<{
 	overlayColor?: unknown;
 	blur?: string;
 	opacity?: number;
-	paddingY?: string;
-	paddingX?: string;
-	paddingBox?: unknown;
-	marginY?: string;
-	marginBox?: unknown;
+	padding?: unknown;
+	margin?: unknown;
 	borderWidth?: string;
 	borderColor?: string;
 	borderRadius?: string;
@@ -65,33 +62,12 @@ const sectionStyle = computed(() => {
 	if (props.opacity !== undefined && props.opacity !== 1) {
 		s.opacity = String(props.opacity);
 	}
-	const paddingY =
-		props.paddingY && props.paddingY !== "none"
-			? (SECTION_SPACING[props.paddingY] ?? props.paddingY)
-			: undefined;
-	const paddingX =
-		props.paddingX && props.paddingX !== "none"
-			? (SECTION_SPACING[props.paddingX] ?? props.paddingX)
-			: undefined;
-	const marginY =
-		props.marginY && props.marginY !== "none"
-			? (SECTION_SPACING[props.marginY] ?? props.marginY)
-			: undefined;
-	// Per-side overrides, shared with every other node that needs this escape
-	// hatch (see packages/nodes/src/spacing-field.ts). Empty side falls back
-	// to the Padding/Margin X/Y shorthand above.
+	// Section keeps its own, larger rhythm: the same `lg` token is 64px here
+	// and 32px on a Stack, which is why the scale travels with the field.
 	Object.assign(
 		s,
-		resolveSpacingStyle("padding", props.paddingBox, {
-			top: paddingY,
-			right: paddingX,
-			bottom: paddingY,
-			left: paddingX,
-		}),
-		resolveSpacingStyle("margin", props.marginBox, {
-			top: marginY,
-			bottom: marginY,
-		}),
+		resolveSpacingStyle("padding", props.padding, {}, SECTION_SPACING),
+		resolveSpacingStyle("margin", props.margin, {}, SECTION_SPACING),
 	);
 	if (props.borderWidth && props.borderWidth !== "0") {
 		s.borderWidth = `${props.borderWidth}px`;

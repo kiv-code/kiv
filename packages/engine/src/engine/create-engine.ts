@@ -1,4 +1,6 @@
 import { createEventBus } from "../events";
+import type { FontProvider } from "../fonts";
+import { systemFontProvider } from "../fonts";
 import type { MediaProvider } from "../media";
 import type {
 	EditorExtensionPoints,
@@ -20,6 +22,8 @@ export interface CreateEngineOptions {
 	plugins?: KivPlugin[];
 	nodes?: CompiledNode[];
 	media?: { provider: MediaProvider };
+	/** Typefaces the project ships. Without one, only the generic system families are offered. */
+	fonts?: { provider: FontProvider };
 	services?: ServicesContainer;
 }
 
@@ -29,6 +33,7 @@ export interface KivEngine {
 	theme: ThemeTokens;
 	i18n: I18nConfig;
 	media?: MediaProvider;
+	fonts: FontProvider;
 	services: ServicesContainer;
 	use(plugin: KivPlugin): void;
 	css(): string;
@@ -48,6 +53,7 @@ export function createEngine(options: CreateEngineOptions = {}): KivEngine {
 	const theme = resolveTheme(options.theme);
 	const i18n = options.i18n ?? DEFAULT_I18N;
 	const media = options.media?.provider;
+	const fonts = options.fonts?.provider ?? systemFontProvider;
 	const services = options.services ?? {};
 	const installed = new Set<string>();
 	const installedPlugins: KivPlugin[] = [];
@@ -105,7 +111,10 @@ export function createEngine(options: CreateEngineOptions = {}): KivEngine {
 		const declarations = Object.entries(vars)
 			.map(([k, v]) => `  ${k}: ${v};`)
 			.join("\n");
-		return `:root {\n${declarations}\n}`;
+		// The provider's @font-face/@import has to come first — CSS requires
+		// @import before any other rule.
+		const fontCss = fonts.stylesheet?.() ?? "";
+		return `${fontCss ? `${fontCss}\n` : ""}:root {\n${declarations}\n}`;
 	}
 
 	function resolve(node: KivNode, ctx: ResolveContext) {
@@ -118,6 +127,7 @@ export function createEngine(options: CreateEngineOptions = {}): KivEngine {
 		theme,
 		i18n,
 		media,
+		fonts,
 		services,
 		use,
 		css,

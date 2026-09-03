@@ -20,6 +20,7 @@ import {
 import { createPortal } from "react-dom";
 import { KivBusContext } from "../bus";
 import { KivEditorModeContext } from "../editor-mode";
+import { useKivLink } from "../hooks/useKivLink";
 import type { KivNodeComponentProps } from "../node-props";
 
 declare module "@kivcode/engine" {
@@ -75,9 +76,8 @@ export interface ModalNodeProps extends KivNodeComponentProps {
 	triggerBorderWidth?: number;
 	triggerShadow?: string;
 	triggerFullWidth?: boolean;
-	clickAction?: string;
-	actionHref?: string;
-	actionTarget?: string;
+	linkType?: string;
+	href?: string;
 }
 
 export function ModalNode({
@@ -115,9 +115,8 @@ export function ModalNode({
 	triggerBorderWidth,
 	triggerShadow,
 	triggerFullWidth,
-	clickAction,
-	actionHref,
-	actionTarget,
+	linkType,
+	href,
 	slots,
 	id,
 	style,
@@ -125,6 +124,10 @@ export function ModalNode({
 }: ModalNodeProps) {
 	const bus = useContext(KivBusContext);
 	const isEditorMode = useContext(KivEditorModeContext);
+	// The trigger can both navigate and open the modal. The shared link handler
+	// owns the navigation half (router, anchor scroll, editor guard) so it
+	// behaves exactly like Button and Link; opening is layered on top.
+	const modalLink = useKivLink({ href, linkType });
 
 	const [open, setOpen] = useState(false);
 	// Whether the backdrop is actually in the DOM — stays true a bit longer
@@ -281,7 +284,7 @@ export function ModalNode({
 
 	// ── Trigger rendering ──
 	const resolvedTriggerTag =
-		clickAction && clickAction !== "none" ? "a" : (triggerTag ?? "button");
+		modalLink.link.type !== "none" ? "a" : (triggerTag ?? "button");
 	const wrapperHidden = showTrigger === false && !isEditorMode;
 	const showEditorPlaceholder = isEditorMode && showTrigger === false;
 	const autoOpenSummary = useMemo(() => {
@@ -476,12 +479,13 @@ export function ModalNode({
 		} else if (resolvedTriggerTag === "a") {
 			trigger = (
 				<a
-					href={actionHref}
-					target={actionTarget}
+					href={modalLink.link.href}
+					target={modalLink.link.target}
+					rel={modalLink.link.rel}
 					style={triggerStyle}
 					data-kiv-modal-trigger
 					onClick={(e) => {
-						e.preventDefault();
+						modalLink.onClick(e);
 						openModal();
 					}}
 				>

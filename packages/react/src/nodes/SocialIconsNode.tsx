@@ -4,23 +4,10 @@ import {
 	hoverGlowStyle,
 	parseSocialLinks,
 	RADIUS,
-	resolveIcon,
+	resolveSocialLinkDisplay,
 } from "@kivcode/nodes";
 import { useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
-
-const PLATFORM_ICON: Record<string, string> = {
-	twitter: "fa6-brands:x-twitter",
-	x: "fa6-brands:x-twitter",
-	facebook: "fa6-brands:facebook",
-	instagram: "fa6-brands:instagram",
-	linkedin: "fa6-brands:linkedin",
-	youtube: "fa6-brands:youtube",
-	github: "fa6-brands:github",
-	tiktok: "fa6-brands:tiktok",
-	whatsapp: "fa6-brands:whatsapp",
-	email: "fa6-regular:envelope",
-};
 
 const SHAPE_RADIUS: Record<string, string> = {
 	none: "0",
@@ -28,11 +15,6 @@ const SHAPE_RADIUS: Record<string, string> = {
 	square: "0",
 	rounded: RADIUS.md ?? "8px",
 };
-
-function iconSvg(platform: string): string | null {
-	const name = PLATFORM_ICON[platform.toLowerCase()];
-	return name ? resolveIcon(name) : null;
-}
 
 export interface SocialIconsNodeProps extends KivNodeComponentProps {
 	links?: string;
@@ -58,7 +40,14 @@ export function SocialIconsNode({
 	style,
 	...rest
 }: SocialIconsNodeProps) {
-	const socialLinks = useMemo(() => parseSocialLinks(links), [links]);
+	const socialLinks = useMemo(
+		() =>
+			parseSocialLinks(links).map((link) => ({
+				...link,
+				...resolveSocialLinkDisplay(link),
+			})),
+		[links],
+	);
 	const hoverClass = hoverEffectClass(hoverEffect);
 
 	const wrapperStyle = useMemo(
@@ -89,33 +78,30 @@ export function SocialIconsNode({
 
 	return (
 		<div id={id} style={wrapperStyle} data-kiv-type="social-icons" {...rest}>
-			{socialLinks.map((link, i) => {
-				const svg = iconSvg(link.platform);
-				return (
-					<a
-						// biome-ignore lint/suspicious/noArrayIndexKey: links have no stable identity, mirrors the Vue original's `${platform}-${i}` key
-						key={`${link.platform}-${i}`}
-						href={link.url}
-						target="_blank"
-						rel="noopener noreferrer"
-						aria-label={link.platform}
-						className={hoverClass}
-						style={itemStyle}
-					>
-						{svg ? (
-							<span
-								className="kiv-social-icons__svg"
-								// biome-ignore lint/security/noDangerouslySetInnerHtml: resolved icon markup, same trust boundary as the Vue renderer's v-html
-								dangerouslySetInnerHTML={{ __html: svg }}
-							/>
-						) : (
-							<span aria-hidden="true">
-								{link.platform.slice(0, 1).toUpperCase()}
-							</span>
-						)}
-					</a>
-				);
-			})}
+			{socialLinks.map((link, i) => (
+				<a
+					// biome-ignore lint/suspicious/noArrayIndexKey: links have no stable identity, mirrors the Vue original's `${platform}-${i}` key
+					key={`${link.platform}-${i}`}
+					href={link.url}
+					target="_blank"
+					rel="noopener noreferrer"
+					aria-label={link.label}
+					className={hoverClass}
+					style={itemStyle}
+				>
+					{link.svg ? (
+						<span
+							className="kiv-social-icons__svg"
+							// biome-ignore lint/security/noDangerouslySetInnerHtml: resolved icon markup, same trust boundary as the Vue renderer's v-html
+							dangerouslySetInnerHTML={{ __html: link.svg }}
+						/>
+					) : (
+						<span aria-hidden="true">
+							{link.label.slice(0, 1).toUpperCase()}
+						</span>
+					)}
+				</a>
+			))}
 		</div>
 	);
 }

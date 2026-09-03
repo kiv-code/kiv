@@ -1,6 +1,39 @@
 import { defineNode, f } from "@kivcode/engine";
 import { escapeHtml, styleToString } from "../html-utils";
-import { BUTTON_RADIUS, BUTTON_SIZE, BUTTON_VARIANT } from "../scales";
+import { linkAttrs, linkFields, resolveLink } from "../link-field";
+import {
+	BUTTON_RADIUS,
+	BUTTON_SIZE,
+	BUTTON_VARIANT,
+	fromScale,
+} from "../scales";
+import { resolveTypographyStyle, typographyFields } from "../typography-field";
+
+const typo = typographyFields({
+	group: "Style",
+	defaultSize: 16,
+	weightDefault: "500",
+});
+
+/** Resolves the inline-mode link's text style through the shared typography
+ * resolver. Only used when `display === "inline"` — button mode keeps its own
+ * fixed weight/family, mirroring Button. */
+export function resolveLinkTypographyStyle(props: {
+	fontFamily?: string;
+	fontSize?: number;
+	weight?: string;
+	color?: unknown;
+}): Record<string, string | undefined> {
+	return resolveTypographyStyle(
+		{
+			fontFamily: props.fontFamily,
+			size: props.fontSize,
+			weight: props.weight,
+			color: props.color,
+		},
+		{ size: 16, weight: "500", colorFallback: "#6366f1" },
+	);
+}
 
 export const linkNode = defineNode({
 	type: "link",
@@ -8,9 +41,7 @@ export const linkNode = defineNode({
 	label: "Link",
 	description: "Inline or button-style hyperlink",
 	toHtml(props, children) {
-		const href = escapeHtml(props.href ?? "#");
-		const target = String(props.target ?? "_self");
-		const rel = target === "_blank" ? ' rel="noopener noreferrer"' : "";
+		const link = linkAttrs(resolveLink(props), escapeHtml);
 		// Slotted children (icon/image/text nodes) win over the flat `text`
 		// field — the field is only a fallback for links with no children,
 		// which keeps documents saved before slots existed rendering unchanged.
@@ -41,8 +72,11 @@ export const linkNode = defineNode({
 				fontFamily: "inherit",
 				textAlign: "center",
 				textDecoration: variant.textDecoration ?? "none",
-				borderRadius:
-					BUTTON_RADIUS[String(props.buttonRadius ?? "md")] ?? "6px",
+				borderRadius: fromScale(
+					BUTTON_RADIUS,
+					props.buttonRadius ?? "md",
+					"6px",
+				),
 				lineHeight: "1",
 				whiteSpace: "nowrap",
 				background: variant.background,
@@ -50,15 +84,17 @@ export const linkNode = defineNode({
 				border: variant.border,
 			});
 		} else {
+			const typoStyle = resolveLinkTypographyStyle(props);
 			style = styleToString({
-				color: String(props.textColor ?? "#6366f1"),
+				color: typoStyle.color,
 				textDecoration: props.underline !== false ? "underline" : "none",
-				fontWeight: String(props.fontWeight ?? "500"),
-				fontSize: String(props.fontSize ?? "inherit"),
+				fontWeight: typoStyle.fontWeight,
+				fontSize: typoStyle.fontSize,
+				fontFamily: typoStyle.fontFamily,
 			});
 		}
 
-		return `<a href="${href}" target="${escapeHtml(target)}"${rel} style="${style}" data-kiv-type="link">${content}</a>`;
+		return `<a${link} style="${style}" data-kiv-type="link">${content}</a>`;
 	},
 	fields: {
 		text: f.text({
@@ -67,42 +103,33 @@ export const linkNode = defineNode({
 			inline: true,
 			group: "Content",
 		}),
-		href: f.text({ label: "URL", default: "#", group: "Content" }),
-		target: f.select(["_self", "_blank"], {
-			label: "Open in",
-			default: "_self",
-			group: "Content",
-		}),
+		...linkFields({ group: "Content", default: "internal" }),
 		display: f.select(["inline", "button"], {
 			label: "Display as",
 			default: "inline",
 			group: "Style",
 		}),
 		// Inline style fields
-		textColor: f.color({
-			label: "Color",
-			default: "#6366f1",
+		fontFamily: {
+			...typo.fontFamily,
+			showIf: { field: "display", equals: "inline" },
+		},
+		color: {
+			...f.color({ label: "Color", default: "#6366f1" }),
 			group: "Style",
 			showIf: { field: "display", equals: "inline" },
-		}),
+		},
 		underline: f.boolean({
 			label: "Underline",
 			default: true,
 			group: "Style",
 			showIf: { field: "display", equals: "inline" },
 		}),
-		fontWeight: f.select(["400", "500", "600", "700"], {
-			label: "Weight",
-			default: "500",
-			group: "Style",
-			showIf: { field: "display", equals: "inline" },
-		}),
-		fontSize: f.text({
-			label: "Font size",
-			default: "inherit",
-			group: "Style",
-			showIf: { field: "display", equals: "inline" },
-		}),
+		weight: { ...typo.weight, showIf: { field: "display", equals: "inline" } },
+		// Named `fontSize` (not `size`) because `size` is already the button-mode
+		// size preset below (xs..xl) — the two fields are mutually exclusive via
+		// `showIf`, but they can't share a key in one flat `fields` object.
+		fontSize: { ...typo.size, showIf: { field: "display", equals: "inline" } },
 		// Button-style fields
 		variant: f.select(["primary", "secondary", "ghost", "outline", "link"], {
 			label: "Variant",

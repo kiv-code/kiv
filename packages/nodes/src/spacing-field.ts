@@ -1,5 +1,6 @@
 import type { FieldDescriptor } from "@kivcode/engine";
 import { z } from "zod";
+import { SPACING } from "./scales";
 
 /** Shared shape for any field that controls the 4 sides of a box (padding, margin, gap...) independently. */
 export interface SpacingBoxValue {
@@ -24,17 +25,32 @@ export const spacingBoxSchema = z.object({
 	left: z.string(),
 });
 
-interface SpacingBoxFieldOptions {
+/**
+ * A side holds EITHER a scale token (`"md"`) or a raw CSS length (`"2.5rem"`).
+ * Tokens keep documents on the design system and stay correct when a node uses
+ * its own scale (a Section's `lg` is deliberately larger than a Stack's);
+ * raw lengths are the escape hatch for the cases a closed scale can't express.
+ */
+export type SpacingScale = Record<string, string>;
+
+interface SpacingFieldOptions {
 	label?: string;
 	group?: string;
 	hint?: string;
 	default?: Partial<SpacingBoxValue>;
 	showIf?: { field: string; equals: string | string[] };
+	/** Token presets offered by the control. Defaults to the shared SPACING scale. */
+	scale?: SpacingScale;
+	responsive?: boolean;
 }
 
-/** Field descriptor for independent per-side spacing, rendered by the shared SpacingBoxControl. */
-export function spacingBoxField(
-	opts: SpacingBoxFieldOptions = {},
+/**
+ * The single spacing field. Its control covers both the "same on every side"
+ * and the "per side" cases, which is why nodes no longer declare a separate
+ * `paddingX`/`paddingY` shorthand alongside it — one field, one source of truth.
+ */
+export function spacingField(
+	opts: SpacingFieldOptions = {},
 ): FieldDescriptor<SpacingBoxValue> {
 	return {
 		schema: spacingBoxSchema,
@@ -44,9 +60,14 @@ export function spacingBoxField(
 		group: opts.group,
 		hint: opts.hint,
 		showIf: opts.showIf,
+		responsive: opts.responsive ?? true,
+		spacingScale: opts.scale ?? SPACING,
 		default: { ...DEFAULT_SPACING_BOX, ...opts.default },
 	};
 }
+
+/** @deprecated Use `spacingField`. Kept as an alias so external node packages keep compiling. */
+export const spacingBoxField = spacingField;
 
 /**
  * Normalizes any stored value (a full per-side object, a single CSS length
@@ -65,6 +86,20 @@ export function normalizeSpacingBox(value: unknown): SpacingBoxValue {
 	return DEFAULT_SPACING_BOX;
 }
 
+/**
+ * Turns one side's stored value into CSS. A scale token resolves through the
+ * node's own scale; anything else is already a CSS length and passes through,
+ * which is what makes arbitrary values (`"2.5rem"`, `"clamp(1rem,4vw,3rem)"`)
+ * work without a separate field.
+ */
+export function resolveSpacingValue(
+	value: string,
+	scale: SpacingScale = SPACING,
+): string | undefined {
+	if (!value) return undefined;
+	return scale[value] ?? value;
+}
+
 /** Per-side fallback for `resolveSpacingStyle` — `undefined` means "no CSS declaration for this side" (browser default), distinct from an explicit "0". */
 export type SpacingBoxFallback = Partial<
 	Record<keyof SpacingBoxValue, string | undefined>
@@ -80,6 +115,7 @@ export function resolveSpacingStyle(
 	property: "padding" | "margin",
 	value: unknown,
 	fallback: string | SpacingBoxFallback = "0",
+	scale: SpacingScale = SPACING,
 ): Record<string, string | undefined> {
 	const v = normalizeSpacingBox(value);
 	const fb: SpacingBoxFallback =
@@ -87,9 +123,9 @@ export function resolveSpacingStyle(
 			? { top: fallback, right: fallback, bottom: fallback, left: fallback }
 			: fallback;
 	return {
-		[`${property}Top`]: v.top || fb.top,
-		[`${property}Right`]: v.right || fb.right,
-		[`${property}Bottom`]: v.bottom || fb.bottom,
-		[`${property}Left`]: v.left || fb.left,
+		[`${property}Top`]: resolveSpacingValue(v.top, scale) ?? fb.top,
+		[`${property}Right`]: resolveSpacingValue(v.right, scale) ?? fb.right,
+		[`${property}Bottom`]: resolveSpacingValue(v.bottom, scale) ?? fb.bottom,
+		[`${property}Left`]: resolveSpacingValue(v.left, scale) ?? fb.left,
 	};
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Breakpoint, FieldDescriptor } from "@kivcode/engine";
-import { inject } from "vue";
+import { computed, inject } from "vue";
 import { EDITOR_EXTENSIONS_KEY } from "../store/context";
 import BooleanControl from "./controls/BooleanControl.vue";
 import ColorControl from "./controls/ColorControl.vue";
@@ -15,23 +15,34 @@ const props = defineProps<{
 	modelValue: unknown;
 	breakpoint?: Breakpoint;
 	locale?: string;
+	/** The whole node's props — lets a control depend on a sibling field, e.g.
+	 * the weight control narrowing its options to the chosen font's real cuts. */
+	nodeProps?: Record<string, unknown>;
 }>();
 
 const extensions = inject(EDITOR_EXTENSIONS_KEY, null);
 
-// Check if a plugin has registered a custom control for this field type
-const pluginControlKey =
-	props.descriptor.pluginControl ?? props.descriptor.control;
-const customControl = pluginControlKey
-	? extensions?.getFieldControl(pluginControlKey)
-	: undefined;
+// Everything derived from `descriptor` must be computed, not a one-shot const:
+// Vue reuses a FieldControl instance when two nodes share a field key inside the
+// same group, so a plain const would keep the PREVIOUS node's control/label —
+// e.g. Card's gradient `background` rendering with Stack's plain-color control,
+// which writes an object into a string prop and surfaces as "[object Object]".
+const pluginControlKey = computed(
+	() => props.descriptor.pluginControl ?? props.descriptor.control,
+);
+const customControl = computed(() =>
+	pluginControlKey.value
+		? extensions?.getFieldControl(pluginControlKey.value)
+		: undefined,
+);
 
 const emit = defineEmits<{ "update:modelValue": [value: unknown] }>();
 
-const label = props.descriptor.label ?? props.fieldKey;
+const label = computed(() => props.descriptor.label ?? props.fieldKey);
 
-const selectOptions =
-	props.descriptor.options?.map((o) => String(o.value)) ?? [];
+const selectOptions = computed(
+	() => props.descriptor.options?.map((o) => String(o.value)) ?? [],
+);
 
 const BP_SHORT: Record<string, string> = {
 	base: "",
@@ -40,11 +51,14 @@ const BP_SHORT: Record<string, string> = {
 	lg: "LG",
 	xl: "XL",
 };
-const bpBadge =
+const bpBadge = computed(() =>
 	props.descriptor.responsive && props.breakpoint && props.breakpoint !== "base"
 		? (BP_SHORT[props.breakpoint] ?? "")
-		: "";
-const localeBadge = props.locale ? props.locale.toUpperCase() : "";
+		: "",
+);
+const localeBadge = computed(() =>
+	props.locale ? props.locale.toUpperCase() : "",
+);
 </script>
 
 <template>
@@ -64,6 +78,7 @@ const localeBadge = props.locale ? props.locale.toUpperCase() : "";
 			:model-value="modelValue"
 			:field-key="fieldKey"
 			:descriptor="descriptor"
+			:node-props="nodeProps"
 			@update:model-value="emit('update:modelValue', $event)"
 		/>
 		<!-- For boolean we pass the badge separately so BooleanControl can show it inline -->
@@ -101,6 +116,10 @@ const localeBadge = props.locale ? props.locale.toUpperCase() : "";
 			:model-value="(modelValue as string | undefined)"
 			@update:model-value="emit('update:modelValue', $event)"
 		/>
+		<!-- Node authors write these to disambiguate overlapping fields (e.g. how
+		     `paddingBox` interacts with the `paddingX/Y` shorthand). Rendering them
+		     is what makes those pairs legible instead of looking duplicated. -->
+		<p v-if="descriptor.hint" class="kiv-field__hint">{{ descriptor.hint }}</p>
 	</div>
 </template>
 
@@ -122,6 +141,14 @@ const localeBadge = props.locale ? props.locale.toUpperCase() : "";
 	text-transform: uppercase;
 	letter-spacing: 0.07em;
 	color: var(--color-text-secondary);
+}
+
+.kiv-field__hint {
+	margin: 0.25rem 0 0;
+	font-size: 0.65rem;
+	line-height: 1.4;
+	color: var(--color-text-secondary);
+	opacity: 0.8;
 }
 .kiv-field__badges {
 	display: flex;

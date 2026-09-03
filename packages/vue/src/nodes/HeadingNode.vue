@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import {
-	HEADING_LEVEL_SIZE,
-	LETTER_SPACING,
-	LINE_HEIGHT,
-	resolveTextPaintStyle,
-} from "@kivcode/nodes";
+import { HEADING_LEVEL_SIZE } from "@kivcode/nodes";
 import { computed } from "vue";
+import { useKivTypography } from "../composables/useKivTypography";
 
 const props = defineProps<{
 	text?: string;
@@ -17,24 +13,23 @@ const props = defineProps<{
 	lineHeight?: string;
 	letterSpacing?: string;
 	transform?: string;
+	fontStyle?: string;
+	fontFamily?: string;
 }>();
 
 const tag = computed(() => `h${props.level ?? "2"}`);
 
-const headingStyle = computed(() => ({
-	fontSize: `${props.size ?? HEADING_LEVEL_SIZE[props.level ?? "2"] ?? 36}px`,
-	fontWeight: props.weight ?? "700",
-	...resolveTextPaintStyle(props.color, "inherit"),
-	textAlign: (props.align ?? "left") as "left" | "center" | "right" | "justify",
-	lineHeight: LINE_HEIGHT[props.lineHeight ?? "normal"] ?? "1.4",
-	letterSpacing: LETTER_SPACING[props.letterSpacing ?? "normal"] ?? "0em",
-	textTransform: (props.transform ?? "none") as
-		| "none"
-		| "uppercase"
-		| "lowercase"
-		| "capitalize",
-	margin: "0",
-}));
+// Style comes from the shared typography resolver, so this component, the
+// static HTML export and every other text node stay in agreement.
+const headingStyle = useKivTypography(
+	computed(() => ({ ...props })),
+	{
+		size: HEADING_LEVEL_SIZE[props.level ?? "2"] ?? 36,
+		weight: "700",
+		colorFallback: "inherit",
+		lineHeightFallback: "normal",
+	},
+);
 </script>
 
 <template>

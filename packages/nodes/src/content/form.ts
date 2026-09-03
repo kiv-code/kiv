@@ -1,6 +1,6 @@
 import { defineNode, f } from "@kivcode/engine";
 import { escapeHtml, styleToString } from "../html-utils";
-import { GAP } from "../scales";
+import { fromScale, GAP } from "../scales";
 
 export const formNode = defineNode({
 	type: "form",
@@ -10,7 +10,7 @@ export const formNode = defineNode({
 	slotConstraints: { default: ["form-field"] },
 	toHtml(props, children) {
 		const layout = String(props.layout ?? "stacked");
-		const gap = GAP[String(props.gap ?? "md")] ?? "16px";
+		const gap = fromScale(GAP, props.gap ?? "md", "16px");
 		const style = styleToString({
 			display: layout === "grid-2" ? "grid" : "flex",
 			gridTemplateColumns: layout === "grid-2" ? "1fr 1fr" : undefined,

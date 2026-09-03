@@ -6,8 +6,9 @@ import {
 	resolveSolidColor,
 } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
-import { BLUR, RADIUS, SECTION_SPACING, SHADOW } from "../scales";
-import { resolveSpacingStyle, spacingBoxField } from "../spacing-field";
+import { BLUR, fromScale, RADIUS, SECTION_SPACING, SHADOW } from "../scales";
+import { sizeField } from "../size-field";
+import { resolveSpacingStyle, spacingField } from "../spacing-field";
 
 function isGradient(value: unknown): boolean {
 	return (
@@ -45,30 +46,14 @@ export const sectionNode = defineNode({
 		if (props.opacity !== undefined && props.opacity !== 1) {
 			s.opacity = String(props.opacity);
 		}
-		const paddingY =
-			props.paddingY && props.paddingY !== "none"
-				? (SECTION_SPACING[String(props.paddingY)] ?? String(props.paddingY))
-				: undefined;
-		const paddingX =
-			props.paddingX && props.paddingX !== "none"
-				? (SECTION_SPACING[String(props.paddingX)] ?? String(props.paddingX))
-				: undefined;
-		const marginY =
-			props.marginY && props.marginY !== "none"
-				? (SECTION_SPACING[String(props.marginY)] ?? String(props.marginY))
-				: undefined;
+		// Section keeps its own, larger rhythm: the same `lg` token is 64px here
+		// and 32px on a Stack, which is why the scale travels with the field.
 		Object.assign(
 			s,
-			resolveSpacingStyle("padding", props.paddingBox, {
-				top: paddingY,
-				right: paddingX,
-				bottom: paddingY,
-				left: paddingX,
-			}),
-			resolveSpacingStyle("margin", props.marginBox, {
-				top: marginY,
-				bottom: marginY,
-			}),
+			// `{}` fallback = emit no declaration for an empty side, which is
+			// distinct from an explicit "0" and keeps margin collapsing intact.
+			resolveSpacingStyle("padding", props.padding, {}, SECTION_SPACING),
+			resolveSpacingStyle("margin", props.margin, {}, SECTION_SPACING),
 		);
 		if (props.borderWidth && props.borderWidth !== "0") {
 			s.borderWidth = `${props.borderWidth}px`;
@@ -96,7 +81,7 @@ export const sectionNode = defineNode({
 		}
 
 		let blurHtml = "";
-		const blurAmount = BLUR[String(props.blur ?? "none")] ?? "0";
+		const blurAmount = fromScale(BLUR, props.blur ?? "none", "0");
 		if (blurAmount !== "0") {
 			const blurStyle = styleToString({
 				position: "absolute",
@@ -187,34 +172,26 @@ export const sectionNode = defineNode({
 			default: true,
 			group: "Layout",
 		}),
-		minHeight: f.text({ label: "Min height (CSS)", group: "Layout" }),
-		paddingY: f.select(["none", "xs", "sm", "md", "lg", "xl", "2xl"], {
-			label: "Padding Y",
-			default: "lg",
-			responsive: true,
+		minHeight: sizeField({
+			label: "Min height",
 			group: "Layout",
+			allowAuto: true,
+			units: [
+				{ unit: "px", min: 0, max: 1200, step: 10 },
+				{ unit: "vh", min: 0, max: 100, step: 1 },
+				{ unit: "%", min: 0, max: 100, step: 1 },
+			],
 		}),
-		paddingX: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Padding X",
-			default: "none",
-			responsive: true,
+		padding: spacingField({
+			label: "Padding",
 			group: "Layout",
+			scale: SECTION_SPACING,
+			default: { top: "lg", bottom: "lg" },
 		}),
-		marginY: f.select(["none", "xs", "sm", "md", "lg", "xl"], {
-			label: "Margin Y",
-			default: "none",
-			responsive: true,
+		margin: spacingField({
+			label: "Margin",
 			group: "Layout",
-		}),
-		paddingBox: spacingBoxField({
-			label: "Padding (per side)",
-			group: "Layout",
-			hint: "Overrides Padding X/Y for individual sides. Empty side = use the shorthand above.",
-		}),
-		marginBox: spacingBoxField({
-			label: "Margin (per side)",
-			group: "Layout",
-			hint: "Overrides Margin Y for individual sides. Empty side = use the shorthand above.",
+			scale: SECTION_SPACING,
 		}),
 		alignItems: f.select(["flex-start", "center", "flex-end", "stretch"], {
 			label: "Align horizontal",

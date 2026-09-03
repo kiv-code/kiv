@@ -1,7 +1,7 @@
 import { defineNode, f } from "@kivcode/engine";
 import { alignField } from "../align-field";
 import { escapeHtml, styleToString } from "../html-utils";
-import { SPACING } from "../scales";
+import { fromScale, SPACING } from "../scales";
 import { sizeField } from "../size-field";
 
 export const dividerNode = defineNode({
@@ -24,8 +24,8 @@ export const dividerNode = defineNode({
 		const wrapperStyle = styleToString({
 			display: "flex",
 			width: "100%",
-			paddingTop: SPACING[String(props.spacing ?? "md")] ?? "16px",
-			paddingBottom: SPACING[String(props.spacing ?? "md")] ?? "16px",
+			paddingTop: fromScale(SPACING, props.spacing ?? "md", "16px"),
+			paddingBottom: fromScale(SPACING, props.spacing ?? "md", "16px"),
 			justifyContent:
 				justifyByAlignment[String(props.alignment ?? "center")] ?? "center",
 		});

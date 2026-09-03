@@ -1,30 +1,22 @@
 <script setup lang="ts">
+import type { FieldDescriptor } from "@kivcode/engine";
 import type { SocialLink } from "@kivcode/nodes";
 import { computed } from "vue";
+import IconPicker from "./IconPicker.vue";
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps<{
 	modelValue?: string;
+	/** Part of the common plugin-control contract; unused here. */
+	fieldKey?: string;
+	descriptor?: FieldDescriptor;
+	nodeProps?: Record<string, unknown>;
 }>();
 
 const emit = defineEmits<{
 	"update:modelValue": [value: string];
 }>();
-
-// Every platform social-icons.ts knows how to render an icon for — kept in
-// sync with PLATFORM_ICON there. Showing only these options (instead of a
-// free-text platform field) means every link a user adds actually renders
-// with a real icon, never a blank/mystery entry.
-const PLATFORMS = [
-	{ value: "twitter", label: "X (Twitter)" },
-	{ value: "facebook", label: "Facebook" },
-	{ value: "instagram", label: "Instagram" },
-	{ value: "linkedin", label: "LinkedIn" },
-	{ value: "youtube", label: "YouTube" },
-	{ value: "github", label: "GitHub" },
-	{ value: "tiktok", label: "TikTok" },
-	{ value: "whatsapp", label: "WhatsApp" },
-	{ value: "email", label: "Email" },
-] as const;
 
 function parse(v: string | undefined): SocialLink[] {
 	if (!v) return [];
@@ -34,8 +26,9 @@ function parse(v: string | undefined): SocialLink[] {
 		return parsed
 			.filter((item): item is SocialLink => !!item && typeof item === "object")
 			.map((item) => ({
-				platform: String(item.platform ?? "twitter"),
+				platform: String(item.platform ?? ""),
 				url: String(item.url ?? ""),
+				icon: typeof item.icon === "string" ? item.icon : "",
 			}));
 	} catch {
 		return [];
@@ -49,11 +42,11 @@ function commit(next: SocialLink[]): void {
 }
 
 function addLink(): void {
-	commit([...links.value, { platform: "twitter", url: "" }]);
+	commit([...links.value, { platform: "", url: "", icon: "" }]);
 }
 
-function updatePlatform(index: number, platform: string): void {
-	commit(links.value.map((l, i) => (i === index ? { ...l, platform } : l)));
+function updateIcon(index: number, icon: string): void {
+	commit(links.value.map((l, i) => (i === index ? { ...l, icon } : l)));
 }
 
 function updateUrl(index: number, url: string): void {
@@ -71,15 +64,12 @@ function removeLink(index: number): void {
 			No links yet.
 		</div>
 		<div v-for="(link, i) in links" :key="i" class="kiv-social-links__row">
-			<select
-				class="kiv-select kiv-social-links__platform"
-				:value="link.platform"
-				@change="updatePlatform(i, ($event.target as HTMLSelectElement).value)"
-			>
-				<option v-for="p in PLATFORMS" :key="p.value" :value="p.value">
-					{{ p.label }}
-				</option>
-			</select>
+			<IconPicker
+				class="kiv-social-links__icon"
+				:model-value="link.icon ?? ''"
+				:show-extras="false"
+				@update:model-value="updateIcon(i, $event)"
+			/>
 			<input
 				type="text"
 				class="kiv-input kiv-social-links__url"
@@ -116,12 +106,27 @@ function removeLink(index: number): void {
 	gap: 6px;
 	align-items: center;
 }
-.kiv-social-links__platform {
-	flex: 0 0 118px;
+.kiv-social-links__icon {
+	flex: 0 0 40px;
+}
+.kiv-social-links__icon :deep(.kiv-icon-picker__trigger-label) {
+	display: none;
+}
+.kiv-social-links__icon :deep(.kiv-icon-picker__trigger-chevron) {
+	display: none;
+}
+.kiv-social-links__icon :deep(.kiv-icon-picker__trigger) {
+	justify-content: center;
+	padding: 5px;
+}
+.kiv-social-links__icon :deep(.kiv-icon-picker__popover) {
+	width: 220px;
+	right: auto;
 }
 .kiv-social-links__url {
 	flex: 1;
 	min-width: 0;
+	box-sizing: border-box;
 }
 .kiv-social-links__remove {
 	display: inline-flex;

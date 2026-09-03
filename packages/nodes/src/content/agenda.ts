@@ -2,15 +2,70 @@ import { defineNode, f } from "@kivcode/engine";
 import {
 	colorOrGradientField,
 	resolveBackgroundPaint,
+	resolveSolidColor,
 } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
-import { GAP, RADIUS } from "../scales";
+import { fromScale, GAP, RADIUS } from "../scales";
 import { sizeField } from "../size-field";
-
-const WEIGHT_OPTIONS = ["300", "400", "500", "600", "700", "800"] as const;
+import { resolveTypographyStyle, typographyFields } from "../typography-field";
 
 const PIN_SVG =
 	'<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
+
+const stripeTypo = typographyFields({
+	group: "Style",
+	defaultSize: 14,
+	weightDefault: "800",
+});
+const titleTypo = typographyFields({
+	group: "Style",
+	defaultSize: 15,
+	weightDefault: "700",
+});
+const descriptionTypo = typographyFields({
+	group: "Style",
+	defaultSize: 13,
+	weightDefault: "400",
+});
+const speakerLabelTypo = typographyFields({
+	group: "Speaker",
+	defaultSize: 11,
+	weightDefault: "700",
+});
+const speakerNameTypo = typographyFields({
+	group: "Speaker",
+	defaultSize: 14,
+	weightDefault: "700",
+});
+const speakerTitleTypo = typographyFields({
+	group: "Speaker",
+	defaultSize: 12,
+	weightDefault: "400",
+});
+const speakerCompanyTypo = typographyFields({
+	group: "Speaker",
+	defaultSize: 12,
+	weightDefault: "400",
+});
+
+/** Resolves one agenda-item text role (stripe, title, description, or one of
+ * the speaker roles) through the shared typography resolver. Each role has
+ * its own defaults/fallbacks, mirroring the field triplets that used to be
+ * hand-rolled per role. */
+export function resolveAgendaTypographyStyle(
+	props: Record<string, unknown>,
+	defaults: { size: number; weight: string; colorFallback: string },
+): Record<string, string | undefined> {
+	return resolveTypographyStyle(
+		props as {
+			fontFamily?: string;
+			size?: number;
+			weight?: string;
+			color?: unknown;
+		},
+		defaults,
+	);
+}
 
 export const agendaNode = defineNode({
 	type: "agenda",
@@ -28,10 +83,13 @@ export const agendaNode = defineNode({
 		const style = styleToString({
 			display: "flex",
 			flexDirection: "column",
-			gap: GAP[String(props.gap ?? "xs")] ?? "4px",
+			gap: fromScale(GAP, props.gap ?? "xs", "4px"),
 			"--kiv-agenda-stripe-width": String(props.stripeWidth || "150px"),
-			"--kiv-agenda-item-radius":
-				RADIUS[String(props.itemRadius ?? "md")] ?? "8px",
+			"--kiv-agenda-item-radius": fromScale(
+				RADIUS,
+				props.itemRadius ?? "md",
+				"8px",
+			),
 			"--kiv-agenda-layout": String(props.layout ?? "stripe"),
 		});
 		return `<div data-kiv-type="agenda">${disclaimer}<div style="${style}">${children.default ?? ""}</div></div>`;
@@ -111,12 +169,19 @@ export const agendaItemNode = defineNode({
 			alignItems: "center",
 			justifyContent: "center",
 			textAlign: "center",
-			fontWeight: String(props.stripeFontWeight || "800"),
-			fontSize: String(props.stripeFontSize || "0.85rem"),
+			...resolveAgendaTypographyStyle(
+				{
+					fontFamily: props.stripeFontFamily,
+					size: props.stripeFontSize,
+					weight: props.stripeFontWeight,
+					color: props.stripeTextColor,
+				},
+				{ size: 14, weight: "800", colorFallback: "#0f172a" },
+			),
 			padding: "12px",
 			lineHeight: "1.3",
 			background: resolveBackgroundPaint(props.stripeColor, "#e2e8f0"),
-			color: String(props.stripeTextColor || "#0f172a"),
+			margin: undefined,
 		});
 
 		const hasTime = time !== "" || label !== "";
@@ -127,7 +192,19 @@ export const agendaItemNode = defineNode({
 		const title = props.title !== undefined ? escapeHtml(props.title) : "";
 		const description =
 			props.description !== undefined && props.description !== ""
-				? `<p style="${styleToString({ margin: "0", fontSize: String(props.descriptionFontSize || "0.82rem"), fontWeight: String(props.descriptionFontWeight || "400"), color: String(props.descriptionColor || "#475569"), lineHeight: "1.5" })}">${escapeHtml(props.description)}</p>`
+				? `<p style="${styleToString({
+						...resolveAgendaTypographyStyle(
+							{
+								fontFamily: props.descriptionFontFamily,
+								size: props.descriptionFontSize,
+								weight: props.descriptionFontWeight,
+								color: props.descriptionColor,
+							},
+							{ size: 13, weight: "400", colorFallback: "#475569" },
+						),
+						margin: "0",
+						lineHeight: "1.5",
+					})}">${escapeHtml(props.description)}</p>`
 				: "";
 		const location =
 			props.location !== undefined && props.location !== ""
@@ -180,27 +257,51 @@ export const agendaItemNode = defineNode({
 				background: "#e2e8f0",
 			});
 			const roleLabelStyle = styleToString({
-				fontSize: String(props.speakerLabelFontSize || "0.68rem"),
-				fontWeight: String(props.speakerLabelFontWeight || "700"),
-				color: String(props.speakerLabelColor || "#ff1d96"),
+				...resolveAgendaTypographyStyle(
+					{
+						fontFamily: props.speakerLabelFontFamily,
+						size: props.speakerLabelFontSize,
+						weight: props.speakerLabelFontWeight,
+						color: props.speakerLabelColor,
+					},
+					{ size: 11, weight: "700", colorFallback: "#ff1d96" },
+				),
 				textTransform: "uppercase",
 				letterSpacing: "0.04em",
 			});
-			const nameStyle = styleToString({
-				fontWeight: String(props.speakerNameFontWeight || "700"),
-				fontSize: String(props.speakerNameFontSize || "0.88rem"),
-				color: props.speakerNameColor ? String(props.speakerNameColor) : "",
-			});
+			const nameStyle = styleToString(
+				resolveAgendaTypographyStyle(
+					{
+						fontFamily: props.speakerNameFontFamily,
+						size: props.speakerNameFontSize,
+						weight: props.speakerNameFontWeight,
+						color: props.speakerNameColor,
+					},
+					{ size: 14, weight: "700", colorFallback: "inherit" },
+				),
+			);
 			const titleStyle = styleToString({
-				fontSize: String(props.speakerTitleFontSize || "0.76rem"),
-				fontWeight: String(props.speakerTitleFontWeight || "400"),
-				color: String(props.speakerTitleColor || "#64748b"),
+				...resolveAgendaTypographyStyle(
+					{
+						fontFamily: props.speakerTitleFontFamily,
+						size: props.speakerTitleFontSize,
+						weight: props.speakerTitleFontWeight,
+						color: props.speakerTitleColor,
+					},
+					{ size: 12, weight: "400", colorFallback: "#64748b" },
+				),
 				lineHeight: "1.35",
 			});
 			const companyStyle = styleToString({
-				fontSize: String(props.speakerCompanyFontSize || "0.76rem"),
-				fontWeight: String(props.speakerCompanyFontWeight || "400"),
-				color: String(props.speakerCompanyColor || "#64748b"),
+				...resolveAgendaTypographyStyle(
+					{
+						fontFamily: props.speakerCompanyFontFamily,
+						size: props.speakerCompanyFontSize,
+						weight: props.speakerCompanyFontWeight,
+						color: props.speakerCompanyColor,
+					},
+					{ size: 12, weight: "400", colorFallback: "#64748b" },
+				),
 				lineHeight: "1.35",
 			});
 			const cards: string[] = [];
@@ -254,13 +355,25 @@ export const agendaItemNode = defineNode({
 		});
 
 		const highlight = props.highlight
-			? `border-left: 4px solid ${String(props.highlightColor || "#6366f1")};`
+			? `border-left: 4px solid ${resolveSolidColor(props.highlightColor, "#6366f1")};`
 			: "";
+
+		const titleStyleStr = styleToString(
+			resolveAgendaTypographyStyle(
+				{
+					fontFamily: props.titleFontFamily,
+					size: props.titleFontSize,
+					weight: props.titleFontWeight,
+					color: props.titleColor,
+				},
+				{ size: 15, weight: "700", colorFallback: "inherit" },
+			),
+		);
 
 		return (
 			`<article data-kiv-type="agenda-item" style="${wrapStyle}${highlight}">` +
 			stripeHtml +
-			`<div style="${bodyStyle}"><div style="${mainStyle}">${imageHtml}<p style="margin:0;font-weight:${escapeHtml(String(props.titleFontWeight || "700"))};font-size:${escapeHtml(String(props.titleFontSize || "0.95rem"))};color:${escapeHtml(String(props.titleColor || ""))};">${title}</p>${description}${location}${tagsHtml}</div>${speakerHtml}</div>` +
+			`<div style="${bodyStyle}"><div style="${mainStyle}">${imageHtml}<p style="${titleStyleStr}">${title}</p>${description}${location}${tagsHtml}</div>${speakerHtml}</div>` +
 			`</article>`
 		);
 	},
@@ -329,64 +442,37 @@ export const agendaItemNode = defineNode({
 			group: "Style",
 			hint: "Background paint for the time block on the left.",
 		}),
-		stripeTextColor: f.color({
+		stripeTextColor: {
+			...stripeTypo.color,
 			label: "Stripe Text Color",
 			default: "#0f172a",
-			group: "Style",
-		}),
-		stripeFontSize: sizeField({
-			label: "Time/Label Font Size",
-			default: "0.85rem",
-			group: "Style",
-			units: [
-				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
-				{ unit: "px", min: 8, max: 32, step: 1 },
-			],
-		}),
-		stripeFontWeight: f.select(WEIGHT_OPTIONS, {
-			label: "Time/Label Font Weight",
-			default: "800",
-			group: "Style",
-		}),
-		titleFontSize: sizeField({
-			label: "Title Font Size",
-			default: "0.95rem",
-			group: "Style",
-			units: [
-				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
-				{ unit: "px", min: 8, max: 32, step: 1 },
-			],
-		}),
-		titleFontWeight: f.select(WEIGHT_OPTIONS, {
-			label: "Title Font Weight",
-			default: "700",
-			group: "Style",
-		}),
-		titleColor: f.color({
+		},
+		stripeFontFamily: stripeTypo.fontFamily,
+		stripeFontSize: { ...stripeTypo.size, label: "Time/Label Font Size" },
+		stripeFontWeight: { ...stripeTypo.weight, label: "Time/Label Font Weight" },
+		titleFontFamily: titleTypo.fontFamily,
+		titleFontSize: { ...titleTypo.size, label: "Title Font Size" },
+		titleFontWeight: { ...titleTypo.weight, label: "Title Font Weight" },
+		titleColor: {
+			...titleTypo.color,
 			label: "Title Color",
 			default: "",
 			hint: "Empty = inherit the item's default text color.",
-			group: "Style",
-		}),
-		descriptionFontSize: sizeField({
+		},
+		descriptionFontFamily: descriptionTypo.fontFamily,
+		descriptionFontSize: {
+			...descriptionTypo.size,
 			label: "Description Font Size",
-			default: "0.82rem",
-			group: "Style",
-			units: [
-				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
-				{ unit: "px", min: 8, max: 32, step: 1 },
-			],
-		}),
-		descriptionFontWeight: f.select(WEIGHT_OPTIONS, {
+		},
+		descriptionFontWeight: {
+			...descriptionTypo.weight,
 			label: "Description Font Weight",
-			default: "400",
-			group: "Style",
-		}),
-		descriptionColor: f.color({
+		},
+		descriptionColor: {
+			...descriptionTypo.color,
 			label: "Description Color",
 			default: "#475569",
-			group: "Style",
-		}),
+		},
 		hasSpeaker: f.boolean({
 			label: "Has Speaker",
 			default: false,
@@ -414,113 +500,105 @@ export const agendaItemNode = defineNode({
 			group: "Speaker 1",
 			showIf: { field: "hasSpeaker", equals: "true" },
 		}),
-		speakerLabelFontSize: sizeField({
-			label: "Role Label Font Size",
-			default: "0.68rem",
-			group: "Speaker",
+		speakerLabelFontFamily: {
+			...speakerLabelTypo.fontFamily,
 			showIf: { field: "hasSpeaker", equals: "true" },
-			units: [
-				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
-				{ unit: "px", min: 8, max: 32, step: 1 },
-			],
-		}),
-		speakerLabelColor: f.color({
+		},
+		speakerLabelFontSize: {
+			...speakerLabelTypo.size,
+			label: "Role Label Font Size",
+			showIf: { field: "hasSpeaker", equals: "true" },
+		},
+		speakerLabelColor: {
+			...speakerLabelTypo.color,
 			label: "Role Label Color",
 			default: "#ff1d96",
-			group: "Speaker",
 			showIf: { field: "hasSpeaker", equals: "true" },
-		}),
-		speakerLabelFontWeight: f.select(WEIGHT_OPTIONS, {
+		},
+		speakerLabelFontWeight: {
+			...speakerLabelTypo.weight,
 			label: "Role Label Font Weight",
-			default: "700",
-			group: "Speaker",
 			showIf: { field: "hasSpeaker", equals: "true" },
-		}),
+		},
 		speakerName: f.text({
 			label: "Name",
 			localizable: true,
 			group: "Speaker 1",
 			showIf: { field: "hasSpeaker", equals: "true" },
 		}),
-		speakerNameFontSize: sizeField({
-			label: "Name Font Size",
-			default: "0.88rem",
-			group: "Speaker",
+		speakerNameFontFamily: {
+			...speakerNameTypo.fontFamily,
 			showIf: { field: "hasSpeaker", equals: "true" },
-			units: [
-				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
-				{ unit: "px", min: 8, max: 32, step: 1 },
-			],
-		}),
-		speakerNameColor: f.color({
+		},
+		speakerNameFontSize: {
+			...speakerNameTypo.size,
+			label: "Name Font Size",
+			showIf: { field: "hasSpeaker", equals: "true" },
+		},
+		speakerNameColor: {
+			...speakerNameTypo.color,
 			label: "Name Color",
 			default: "",
 			hint: "Empty = inherit the item's default text color.",
-			group: "Speaker",
 			showIf: { field: "hasSpeaker", equals: "true" },
-		}),
-		speakerNameFontWeight: f.select(WEIGHT_OPTIONS, {
+		},
+		speakerNameFontWeight: {
+			...speakerNameTypo.weight,
 			label: "Name Font Weight",
-			default: "700",
-			group: "Speaker",
 			showIf: { field: "hasSpeaker", equals: "true" },
-		}),
+		},
 		speakerRole: f.text({
 			label: "Title",
 			localizable: true,
 			group: "Speaker 1",
 			showIf: { field: "hasSpeaker", equals: "true" },
 		}),
-		speakerTitleFontSize: sizeField({
-			label: "Title Font Size",
-			default: "0.76rem",
-			group: "Speaker",
+		speakerTitleFontFamily: {
+			...speakerTitleTypo.fontFamily,
 			showIf: { field: "hasSpeaker", equals: "true" },
-			units: [
-				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
-				{ unit: "px", min: 8, max: 32, step: 1 },
-			],
-		}),
-		speakerTitleColor: f.color({
+		},
+		speakerTitleFontSize: {
+			...speakerTitleTypo.size,
+			label: "Title Font Size",
+			showIf: { field: "hasSpeaker", equals: "true" },
+		},
+		speakerTitleColor: {
+			...speakerTitleTypo.color,
 			label: "Title Color",
 			default: "#64748b",
-			group: "Speaker",
 			showIf: { field: "hasSpeaker", equals: "true" },
-		}),
-		speakerTitleFontWeight: f.select(WEIGHT_OPTIONS, {
+		},
+		speakerTitleFontWeight: {
+			...speakerTitleTypo.weight,
 			label: "Title Font Weight",
-			default: "400",
-			group: "Speaker",
 			showIf: { field: "hasSpeaker", equals: "true" },
-		}),
+		},
 		speakerCompany: f.text({
 			label: "Company",
 			localizable: true,
 			group: "Speaker 1",
 			showIf: { field: "hasSpeaker", equals: "true" },
 		}),
-		speakerCompanyFontSize: sizeField({
-			label: "Company Font Size",
-			default: "0.76rem",
-			group: "Speaker",
+		speakerCompanyFontFamily: {
+			...speakerCompanyTypo.fontFamily,
 			showIf: { field: "hasSpeaker", equals: "true" },
-			units: [
-				{ unit: "rem", min: 0.5, max: 2, step: 0.01 },
-				{ unit: "px", min: 8, max: 32, step: 1 },
-			],
-		}),
-		speakerCompanyColor: f.color({
+		},
+		speakerCompanyFontSize: {
+			...speakerCompanyTypo.size,
+			label: "Company Font Size",
+			showIf: { field: "hasSpeaker", equals: "true" },
+		},
+		speakerCompanyColor: {
+			...speakerCompanyTypo.color,
 			label: "Company Color",
 			default: "#64748b",
-			group: "Speaker",
 			showIf: { field: "hasSpeaker", equals: "true" },
-		}),
-		speakerCompanyFontWeight: f.select(WEIGHT_OPTIONS, {
+		},
+		speakerCompanyFontWeight: {
+			...speakerCompanyTypo.weight,
 			label: "Company Font Weight",
-			default: "400",
-			group: "Speaker",
 			showIf: { field: "hasSpeaker", equals: "true" },
-		}),
+		},
 		speakerAvatar: f.text({
 			label: "Photo",
 			group: "Speaker 1",

@@ -1,8 +1,9 @@
-import { computeCountdownParts } from "@kivcode/nodes";
+import {
+	computeCountdownParts,
+	resolveCountdownTypographyStyle,
+} from "@kivcode/nodes";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import type { KivNodeComponentProps } from "../node-props";
-
-const SIZE_PX: Record<string, string> = { sm: "18px", md: "28px", lg: "40px" };
 
 function pad(value: number): string {
 	return String(value).padStart(2, "0");
@@ -17,8 +18,10 @@ export interface CountdownNodeProps extends KivNodeComponentProps {
 	secondsLabel?: string;
 	showLabels?: boolean;
 	countdownStyle?: string;
-	size?: string;
-	accentColor?: string;
+	fontFamily?: string;
+	size?: number;
+	weight?: string;
+	color?: string;
 }
 
 export function CountdownNode({
@@ -30,8 +33,10 @@ export function CountdownNode({
 	secondsLabel,
 	showLabels = true,
 	countdownStyle,
+	fontFamily,
 	size,
-	accentColor,
+	weight,
+	color,
 	id,
 	style,
 	...rest
@@ -50,8 +55,14 @@ export function CountdownNode({
 		[targetDate, now],
 	);
 
-	const fontSize = SIZE_PX[size ?? "md"] ?? "28px";
 	const displayStyle = countdownStyle ?? "boxes";
+	const numberStyle = resolveCountdownTypographyStyle({
+		fontFamily,
+		size,
+		weight,
+		color,
+		minimal: displayStyle === "minimal",
+	});
 
 	const units = [
 		{ value: parts.days, label: daysLabel ?? "Days" },
@@ -105,15 +116,7 @@ export function CountdownNode({
 							>
 								<span
 									className="kiv-countdown__value"
-									style={{
-										fontSize,
-										fontWeight: 700,
-										lineHeight: "1",
-										color:
-											displayStyle === "minimal"
-												? "inherit"
-												: (accentColor ?? "#6366f1"),
-									}}
+									style={{ ...numberStyle, lineHeight: "1" }}
 								>
 									{pad(unit.value)}
 								</span>

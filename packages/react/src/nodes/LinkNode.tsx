@@ -1,33 +1,43 @@
-import { BUTTON_RADIUS, BUTTON_SIZE, BUTTON_VARIANT } from "@kivcode/nodes";
-import { useContext, useMemo } from "react";
-import { KivLinkContext } from "../link";
+import {
+	BUTTON_RADIUS,
+	BUTTON_SIZE,
+	BUTTON_VARIANT,
+	resolveLinkTypographyStyle,
+} from "@kivcode/nodes";
+import { useMemo } from "react";
+import { useKivLink } from "../hooks/useKivLink";
 import type { KivNodeComponentProps } from "../node-props";
 
 export interface LinkNodeProps extends KivNodeComponentProps {
 	text?: string;
 	href?: string;
+	linkType?: string;
+	/** Pre-`linkType` documents; read by resolveLink for back-compat. */
 	target?: string;
 	display?: string;
 	variant?: string;
 	size?: string;
 	buttonRadius?: string;
-	textColor?: string;
+	fontFamily?: string;
+	color?: string;
 	underline?: boolean;
-	fontWeight?: string;
-	fontSize?: string;
+	weight?: string;
+	fontSize?: number;
 }
 
 export function LinkNode({
 	text,
 	href,
+	linkType,
 	target,
 	display,
 	variant,
 	size,
 	buttonRadius,
-	textColor,
+	fontFamily,
+	color,
 	underline,
-	fontWeight,
+	weight,
 	fontSize,
 	slots,
 	id,
@@ -35,6 +45,13 @@ export function LinkNode({
 	...rest
 }: LinkNodeProps) {
 	const isButton = display === "button";
+
+	const typoStyle = resolveLinkTypographyStyle({
+		fontFamily,
+		fontSize,
+		weight,
+		color,
+	});
 
 	const linkStyle = useMemo(() => {
 		if (isButton) {
@@ -65,55 +82,34 @@ export function LinkNode({
 			};
 		}
 		return {
-			color: textColor ?? "#6366f1",
+			color: typoStyle.color,
 			textDecoration: underline !== false ? "underline" : "none",
-			fontWeight: fontWeight ?? "500",
-			fontSize: fontSize ?? "inherit",
+			fontWeight: typoStyle.fontWeight,
+			fontSize: typoStyle.fontSize,
+			fontFamily: typoStyle.fontFamily,
 			...style,
 		};
-	}, [
-		isButton,
-		variant,
-		size,
-		buttonRadius,
-		textColor,
-		underline,
-		fontWeight,
-		fontSize,
-		style,
-	]);
+	}, [isButton, variant, size, buttonRadius, typoStyle, underline, style]);
 
-	// Next.js consumers pass their `Link` via KivRenderer's `linkComponent`
-	// prop; that's what powers client-side navigation for non-`_blank`
-	// links. Everything else falls back to a plain <a>.
-	const RouterLinkLike = useContext(KivLinkContext);
-	const useRouterLink = target !== "_blank" && !!RouterLinkLike;
-
-	if (useRouterLink && RouterLinkLike) {
-		return (
-			<RouterLinkLike
-				id={id}
-				href={href ?? "/"}
-				style={linkStyle}
-				data-kiv-type="link"
-				{...rest}
-			>
-				{slots?.default ?? text ?? "Link"}
-			</RouterLinkLike>
-		);
-	}
+	// Same shared link behaviour as Button — this component used to pick the
+	// router off `target` alone, which handed anchors and absolute external
+	// URLs to the router as if they were app routes.
+	const {
+		tag: Tag,
+		attrs: linkAttrs,
+		onClick,
+	} = useKivLink({ href, linkType, target });
 
 	return (
-		<a
+		<Tag
 			id={id}
-			href={href ?? "#"}
-			target={target ?? "_self"}
-			rel={target === "_blank" ? "noopener noreferrer" : undefined}
 			style={linkStyle}
 			data-kiv-type="link"
+			onClick={onClick}
+			{...linkAttrs}
 			{...rest}
 		>
 			{slots?.default ?? text ?? "Link"}
-		</a>
+		</Tag>
 	);
 }

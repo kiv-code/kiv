@@ -1,6 +1,31 @@
 import { defineNode, f } from "@kivcode/engine";
 import { alignField } from "../align-field";
 import { escapeHtml, styleToString } from "../html-utils";
+import { resolveTypographyStyle, typographyFields } from "../typography-field";
+
+const typo = typographyFields({
+	group: "Style",
+	defaultSize: 14,
+	weightDefault: "400",
+});
+
+/** Resolves the table's cell text through the shared typography resolver.
+ * Header cells additionally get the fixed 700 weight they always had. */
+export function resolveTableTypographyStyle(
+	props: {
+		fontFamily?: string;
+		size?: number;
+		weight?: string;
+		color?: unknown;
+	},
+	isHeader: boolean,
+): Record<string, string | undefined> {
+	return resolveTypographyStyle(props, {
+		size: 14,
+		weight: isHeader ? "700" : "400",
+		colorFallback: "inherit",
+	});
+}
 
 export interface TableData {
 	headers: string[];
@@ -46,12 +71,18 @@ export const tableNode = defineNode({
 			borderCollapse: "collapse",
 			border,
 		});
+		const typoProps = {
+			fontFamily: props.fontFamily as string | undefined,
+			size: props.size as number | undefined,
+			weight: props.weight as string | undefined,
+			color: props.color,
+		};
 		const thStyle = styleToString({
 			textAlign: align,
 			padding: cellPadding,
 			background: headerBackground,
 			border,
-			fontWeight: "700",
+			...resolveTableTypographyStyle(typoProps, true),
 		});
 		const cellStyleFor = (rowIndex: number) =>
 			styleToString({
@@ -60,6 +91,7 @@ export const tableNode = defineNode({
 				border,
 				background:
 					striped && rowIndex % 2 === 1 ? "rgba(0,0,0,0.03)" : undefined,
+				...resolveTableTypographyStyle(typoProps, false),
 			});
 
 		const headHtml = headers.length
@@ -94,5 +126,9 @@ export const tableNode = defineNode({
 			group: "Style",
 		}),
 		align: alignField({ label: "Cell Align", default: "left", group: "Style" }),
+		fontFamily: typo.fontFamily,
+		size: typo.size,
+		weight: typo.weight,
+		color: typo.color,
 	},
 });

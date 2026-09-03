@@ -6,15 +6,13 @@ import {
 	resolveBackgroundPaint,
 	resolveSpacingStyle,
 	SHADOW,
-	SPACING,
 } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{
 	background?: unknown;
 	borderRadius?: string;
-	padding?: string;
-	paddingBox?: unknown;
+	padding?: unknown;
 	shadow?: string;
 	borderWidth?: number;
 	borderColor?: string;
@@ -26,14 +24,9 @@ const props = defineProps<{
 const cardStyle = computed(() => ({
 	background: resolveBackgroundPaint(props.background, "#ffffff"),
 	borderRadius: RADIUS[props.borderRadius ?? "lg"] ?? "16px",
-	// Per-side override, shared with every other node that needs this escape
-	// hatch (see packages/nodes/src/spacing-field.ts). Empty side falls back
-	// to the Padding shorthand above.
-	...resolveSpacingStyle(
-		"padding",
-		props.paddingBox,
-		SPACING[props.padding ?? "lg"] ?? "32px",
-	),
+	// A legacy string value ("lg") normalizes to a uniform box, so old
+	// documents keep rendering without a migration step.
+	...resolveSpacingStyle("padding", props.padding, "32px"),
 	boxShadow: SHADOW[props.shadow ?? "md"] ?? "none",
 	borderWidth: props.borderWidth ? `${props.borderWidth}px` : undefined,
 	borderStyle: props.borderWidth ? ("solid" as const) : undefined,

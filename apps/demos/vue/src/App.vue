@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { Breakpoint, KivDocument, KivPlugin } from "@kivcode/engine";
+import type {
+	Breakpoint,
+	FontProvider,
+	KivDocument,
+	KivPlugin,
+} from "@kivcode/engine";
 import { createEngine, renderToHtml } from "@kivcode/engine";
 import { ALL_NODES, HOVER_EFFECTS_CSS } from "@kivcode/nodes";
 import { ALL_INTERACTIVE_NODES } from "@kivcode/nodes-interactive";
@@ -75,10 +80,43 @@ const editorHooksPlugin: KivPlugin = {
 // Plugin 5 — a11y checker: re-runs on every mutation, logs the issue count.
 const a11yIssueCount = shallowRef(0);
 
+// Stands in for a real project's font setup: the families this app actually
+// ships, with the weights each one really has. The editor offers exactly these.
+const demoFontProvider: FontProvider = {
+	list: () => [
+		{
+			id: "montserrat",
+			label: "Montserrat",
+			stack: '"Montserrat", system-ui, sans-serif',
+			weights: [400, 500, 600, 700, 800, 900],
+			italic: true,
+			category: "sans",
+		},
+		{
+			id: "playfair",
+			label: "Playfair Display",
+			stack: '"Playfair Display", Georgia, serif',
+			weights: [400, 500, 600, 700, 800, 900],
+			italic: true,
+			category: "serif",
+		},
+		{
+			id: "jetbrains",
+			label: "JetBrains Mono",
+			stack: '"JetBrains Mono", ui-monospace, monospace',
+			weights: [400, 500, 700],
+			category: "mono",
+		},
+	],
+	stylesheet: () =>
+		"@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400..900;1,400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500;700&display=swap');",
+};
+
 const engine = createEngine({
 	nodes: [...ALL_NODES, ...ALL_INTERACTIVE_NODES],
 	services: { storage: localStorageService },
 	media: { provider: mockMediaProvider },
+	fonts: { provider: demoFontProvider },
 	plugins: [
 		// Plugin 1 — captures EVERY event via the "*" wildcard.
 		analyticsPlugin({
@@ -282,6 +320,7 @@ function exportHtml() {
 					:breakpoint="previewBreakpoint"
 					:bus="engine.bus"
 					:media="engine.media"
+				:fonts="engine.fonts"
 					:services="engine.services"
 				/>
 			</div>

@@ -1,6 +1,7 @@
 import type {
 	Breakpoint,
 	EventBus,
+	FontProvider,
 	KivDocument,
 	MediaProvider,
 	ServicesContainer,
@@ -10,6 +11,7 @@ import { type ComponentType, useEffect, useMemo } from "react";
 import { KivBusContext } from "./bus";
 import { KivContext } from "./context";
 import { KivEditorModeContext } from "./editor-mode";
+import { KivFontsContext } from "./fonts";
 import { KivNodeRenderer } from "./KivNodeRenderer";
 import type { KivLinkComponentProps } from "./link";
 import { KivLinkContext } from "./link";
@@ -27,6 +29,8 @@ export interface KivRendererProps {
 	bus?: EventBus | null;
 	/** Optional MediaProvider (from engine.media). When passed, ImageNode resolves responsive srcset. */
 	media?: MediaProvider | null;
+	/** Optional FontProvider (from engine.fonts). When passed, text nodes resolve a stored font id to its real stack, and the provider's @font-face/@import is injected once. */
+	fonts?: FontProvider | null;
 	/** Optional services container (from engine.services). When passed, FormNode submits via services.api. */
 	services?: ServicesContainer | null;
 	/** Router-aware link component (e.g. Next.js's `Link`) for internal navigation. Falls back to `<a>`. */
@@ -34,6 +38,7 @@ export interface KivRendererProps {
 }
 
 const HOVER_CSS_ID = "kiv-hover-effects-css";
+const FONT_CSS_ID = "kiv-fonts-css";
 
 export function KivRenderer({
 	document: doc,
@@ -43,6 +48,7 @@ export function KivRenderer({
 	editorMode = false,
 	bus = null,
 	media = null,
+	fonts = null,
 	services = null,
 	linkComponent = null,
 }: KivRendererProps) {
@@ -71,16 +77,32 @@ export function KivRenderer({
 		document.head.appendChild(styleEl);
 	}, []);
 
+	// A font the project ships still needs its @font-face/@import on the page.
+	// Injecting it here is what stops the classic "I picked a font and the
+	// public page didn't change" — the consumer no longer has to remember a
+	// stylesheet.
+	useEffect(() => {
+		const css = fonts?.stylesheet?.();
+		if (!css || typeof document === "undefined") return;
+		if (document.getElementById(FONT_CSS_ID)) return;
+		const styleEl = document.createElement("style");
+		styleEl.id = FONT_CSS_ID;
+		styleEl.textContent = css;
+		document.head.appendChild(styleEl);
+	}, [fonts]);
+
 	return (
 		<KivContext.Provider value={ctx}>
 			<KivEditorModeContext.Provider value={editorMode}>
 				<KivBusContext.Provider value={bus}>
 					<KivMediaContext.Provider value={media}>
-						<KivServicesContext.Provider value={services}>
-							<KivLinkContext.Provider value={linkComponent}>
-								<KivNodeRenderer node={doc.root} />
-							</KivLinkContext.Provider>
-						</KivServicesContext.Provider>
+						<KivFontsContext.Provider value={fonts}>
+							<KivServicesContext.Provider value={services}>
+								<KivLinkContext.Provider value={linkComponent}>
+									<KivNodeRenderer node={doc.root} />
+								</KivLinkContext.Provider>
+							</KivServicesContext.Provider>
+						</KivFontsContext.Provider>
 					</KivMediaContext.Provider>
 				</KivBusContext.Provider>
 			</KivEditorModeContext.Provider>

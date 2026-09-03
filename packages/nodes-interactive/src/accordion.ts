@@ -2,6 +2,7 @@ import { defineNode, f } from "@kivcode/engine";
 import {
 	borderVisualFields,
 	escapeHtml,
+	fromScale,
 	GAP,
 	gapField,
 	RADIUS,
@@ -32,7 +33,7 @@ export const accordionNode = defineNode({
 		const style = styleToString({
 			display: "flex",
 			flexDirection: "column",
-			gap: GAP[String(props.gap ?? "sm")] ?? "8px",
+			gap: fromScale(GAP, props.gap ?? "sm", "8px"),
 		});
 		return `<div data-kiv-type="accordion" style="${style}">${children.default ?? ""}</div>`;
 	},
@@ -122,11 +123,11 @@ export const accordionItemNode = defineNode({
 			color: props.titleColor ? String(props.titleColor) : undefined,
 			fontWeight: String(props.titleFontWeight ?? "600"),
 			fontSize: props.titleFontSize ? `${props.titleFontSize}px` : undefined,
-			padding: SPACING[String(props.padding ?? "md")] ?? "12px 16px",
+			padding: fromScale(SPACING, props.padding ?? "md", "12px 16px"),
 			opacity: props.disabled ? "0.5" : undefined,
 		});
 		const bodyStyle = styleToString({
-			padding: SPACING[String(props.bodyPadding ?? "md")] ?? "0 16px 16px",
+			padding: fromScale(SPACING, props.bodyPadding ?? "md", "0 16px 16px"),
 		});
 		const title = props.title !== undefined ? escapeHtml(props.title) : "";
 		const openAttr = props.defaultOpen ? " open" : "";

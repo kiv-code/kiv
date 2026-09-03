@@ -15,17 +15,17 @@ cualquier proyecto nuevo o existente.
 | [Instalación](./installation.md)                                    | Cómo instalar Kiv desde cero (monorepo local o futuro paquete npm publicado).                                             | ✅ Escrito   |
 | [Arquitectura](./architecture.md)                                   | Cómo está organizado internamente — capas, flujo de dependencias, reglas invariantes.                                     | ✅ Escrito   |
 | [Migración](./migration.md)                                         | Cómo integrar Kiv en un proyecto **existente** sin perder compatibilidad con su contenido actual — patrón de adaptadores. | ✅ Escrito   |
-| [Engine](./engine.md)                                               | Cómo funciona `@kivcode/engine` — document model, registry, schema de campos, historial, plugins.                             | 🚧 Pendiente |
-| [Editor](./editor.md)                                               | Cómo extender `@kivcode/vue-editor` — extension points, controles de campo custom, paneles.                                   | 🚧 Pendiente |
-| [Crear un Node](./creating-a-node.md)                               | Guía completa paso a paso para definir un nodo nuevo en `@kivcode/nodes`.                                                     | 🚧 Pendiente |
-| [Crear un control de Inspector](./creating-an-inspector-control.md) | Guía completa para un control de campo custom (`pluginControl`).                                                          | 🚧 Pendiente |
-| [Sistema de Templates](./templates.md)                              | Cómo crear templates de página completa y templates de bloque de contenido.                                               | 🚧 Pendiente |
-| [API pública](./api-reference.md)                                   | Qué clases/funciones son la superficie pública de cada paquete.                                                           | 🚧 Pendiente |
-| [Eventos](./events.md)                                              | Cómo reaccionar a cambios del editor vía el `EventBus`.                                                                   | 🚧 Pendiente |
-| [Plugins](./plugins.md)                                             | Cómo extender Kiv sin tocar el núcleo (`createEngine({ plugins })`).                                                      | 🚧 Pendiente |
-| [Buenas prácticas](./best-practices.md)                             | Qué hacer y qué evitar al construir sobre Kiv.                                                                            | 🚧 Pendiente |
-| [Ejemplos](./examples.md)                                           | Casos reales de uso, referenciando integraciones concretas.                                                               | 🚧 Pendiente |
-| [Troubleshooting](./troubleshooting.md)                             | Problemas comunes y sus soluciones.                                                                                       | 🚧 Pendiente |
+| [Engine](./engine.md)                                               | Cómo funciona `@kivcode/engine` — document model, registry, schema de campos, historial, plugins.                             | ✅ Escrito |
+| [Editor](./editor.md)                                               | Cómo extender `@kivcode/vue-editor` — extension points, controles de campo custom, paneles.                                   | ✅ Escrito |
+| [Crear un Node](./creating-a-node.md)                               | Guía completa paso a paso para definir un nodo nuevo en `@kivcode/nodes`.                                                     | ✅ Escrito |
+| [Crear un control de Inspector](./creating-an-inspector-control.md) | Guía completa para un control de campo custom (`pluginControl`).                                                          | ✅ Escrito |
+| [Sistema de Templates](./templates.md)                              | Cómo crear templates de página completa y templates de bloque de contenido.                                               | ✅ Escrito |
+| [API pública](./api-reference.md)                                   | Qué clases/funciones son la superficie pública de cada paquete.                                                           | ✅ Escrito |
+| [Eventos](./events.md)                                              | Cómo reaccionar a cambios del editor vía el `EventBus`.                                                                   | ✅ Escrito |
+| [Plugins](./plugins.md)                                             | Cómo extender Kiv sin tocar el núcleo (`createEngine({ plugins })`).                                                      | ✅ Escrito |
+| [Buenas prácticas](./best-practices.md)                             | Qué hacer y qué evitar al construir sobre Kiv.                                                                            | ✅ Escrito |
+| [Ejemplos](./examples.md)                                           | Casos reales de uso, referenciando integraciones concretas.                                                               | ✅ Escrito |
+| [Troubleshooting](./troubleshooting.md)                             | Problemas comunes y sus soluciones.                                                                                       | ✅ Escrito |
 
 ## Convención de este directorio
 

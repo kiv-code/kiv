@@ -8,14 +8,14 @@ import {
 	hoverEffectClass,
 	hoverGlowStyle,
 	resolveBackgroundPaint,
+	resolveButtonTypographyStyle,
 	resolveIcon,
 	resolveSolidColor,
 	resolveSpacingStyle,
 	resolveTextPaintStyle,
 } from "@kivcode/nodes";
-import { computed, getCurrentInstance, inject } from "vue";
-import { KIV_BUS_KEY } from "../bus";
-import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
+import { computed } from "vue";
+import { useKivLink } from "../composables/useKivLink";
 
 const props = defineProps<{
 	nodeId?: string;
@@ -25,13 +25,15 @@ const props = defineProps<{
 	iconColor?: string;
 	iconPosition?: string;
 	href?: string;
-	target?: string;
 	linkType?: string;
+	/** Pre-`linkType` documents; read by resolveLink for back-compat. */
+	target?: string;
 	variant?: string;
 	size?: string;
 	fullWidth?: boolean;
 	align?: string;
 	borderRadius?: string;
+	fontFamily?: string;
 	fontWeight?: string;
 	background?: unknown;
 	textColor?: unknown;
@@ -41,53 +43,24 @@ const props = defineProps<{
 	hoverGlowColor?: string;
 }>();
 
-const isEditorMode = inject(KIV_EDITOR_MODE_KEY, false);
-const bus = inject(KIV_BUS_KEY, null);
-
-// Detect Vue Router WITHOUT depending on it and WITHOUT resolveComponent(),
-// which warns to the console whenever the name isn't found — even when the
-// result is never used. A plain lookup in the app's registered components is
-// silent: if the consumer's app installed vue-router, `RouterLink` is there;
-// otherwise this is undefined and we fall back to a plain <a>. @kivcode/vue never
-// imports vue-router.
-const registeredRouterLink = computed(() => {
-	if (isEditorMode || props.linkType !== "internal") return undefined;
-	const components = getCurrentInstance()?.appContext.components;
-	return components?.RouterLink ?? components?.["router-link"];
-});
-
-// For linkType="internal", use RouterLink (SPA, no reload) when a router
-// exists. Everything else (external, anchor, or no router) uses <a>.
-const useRouterLink = computed(() => !!registeredRouterLink.value);
-
-// The element/component to render: RouterLink or a plain anchor.
-const tag = computed(() =>
-	useRouterLink.value ? registeredRouterLink.value : "a",
+// Link behaviour (router detection, anchor scroll, bus emit, editor guard)
+// lives in one shared composable so every clickable node behaves the same.
+const {
+	tag,
+	attrs: linkAttrs,
+	onClick,
+	isEditorMode,
+} = useKivLink(
+	computed(() => ({ ...props })),
+	{
+		event: "button.clicked",
+		payload: () => ({
+			nodeId: props.nodeId,
+			label: props.label,
+			href: props.href,
+		}),
+	},
 );
-
-const resolvedHref = computed(() =>
-	isEditorMode ? undefined : (props.href ?? "#"),
-);
-const resolvedTarget = computed(() => {
-	if (isEditorMode) return undefined;
-	if (props.linkType === "external") return "_blank";
-	return props.target ?? "_self";
-});
-const rel = computed(() =>
-	resolvedTarget.value === "_blank" ? "noopener noreferrer" : undefined,
-);
-
-// Props bound to whichever tag we render. RouterLink wants `to`, <a> wants href/target/rel.
-const linkAttrs = computed(() => {
-	if (useRouterLink.value) {
-		return { to: props.href ?? "/" };
-	}
-	return {
-		href: resolvedHref.value,
-		target: resolvedTarget.value,
-		rel: rel.value,
-	};
-});
 
 const DEFAULT_SIZE: ButtonSizeStyle = { padding: "9px 20px", fontSize: "14px" };
 const DEFAULT_VARIANT: ButtonVariantStyle = {
@@ -169,8 +142,10 @@ const buttonStyle = computed(() => ({
 	width: props.fullWidth ? "100%" : undefined,
 	...paddingFinal.value,
 	fontSize: sizing.value.fontSize,
-	fontWeight: props.fontWeight ?? "600",
-	fontFamily: "inherit",
+	...resolveButtonTypographyStyle({
+		fontFamily: props.fontFamily,
+		fontWeight: props.fontWeight,
+	}),
 	textAlign: (props.align ?? "center") as "left" | "center" | "right",
 	borderRadius: BUTTON_RADIUS[props.borderRadius ?? "md"] ?? "6px",
 	textDecoration: variantStyle.value.textDecoration ?? "none",
@@ -193,33 +168,6 @@ const buttonStyle = computed(() => ({
 	border: borderFinal.value,
 	...hoverGlowStyle(props.hoverGlowColor),
 }));
-
-function onClick(e: MouseEvent) {
-	if (isEditorMode) {
-		e.preventDefault();
-		return;
-	}
-	// Runtime: emit through the engine bus if one was provided.
-	bus?.emit("button.clicked", {
-		nodeId: props.nodeId,
-		label: props.label,
-		href: props.href,
-	});
-
-	// Anchor navigation: smooth-scroll to the target node ourselves.
-	// The renderer stamps each node with id="<nodeId>", so href="#hero"
-	// finds the element and scrolls to it — works inside scroll containers,
-	// where the browser's native hash jump can be unreliable.
-	if (props.linkType === "anchor") {
-		const raw = props.href ?? "";
-		const targetId = raw.startsWith("#") ? raw.slice(1) : raw;
-		e.preventDefault();
-		if (targetId) {
-			const el = document.getElementById(targetId);
-			el?.scrollIntoView({ behavior: "smooth", block: "start" });
-		}
-	}
-}
 </script>
 
 <template>

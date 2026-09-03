@@ -42,6 +42,15 @@ export {
 	type WildcardHandler,
 } from "./events";
 export {
+	DEFAULT_FONT_WEIGHTS,
+	type FontProvider,
+	fontWeights,
+	type KivFont,
+	resolveFontStack,
+	SYSTEM_FONTS,
+	systemFontProvider,
+} from "./fonts";
+export {
 	buildLocaleFallbackChain,
 	validateI18nConfig,
 } from "./i18n";

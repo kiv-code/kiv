@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { parseSelectOptions } from "@kivcode/nodes";
+import {
+	parseSelectOptions,
+	resolveFormFieldTypographyStyle,
+} from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{
@@ -9,15 +12,27 @@ const props = defineProps<{
 	placeholder?: string;
 	required?: boolean;
 	options?: string;
+	fontFamily?: string;
+	size?: number;
+	weight?: string;
+	color?: string;
 }>();
 
 const selectOptions = computed(() => parseSelectOptions(props.options));
 const fieldName = computed(() => props.name ?? "field");
+const labelStyle = computed(() =>
+	resolveFormFieldTypographyStyle({
+		fontFamily: props.fontFamily,
+		size: props.size,
+		weight: props.weight,
+		color: props.color,
+	}),
+);
 </script>
 
 <template>
 	<div class="kiv-form-field" data-kiv-type="form-field">
-		<label v-if="label" :for="fieldName">{{ label }}</label>
+		<label v-if="label" :for="fieldName" :style="labelStyle">{{ label }}</label>
 		<textarea
 			v-if="fieldType === 'textarea'"
 			:id="fieldName"
@@ -51,10 +66,6 @@ const fieldName = computed(() => props.name ?? "field");
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
-}
-.kiv-form-field label {
-	font-size: 13px;
-	font-weight: 600;
 }
 .kiv-form-field input,
 .kiv-form-field select,

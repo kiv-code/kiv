@@ -10,6 +10,7 @@ import {
 } from "@kivcode/nodes";
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { KIV_BUS_KEY } from "../bus";
+import { useKivLink } from "../composables/useKivLink";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
 
 declare module "@kivcode/engine" {
@@ -56,9 +57,8 @@ const props = withDefaults(
 		triggerBorderWidth?: number;
 		triggerShadow?: string;
 		triggerFullWidth?: boolean;
-		clickAction?: string;
-		actionHref?: string;
-		actionTarget?: string;
+		linkType?: string;
+		href?: string;
 	}>(),
 	{
 		// Vue coerces an omitted boolean-typed prop to `false`, not `undefined`,
@@ -83,6 +83,16 @@ function openModal(): void {
 	if (isEditorMode) return;
 	open.value = true;
 	bus?.emit("modal.opened", { nodeId: props.nodeId });
+}
+
+// The trigger can both navigate and open the modal. The shared link handler
+// owns the navigation half (router, anchor scroll, editor guard) so it behaves
+// exactly like Button and Link; opening is layered on top of it.
+const modalLink = useKivLink(computed(() => ({ ...props })));
+
+function onTriggerLinkClick(e: MouseEvent): void {
+	modalLink.onClick(e);
+	openModal();
 }
 
 function closeModal(): void {
@@ -225,7 +235,7 @@ watch(
 
 // ── Trigger rendering ──
 const resolvedTriggerTag = computed(() => {
-	if (props.clickAction && props.clickAction !== "none") return "a";
+	if (modalLink.link.value.type !== "none") return "a";
 	return props.triggerTag ?? "button";
 });
 
@@ -404,11 +414,12 @@ const contentStyle = computed(() =>
 			</button>
 			<a
 				v-else-if="resolvedTriggerTag === 'a'"
-				:href="actionHref"
-				:target="actionTarget"
+				:href="modalLink.link.value.href"
+				:target="modalLink.link.value.target"
+				:rel="modalLink.link.value.rel"
 				:style="triggerStyle"
 				data-kiv-modal-trigger
-				@click.prevent="openModal"
+				@click="onTriggerLinkClick"
 			>
 				<template v-if="hasTriggerIcon && !triggerIconOnRight">
 					<span v-if="triggerIconIsSvg" class="kiv-modal__trigger-icon" v-html="triggerIconContent" />

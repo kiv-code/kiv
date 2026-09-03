@@ -19,10 +19,14 @@ const DEFAULT_UNITS = [
 ];
 
 const units = computed(() => props.descriptor?.sliderUnits ?? DEFAULT_UNITS);
+const allowAuto = computed(() => props.descriptor?.allowAuto === true);
+const autoLabel = computed(() => props.descriptor?.autoLabel ?? "auto");
+
+const NUMERIC = /^(-?\d*\.?\d+)\s*([a-z%]*)$/i;
 
 function parse(value: string | undefined): { amount: number; unit: string } {
 	const raw = (value ?? "").trim();
-	const match = raw.match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
+	const match = raw.match(NUMERIC);
 	const fallbackUnit = units.value[0]?.unit ?? "px";
 	if (!match) return { amount: 0, unit: fallbackUnit };
 	const amount = Number(match[1]);
@@ -37,6 +41,25 @@ function parse(value: string | undefined): { amount: number; unit: string } {
 const displayValue = computed(
 	() => props.modelValue ?? (props.descriptor?.default as string | undefined),
 );
+
+const raw = computed(() => (displayValue.value ?? "").trim());
+
+/** Unset — the field contributes no declaration at all. */
+const isAuto = computed(() => raw.value === "");
+
+/**
+ * A value the slider cannot represent: `calc(...)`, `clamp(...)`, or a unit the
+ * field wasn't configured with. Showing it as editable text is the honest
+ * option — the old control rendered it as `0`, and the first drag destroyed it.
+ */
+const isCustom = computed(() => {
+	if (isAuto.value) return false;
+	if (!NUMERIC.test(raw.value)) return true;
+	// A parseable number in a unit this field wasn't configured with would be
+	// driven by the wrong slider range — dragging a `3rem` value on a 0–500px
+	// range writes `250rem`. Editing it as text keeps it intact.
+	return !units.value.some((u) => u.unit === parse(raw.value).unit);
+});
 
 const activeUnit = ref(parse(displayValue.value).unit);
 watch(displayValue, (v) => {
@@ -61,27 +84,63 @@ function onNumber(e: Event) {
 	const v = Number((e.target as HTMLInputElement).value);
 	if (!Number.isNaN(v)) commit(v, activeUnit.value);
 }
+function onCustom(e: Event) {
+	emit("update:modelValue", (e.target as HTMLInputElement).value);
+}
 function switchUnit(unit: string) {
 	activeUnit.value = unit;
-	commit(amount.value, unit);
+	// Coming back from auto/custom there is no number yet — seed from the
+	// unit's own minimum rather than writing NaN.
+	const next =
+		isAuto.value || isCustom.value
+			? (unitConfig.value?.min ?? 0)
+			: amount.value;
+	commit(next, unit);
+}
+function setAuto() {
+	emit("update:modelValue", "");
 }
 </script>
 
 <template>
 	<div class="kiv-size-slider" @change="end">
-		<div v-if="units.length > 1" class="kiv-size-slider__units">
+		<div v-if="units.length > 1 || allowAuto" class="kiv-size-slider__units">
 			<button
 				v-for="u in units"
 				:key="u.unit"
 				type="button"
 				class="kiv-size-slider__unit"
-				:class="{ 'kiv-size-slider__unit--active': u.unit === activeUnit }"
+				:class="{ 'kiv-size-slider__unit--active': !isAuto && !isCustom && u.unit === activeUnit }"
 				@click="switchUnit(u.unit)"
 			>
 				{{ u.unit }}
 			</button>
+			<button
+				v-if="allowAuto"
+				type="button"
+				class="kiv-size-slider__unit"
+				:class="{ 'kiv-size-slider__unit--active': isAuto }"
+				@click="setAuto"
+			>
+				{{ autoLabel }}
+			</button>
 		</div>
-		<div class="kiv-size-slider__row">
+
+		<!-- Unset: nothing to drag, and saying so beats showing a fake 0. -->
+		<p v-if="isAuto" class="kiv-size-slider__auto">
+			Not set — inherits from the layout.
+		</p>
+
+		<!-- calc(), clamp(), or a unit this field wasn't configured with. -->
+		<input
+			v-else-if="isCustom"
+			type="text"
+			class="kiv-input"
+			:value="raw"
+			@input="onCustom"
+		/>
+
+		<div v-else class="kiv-size-slider__row">
 			<input
 				type="range"
 				class="kiv-size-slider__range"
@@ -161,6 +220,12 @@ function switchUnit(unit: string) {
 	font-variant-numeric: tabular-nums;
 	padding: 4px 4px 4px 6px;
 	outline: none;
+}
+.kiv-size-slider__auto {
+	margin: 0;
+	font-size: 0.65rem;
+	color: var(--color-text-muted);
+	font-style: italic;
 }
 .kiv-size-slider__unit-label {
 	font-size: 0.65rem;

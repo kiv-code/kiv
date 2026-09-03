@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { computeCountdownParts } from "@kivcode/nodes";
+import {
+	computeCountdownParts,
+	resolveCountdownTypographyStyle,
+} from "@kivcode/nodes";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = withDefaults(
@@ -12,8 +15,10 @@ const props = withDefaults(
 		secondsLabel?: string;
 		showLabels?: boolean;
 		countdownStyle?: string;
-		size?: string;
-		accentColor?: string;
+		fontFamily?: string;
+		size?: number;
+		weight?: string;
+		color?: string;
 	}>(),
 	{ showLabels: true },
 );
@@ -33,9 +38,16 @@ const parts = computed(() =>
 	computeCountdownParts(props.targetDate, now.value),
 );
 
-const SIZE_PX: Record<string, string> = { sm: "18px", md: "28px", lg: "40px" };
-const fontSize = computed(() => SIZE_PX[props.size ?? "md"] ?? "28px");
 const displayStyle = computed(() => props.countdownStyle ?? "boxes");
+const numberStyle = computed(() =>
+	resolveCountdownTypographyStyle({
+		fontFamily: props.fontFamily,
+		size: props.size,
+		weight: props.weight,
+		color: props.color,
+		minimal: displayStyle.value === "minimal",
+	}),
+);
 
 const units = computed(() => [
 	{ value: parts.value.days, label: props.daysLabel ?? "Days" },
@@ -66,7 +78,7 @@ function pad(value: number): string {
 					>
 						<span
 							class="kiv-countdown__value"
-							:style="{ fontSize, color: displayStyle === 'minimal' ? 'inherit' : accentColor ?? '#6366f1' }"
+							:style="numberStyle"
 						>{{ pad(unit.value) }}</span>
 						<span v-if="showLabels" class="kiv-countdown__label">{{ unit.label }}</span>
 					</div>

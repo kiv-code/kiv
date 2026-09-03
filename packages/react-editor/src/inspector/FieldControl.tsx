@@ -16,6 +16,9 @@ export interface FieldControlProps {
 	value: unknown;
 	breakpoint?: Breakpoint;
 	locale?: string;
+	/** The whole node's props — lets a control depend on a sibling field, e.g.
+	 * the weight control narrowing its options to the chosen font's real cuts. */
+	nodeProps?: Record<string, unknown>;
 	onChange: (value: unknown) => void;
 }
 
@@ -32,6 +35,7 @@ export interface PluginFieldControlProps {
 	value: unknown;
 	fieldKey: string;
 	descriptor: FieldDescriptor;
+	nodeProps?: Record<string, unknown>;
 	onChange: (value: unknown) => void;
 }
 
@@ -55,6 +59,7 @@ export function FieldControl({
 	value,
 	breakpoint,
 	locale,
+	nodeProps,
 	onChange,
 }: FieldControlProps) {
 	const extensions = useContext(EditorExtensionsContext);
@@ -102,6 +107,7 @@ export function FieldControl({
 					value={value}
 					fieldKey={fieldKey}
 					descriptor={descriptor}
+					nodeProps={nodeProps}
 					onChange={onChange}
 				/>
 			) : descriptor.control === "boolean" ? (
@@ -140,6 +146,9 @@ export function FieldControl({
 					onChange={onChange as (value: string) => void}
 				/>
 			)}
+			{/* Node authors write these to disambiguate overlapping fields (e.g. how
+			    `paddingBox` interacts with the `paddingX/Y` shorthand). */}
+			{descriptor.hint && <p className="kiv-field__hint">{descriptor.hint}</p>}
 		</div>
 	);
 }

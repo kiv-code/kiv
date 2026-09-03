@@ -6,7 +6,7 @@ import {
 	type ResolvedIcon,
 	resolveIconInfo,
 } from "@kivcode/nodes";
-import { computed, inject, ref } from "vue";
+import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
 import { EDITOR_STORE_KEY } from "../../store/context";
 
 const INITIAL_LIMIT = 200;
@@ -21,8 +21,12 @@ const props = withDefaults(
 	defineProps<{
 		modelValue?: string;
 		descriptor?: FieldDescriptor;
+		/** Hides the embedded size/color sub-controls — for uses like the
+		 * social-links editor where icon size/color are handled elsewhere and
+		 * writing to a node's `iconSize`/`iconColor` props would be wrong. */
+		showExtras?: boolean;
 	}>(),
-	{ modelValue: "" },
+	{ modelValue: "", showExtras: true },
 );
 
 const emit = defineEmits<{
@@ -43,6 +47,40 @@ const search = ref("");
 // skipping it takes down the whole Inspector panel (see selectedInfo below).
 const showCustom = ref((props.modelValue ?? "").trim().startsWith("<svg"));
 const showAll = ref(false);
+const open = ref(false);
+const rootEl = ref<HTMLElement | null>(null);
+
+function onDocumentClick(e: MouseEvent) {
+	if (open.value && rootEl.value && !rootEl.value.contains(e.target as Node)) {
+		open.value = false;
+	}
+}
+function onDocumentKeydown(e: KeyboardEvent) {
+	if (e.key === "Escape") open.value = false;
+}
+onMounted(() => {
+	document.addEventListener("mousedown", onDocumentClick);
+	document.addEventListener("keydown", onDocumentKeydown);
+});
+onBeforeUnmount(() => {
+	document.removeEventListener("mousedown", onDocumentClick);
+	document.removeEventListener("keydown", onDocumentKeydown);
+});
+
+// Short label for the trigger: "search" from "lucide:search", "Custom SVG"
+// for inline markup, or a placeholder when nothing is picked yet.
+const triggerLabel = computed(() => {
+	if (showCustom.value) return "Custom SVG";
+	const v = props.modelValue ?? "";
+	if (!v) return "Choose icon…";
+	const colonIdx = v.indexOf(":");
+	return colonIdx > 0 ? v.slice(colonIdx + 1) : v;
+});
+const triggerSvg = computed(() => {
+	if (showCustom.value) return "";
+	if (!props.modelValue) return "";
+	return getSvg(props.modelValue);
+});
 
 const svgCache = new Map<string, string>();
 
@@ -100,6 +138,7 @@ function findSetForValue(value: string): IconSet | undefined {
 function selectIconName(name: string) {
 	showCustom.value = false;
 	emit("update:modelValue", `${activeSet.value.prefix}:${name}`);
+	open.value = false;
 }
 
 function switchTab(set: IconSet) {
@@ -145,7 +184,33 @@ function setIconColor(color: string) {
 </script>
 
 <template>
-	<div class="kiv-icon-picker">
+	<div ref="rootEl" class="kiv-icon-picker">
+		<button
+			type="button"
+			class="kiv-icon-picker__trigger"
+			:class="{ 'kiv-icon-picker__trigger--active': open }"
+			@click="open = !open"
+		>
+			<span
+				v-if="triggerSvg"
+				class="kiv-icon-picker__trigger-icon"
+				v-html="triggerSvg"
+			/>
+			<svg
+				v-else
+				class="kiv-icon-picker__trigger-icon kiv-icon-picker__trigger-icon--placeholder"
+				width="16" height="16" viewBox="0 0 16 16" fill="none"
+			>
+				<rect x="2" y="2" width="12" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2"/>
+				<path d="M5.5 8h5M8 5.5v5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+			</svg>
+			<span class="kiv-icon-picker__trigger-label">{{ triggerLabel }}</span>
+			<svg class="kiv-icon-picker__trigger-chevron" width="9" height="9" viewBox="0 0 9 9" fill="none">
+				<path d="M2 3.2 4.5 5.7 7 3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
+		</button>
+
+		<div v-if="open" class="kiv-icon-picker__popover">
 		<div class="kiv-icon-picker__tabs">
 			<button
 				v-for="set in iconSets"
@@ -222,7 +287,7 @@ function setIconColor(color: string) {
 			</div>
 
 			<!-- Embedded icon size + color controls -->
-			<div class="kiv-icon-picker__extra">
+			<div v-if="showExtras" class="kiv-icon-picker__extra">
 				<div class="kiv-icon-picker__extra-row">
 					<label class="kiv-icon-picker__extra-label">Size</label>
 					<div class="kiv-icon-picker__size-wrap">
@@ -272,14 +337,76 @@ function setIconColor(color: string) {
 			rows="4"
 			@input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
 		/>
+		</div>
 	</div>
 </template>
 
 <style scoped>
 .kiv-icon-picker {
+	position: relative;
+}
+
+.kiv-icon-picker__trigger {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	padding: 5px 8px;
+	background: var(--color-surface-base);
+	border: 1px solid var(--color-border);
+	border-radius: 6px;
+	color: var(--color-text-primary);
+	font-size: 0.75rem;
+	font-family: inherit;
+	cursor: pointer;
+	box-sizing: border-box;
+	transition: border-color 0.12s;
+}
+.kiv-icon-picker__trigger:hover,
+.kiv-icon-picker__trigger--active {
+	border-color: var(--color-accent);
+}
+.kiv-icon-picker__trigger-icon {
+	display: inline-flex;
+	flex-shrink: 0;
+	color: var(--color-text-primary);
+}
+.kiv-icon-picker__trigger-icon :deep(svg) {
+	width: 16px;
+	height: 16px;
+	display: block;
+}
+.kiv-icon-picker__trigger-icon--placeholder {
+	color: var(--color-text-muted);
+}
+.kiv-icon-picker__trigger-label {
+	flex: 1;
+	min-width: 0;
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--color-text-secondary);
+}
+.kiv-icon-picker__trigger-chevron {
+	flex-shrink: 0;
+	color: var(--color-text-muted);
+}
+
+.kiv-icon-picker__popover {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	right: 0;
+	z-index: 20;
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+	padding: 8px;
+	background: var(--color-surface-raised);
+	border: 1px solid var(--color-border);
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
 .kiv-icon-picker__tabs {

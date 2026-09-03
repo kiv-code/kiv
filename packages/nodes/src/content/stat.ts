@@ -2,7 +2,32 @@ import { defineNode, f } from "@kivcode/engine";
 import { alignField } from "../align-field";
 import { colorOrGradientField, resolveTextPaintStyle } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
-import { STAT_SIZE } from "../scales";
+import { resolveTypographyStyle, typographyFields } from "../typography-field";
+
+const typo = typographyFields({
+	group: "Style",
+	defaultSize: 56,
+	weightDefault: "800",
+});
+
+/** Resolves the stat value's font family/size/weight through the shared
+ * typography resolver. Color stays a separate colorOrGradient field since a
+ * stat value commonly wants a gradient fill. */
+export function resolveStatTypographyStyle(props: {
+	fontFamily?: string;
+	size?: number;
+	weight?: string;
+}): { fontFamily?: string; fontSize?: string; fontWeight?: string } {
+	const resolved = resolveTypographyStyle(props, {
+		size: 56,
+		weight: "800",
+	});
+	return {
+		fontFamily: resolved.fontFamily,
+		fontSize: resolved.fontSize,
+		fontWeight: resolved.fontWeight,
+	};
+}
 
 export function formatStatValue(
 	value: number,
@@ -23,7 +48,6 @@ export const statNode = defineNode({
 	icon: "trending-up",
 	toHtml(props) {
 		const align = String(props.align ?? "center");
-		const size = STAT_SIZE[String(props.size ?? "xl")] ?? STAT_SIZE.xl;
 		const value = formatStatValue(
 			Number(props.value ?? 0),
 			Number(props.decimals ?? 0),
@@ -42,8 +66,9 @@ export const statNode = defineNode({
 			textAlign: align,
 		});
 		const valueStyle = styleToString({
-			fontSize: size,
-			fontWeight: "800",
+			...resolveStatTypographyStyle(
+				props as { fontFamily?: string; size?: number; weight?: string },
+			),
 			lineHeight: "1.1",
 			...resolveTextPaintStyle(props.valueColor, "#0f172a"),
 		});
@@ -79,11 +104,8 @@ export const statNode = defineNode({
 		}),
 		align: alignField({ default: "center", group: "Style" }),
 		valueColor: colorOrGradientField({ label: "Value Color", group: "Style" }),
-		size: f.select(["md", "lg", "xl", "2xl"], {
-			label: "Size",
-			default: "xl",
-			responsive: true,
-			group: "Style",
-		}),
+		fontFamily: typo.fontFamily,
+		size: typo.size,
+		weight: typo.weight,
 	},
 });

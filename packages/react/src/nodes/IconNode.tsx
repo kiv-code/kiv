@@ -1,10 +1,10 @@
-import { resolveIcon } from "@kivcode/nodes";
+import { resolveIcon, resolveIconSize } from "@kivcode/nodes";
 import { useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
 
 export interface IconNodeProps extends KivNodeComponentProps {
 	icon?: string;
-	iconSize?: number;
+	iconSize?: string | number;
 	iconColor?: string;
 }
 
@@ -24,7 +24,7 @@ export function IconNode({
 
 	const spanStyle = useMemo(
 		() => ({
-			fontSize: `${iconSize ?? 24}px`,
+			fontSize: resolveIconSize(iconSize),
 			color: iconColor || "currentColor",
 			display: "inline-flex" as const,
 			alignItems: "center" as const,

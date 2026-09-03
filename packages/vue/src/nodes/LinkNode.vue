@@ -1,19 +1,28 @@
 <script setup lang="ts">
-import { BUTTON_RADIUS, BUTTON_SIZE, BUTTON_VARIANT } from "@kivcode/nodes";
-import { computed, getCurrentInstance } from "vue";
+import {
+	BUTTON_RADIUS,
+	BUTTON_SIZE,
+	BUTTON_VARIANT,
+	resolveLinkTypographyStyle,
+} from "@kivcode/nodes";
+import { computed } from "vue";
+import { useKivLink } from "../composables/useKivLink";
 
 const props = defineProps<{
 	text?: string;
 	href?: string;
+	linkType?: string;
+	/** Pre-`linkType` documents; read by resolveLink for back-compat. */
 	target?: string;
 	display?: string;
 	variant?: string;
 	size?: string;
 	buttonRadius?: string;
-	textColor?: string;
+	fontFamily?: string;
+	color?: string;
 	underline?: boolean;
-	fontWeight?: string;
-	fontSize?: string;
+	weight?: string;
+	fontSize?: number;
 }>();
 
 const isButton = computed(() => props.display === "button");
@@ -45,36 +54,31 @@ const linkStyle = computed(() => {
 			border: v.border,
 		};
 	}
+	const typoStyle = resolveLinkTypographyStyle({
+		fontFamily: props.fontFamily,
+		fontSize: props.fontSize,
+		weight: props.weight,
+		color: props.color,
+	});
 	return {
-		color: props.textColor ?? "#6366f1",
+		color: typoStyle.color,
 		textDecoration: (props.underline !== false
 			? "underline"
 			: "none") as string,
-		fontWeight: props.fontWeight ?? "500",
-		fontSize: props.fontSize ?? "inherit",
+		fontWeight: typoStyle.fontWeight,
+		fontSize: typoStyle.fontSize,
+		fontFamily: typoStyle.fontFamily,
 	};
 });
 
-const app = getCurrentInstance();
-const registeredRouterLink =
-	app && (app.appContext.components as Record<string, unknown>)?.RouterLink;
-
-const tag = computed(() =>
-	props.target === "_blank" || !registeredRouterLink
-		? "a"
-		: registeredRouterLink,
-);
-
-const linkAttrs = computed(() => {
-	if (tag.value === "a") {
-		return {
-			href: props.href ?? "#",
-			target: props.target ?? "_self",
-			rel: props.target === "_blank" ? "noopener noreferrer" : undefined,
-		};
-	}
-	return { to: props.href ?? "/" };
-});
+// Same shared link behaviour as Button — this component used to pick RouterLink
+// off `target` alone, which handed anchors and absolute external URLs to the
+// router as if they were app routes.
+const {
+	tag,
+	attrs: linkAttrs,
+	onClick,
+} = useKivLink(computed(() => ({ ...props })));
 </script>
 
 <template>
@@ -83,5 +87,6 @@ const linkAttrs = computed(() => {
 		v-bind="linkAttrs"
 		:style="linkStyle"
 		data-kiv-type="link"
+		@click="onClick"
 	><slot>{{ text ?? 'Link' }}</slot></component>
 </template>

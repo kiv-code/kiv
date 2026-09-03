@@ -19,7 +19,10 @@ describe("SectionNode", () => {
 
 	it("applies background color and padding scale values", () => {
 		const wrapper = mount(SectionNode, {
-			props: { background: "#123456", paddingY: "lg", paddingX: "md" },
+			props: {
+				background: "#123456",
+				padding: { top: "lg", right: "md", bottom: "lg", left: "md" },
+			},
 		});
 		const style = wrapper.attributes("style") ?? "";
 		expect(style).toContain("background-color: #123456");

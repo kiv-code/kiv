@@ -1,8 +1,20 @@
 import { defineNode, f } from "@kivcode/engine";
 import { styleToString } from "../html-utils";
-import { SPACING } from "../scales";
-import { resolveSpacingStyle } from "../spacing-field";
-import { spacingFields } from "../spacing-fields";
+import { resolveSpacingStyle, spacingField } from "../spacing-field";
+
+/** Shared by `toHtml` and both framework renderers — one source of truth. */
+export function columnStyle(
+	props: Record<string, unknown>,
+): Record<string, string | undefined> {
+	const s: Record<string, string | undefined> = {};
+	if (props.span && props.span !== "auto") s.gridColumn = `span ${props.span}`;
+	if (props.offset && props.offset !== "0")
+		s.gridColumnStart = String(Number(props.offset) + 1);
+	if (props.alignSelf && props.alignSelf !== "auto")
+		s.alignSelf = String(props.alignSelf);
+	Object.assign(s, resolveSpacingStyle("padding", props.padding, {}));
+	return s;
+}
 
 export const columnNode = defineNode({
 	type: "column",
@@ -10,34 +22,7 @@ export const columnNode = defineNode({
 	label: "Column",
 	description: "Column slot inside a Grid",
 	toHtml(props, children) {
-		const s: Record<string, string | undefined> = {};
-		if (props.span && props.span !== "auto")
-			s.gridColumn = `span ${props.span}`;
-		if (props.offset && props.offset !== "0")
-			s.gridColumnStart = String(Number(props.offset) + 1);
-		if (props.alignSelf && props.alignSelf !== "auto")
-			s.alignSelf = String(props.alignSelf);
-		const px =
-			props.paddingX && props.paddingX !== "none"
-				? SPACING[String(props.paddingX)]
-				: undefined;
-		const py =
-			props.paddingY && props.paddingY !== "none"
-				? SPACING[String(props.paddingY)]
-				: undefined;
-		// Per-side override, shared with every other node that needs this
-		// escape hatch (see packages/nodes/src/spacing-field.ts). Empty side
-		// falls back to the Padding X/Y shorthand above.
-		Object.assign(
-			s,
-			resolveSpacingStyle("padding", props.paddingBox, {
-				top: py,
-				right: px,
-				bottom: py,
-				left: px,
-			}),
-		);
-		return `<div style="${styleToString(s)}" data-kiv-type="column">${children.default ?? ""}</div>`;
+		return `<div style="${styleToString(columnStyle(props))}" data-kiv-type="column">${children.default ?? ""}</div>`;
 	},
 	fields: {
 		span: f.select(
@@ -67,6 +52,6 @@ export const columnNode = defineNode({
 				group: "Layout",
 			},
 		),
-		...spacingFields({ paddingScale: ["none", "xs", "sm", "md", "lg"] }),
+		padding: spacingField({ label: "Padding", group: "Spacing" }),
 	},
 });

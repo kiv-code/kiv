@@ -5,7 +5,7 @@ import {
 	hoverGlowStyle,
 	parseSocialLinks,
 	RADIUS,
-	resolveIcon,
+	resolveSocialLinkDisplay,
 } from "@kivcode/nodes";
 import { computed } from "vue";
 
@@ -20,19 +20,6 @@ const props = defineProps<{
 	hoverGlowColor?: string;
 }>();
 
-const PLATFORM_ICON: Record<string, string> = {
-	twitter: "fa6-brands:x-twitter",
-	x: "fa6-brands:x-twitter",
-	facebook: "fa6-brands:facebook",
-	instagram: "fa6-brands:instagram",
-	linkedin: "fa6-brands:linkedin",
-	youtube: "fa6-brands:youtube",
-	github: "fa6-brands:github",
-	tiktok: "fa6-brands:tiktok",
-	whatsapp: "fa6-brands:whatsapp",
-	email: "fa6-regular:envelope",
-};
-
 const SHAPE_RADIUS: Record<string, string> = {
 	none: "0",
 	circle: RADIUS.full ?? "9999px",
@@ -40,7 +27,12 @@ const SHAPE_RADIUS: Record<string, string> = {
 	rounded: RADIUS.md ?? "8px",
 };
 
-const socialLinks = computed(() => parseSocialLinks(props.links));
+const socialLinks = computed(() =>
+	parseSocialLinks(props.links).map((link) => ({
+		...link,
+		...resolveSocialLinkDisplay(link),
+	})),
+);
 const hoverClass = computed(() => hoverEffectClass(props.hoverEffect));
 
 const wrapperStyle = computed(() => ({
@@ -48,11 +40,6 @@ const wrapperStyle = computed(() => ({
 	alignItems: "center" as const,
 	gap: GAP[props.gap ?? "sm"] ?? "8px",
 }));
-
-function iconSvg(platform: string): string | null {
-	const name = PLATFORM_ICON[platform.toLowerCase()];
-	return name ? resolveIcon(name) : null;
-}
 
 function itemStyle() {
 	const size = props.size ?? 20;
@@ -79,12 +66,12 @@ function itemStyle() {
 			:href="link.url"
 			target="_blank"
 			rel="noopener noreferrer"
-			:aria-label="link.platform"
+			:aria-label="link.label"
 			:class="hoverClass"
 			:style="itemStyle()"
 		>
-			<span v-if="iconSvg(link.platform)" class="kiv-social-icons__svg" v-html="iconSvg(link.platform)" />
-			<span v-else aria-hidden="true">{{ link.platform.slice(0, 1).toUpperCase() }}</span>
+			<span v-if="link.svg" class="kiv-social-icons__svg" v-html="link.svg" />
+			<span v-else aria-hidden="true">{{ link.label.slice(0, 1).toUpperCase() }}</span>
 		</a>
 	</div>
 </template>

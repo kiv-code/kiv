@@ -5,6 +5,7 @@ export type { KivRenderContext } from "./context";
 export { KivContext } from "./context";
 export { createDefaultReactRegistry } from "./defaultRegistry";
 export { KivEditorModeContext } from "./editor-mode";
+export { KivFontsContext } from "./fonts";
 export { useKivNode } from "./hooks/useKivNode";
 export type { KivNodeRendererProps } from "./KivNodeRenderer";
 export { KivNodeRenderer } from "./KivNodeRenderer";

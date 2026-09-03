@@ -61,4 +61,22 @@ export interface FieldDescriptor<T = unknown> {
 		max: number;
 		step?: number;
 	}>;
+	/**
+	 * Token presets for a spacing field (e.g. `pluginControl: "spacing-box"`),
+	 * mapping a scale token to its CSS length. The control offers these as
+	 * one-click presets while still accepting any raw CSS length, so a node
+	 * stays on the design system by default without becoming a closed set.
+	 * Nodes may pass their own scale — a Section's rhythm is deliberately
+	 * larger than a Stack's for the same token name.
+	 */
+	spacingScale?: Readonly<Record<string, string>>;
+	/**
+	 * Lets a size field express "no value" (auto / inherit / unset) alongside
+	 * its numeric range. Without it the slider has no way back to the unset
+	 * state once touched, so a field whose natural default is "no declaration"
+	 * (a Section's min-height, an inherited font size) silently becomes 0.
+	 */
+	allowAuto?: boolean;
+	/** Label for the auto state. Defaults to "auto". */
+	autoLabel?: string;
 }

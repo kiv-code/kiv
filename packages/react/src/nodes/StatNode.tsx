@@ -1,7 +1,7 @@
 import {
 	formatStatValue,
+	resolveStatTypographyStyle,
 	resolveTextPaintStyle,
-	STAT_SIZE,
 } from "@kivcode/nodes";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { KivNodeComponentProps } from "../node-props";
@@ -16,7 +16,9 @@ export interface StatNodeProps extends KivNodeComponentProps {
 	animationDuration?: number;
 	align?: string;
 	valueColor?: unknown;
-	size?: string;
+	fontFamily?: string;
+	size?: number;
+	weight?: string;
 }
 
 export function StatNode({
@@ -29,7 +31,9 @@ export function StatNode({
 	animationDuration,
 	align,
 	valueColor,
+	fontFamily,
 	size,
+	weight,
 	id,
 	style,
 	...rest
@@ -86,15 +90,13 @@ export function StatNode({
 		suffix ?? "",
 	);
 
-	const resolvedSize = STAT_SIZE[size ?? "xl"] ?? "56px";
 	const valueStyle = useMemo(
 		() => ({
-			fontSize: resolvedSize,
-			fontWeight: "800" as const,
+			...resolveStatTypographyStyle({ fontFamily, size, weight }),
 			lineHeight: "1.1",
 			...resolveTextPaintStyle(valueColor, "#0f172a"),
 		}),
-		[resolvedSize, valueColor],
+		[fontFamily, size, weight, valueColor],
 	);
 	const wrapperStyle = useMemo(
 		() => ({

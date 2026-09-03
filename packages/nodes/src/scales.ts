@@ -198,3 +198,23 @@ export const BUTTON_SIZE: Record<string, ButtonSizeStyle> = {
 	lg: { padding: "11px 26px", fontSize: "16px" },
 	xl: { padding: "14px 32px", fontSize: "18px" },
 };
+
+/**
+ * Resolves a scale token to its CSS value, letting anything the scale doesn't
+ * know pass through untouched.
+ *
+ * This is what makes a closed scale open at the edges: `"lg"` stays on the
+ * design system, while `"2.5rem"` or `"clamp(1rem,4vw,3rem)"` still work when
+ * the scale genuinely can't express the design. Without it, an unknown value
+ * silently collapsed to the scale's default — a wrong render that reviews miss
+ * because nothing errors.
+ */
+export function fromScale(
+	scale: Record<string, string>,
+	value: unknown,
+	fallback: string,
+): string {
+	if (value === undefined || value === null || value === "") return fallback;
+	const key = String(value);
+	return scale[key] ?? key;
+}

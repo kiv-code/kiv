@@ -31,7 +31,10 @@ describe("ContainerNode", () => {
 
 	it("maps maxWidth and paddingY scales", () => {
 		const wrapper = mount(ContainerNode, {
-			props: { maxWidth: "sm", paddingY: "lg" },
+			props: {
+				maxWidth: "sm",
+				padding: { top: "lg", right: "md", bottom: "lg", left: "md" },
+			},
 		});
 		const style = wrapper.attributes("style") ?? "";
 		expect(style).toContain("max-width: 640px");

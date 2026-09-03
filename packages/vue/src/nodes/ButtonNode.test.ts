@@ -13,9 +13,19 @@ describe("ButtonNode", () => {
 		expect(wrapper.attributes("href")).toBe("https://example.com");
 	});
 
-	it("defaults to href='#' and target='_self' when linkType is not external", () => {
+	it("renders no link at all until a destination is set", () => {
+		// The old default was href="#", which looked like a link but scrolled
+		// to the top of the page when clicked.
 		const wrapper = mount(ButtonNode, { props: { label: "Go" } });
-		expect(wrapper.attributes("href")).toBe("#");
+		expect(wrapper.element.tagName).toBe("SPAN");
+		expect(wrapper.attributes("href")).toBeUndefined();
+	});
+
+	it("links in the same tab for an internal destination", () => {
+		const wrapper = mount(ButtonNode, {
+			props: { label: "Go", href: "/about", linkType: "internal" },
+		});
+		expect(wrapper.attributes("href")).toBe("/about");
 		expect(wrapper.attributes("target")).toBe("_self");
 		expect(wrapper.attributes("rel")).toBeUndefined();
 	});

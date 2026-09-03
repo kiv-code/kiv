@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
 	formatStatValue,
+	resolveStatTypographyStyle,
 	resolveTextPaintStyle,
-	STAT_SIZE,
 } from "@kivcode/nodes";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
@@ -17,7 +17,9 @@ const props = withDefaults(
 		animationDuration?: number;
 		align?: string;
 		valueColor?: unknown;
-		size?: string;
+		fontFamily?: string;
+		size?: number;
+		weight?: string;
 	}>(),
 	{ animateOnView: true },
 );
@@ -74,10 +76,12 @@ const formatted = computed(() =>
 	),
 );
 
-const resolvedSize = computed(() => STAT_SIZE[props.size ?? "xl"] ?? "56px");
 const valueStyle = computed(() => ({
-	fontSize: resolvedSize.value,
-	fontWeight: "800" as const,
+	...resolveStatTypographyStyle({
+		fontFamily: props.fontFamily,
+		size: props.size,
+		weight: props.weight,
+	}),
 	lineHeight: "1.1",
 	...resolveTextPaintStyle(props.valueColor, "#0f172a"),
 }));

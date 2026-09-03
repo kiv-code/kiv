@@ -1,5 +1,5 @@
-import { LETTER_SPACING, LINE_HEIGHT } from "@kivcode/nodes";
 import { useMemo } from "react";
+import { useKivTypography } from "../hooks/useKivTypography";
 import type { KivNodeComponentProps } from "../node-props";
 
 export interface RichTextNodeProps extends KivNodeComponentProps {
@@ -10,6 +10,9 @@ export interface RichTextNodeProps extends KivNodeComponentProps {
 	align?: string;
 	lineHeight?: string;
 	letterSpacing?: string;
+	transform?: string;
+	fontStyle?: string;
+	fontFamily?: string;
 }
 
 export function RichTextNode({
@@ -20,22 +23,29 @@ export function RichTextNode({
 	align,
 	lineHeight,
 	letterSpacing,
+	transform,
+	fontStyle,
+	fontFamily,
 	id,
 	style,
 	...rest
 }: RichTextNodeProps) {
+	// Style comes from the shared typography resolver, so this component, the
+	// static HTML export and every other text node stay in agreement.
+	const resolved = useKivTypography({
+		size,
+		weight,
+		color,
+		align,
+		lineHeight,
+		letterSpacing,
+		transform,
+		fontStyle,
+		fontFamily,
+	});
 	const richStyle = useMemo(
-		() => ({
-			fontSize: `${size ?? 16}px`,
-			fontWeight: weight ?? "400",
-			color: color ?? "inherit",
-			textAlign: (align ?? "left") as "left" | "center" | "right" | "justify",
-			lineHeight: LINE_HEIGHT[lineHeight ?? "relaxed"] ?? "1.6",
-			letterSpacing: LETTER_SPACING[letterSpacing ?? "normal"] ?? "0em",
-			margin: "0",
-			...style,
-		}),
-		[size, weight, color, align, lineHeight, letterSpacing, style],
+		() => ({ ...resolved, ...style }),
+		[resolved, style],
 	);
 
 	return (

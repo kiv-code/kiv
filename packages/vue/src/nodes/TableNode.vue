@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { parseTableData } from "@kivcode/nodes";
+import { parseTableData, resolveTableTypographyStyle } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = withDefaults(
@@ -10,6 +10,10 @@ const props = withDefaults(
 		compact?: boolean;
 		headerBackground?: string;
 		align?: string;
+		fontFamily?: string;
+		size?: number;
+		weight?: string;
+		color?: string;
 	}>(),
 	{ striped: true, bordered: true },
 );
@@ -26,12 +30,18 @@ const tableStyle = computed(() => ({
 	borderCollapse: "collapse" as const,
 	border: border.value,
 }));
+const typoProps = computed(() => ({
+	fontFamily: props.fontFamily,
+	size: props.size,
+	weight: props.weight,
+	color: props.color,
+}));
 const thStyle = computed(() => ({
 	textAlign: cellAlign.value,
 	padding: cellPadding.value,
 	background: props.headerBackground ?? "#f8fafc",
 	border: border.value,
-	fontWeight: "700" as const,
+	...resolveTableTypographyStyle(typoProps.value, true),
 }));
 
 function cellStyle(rowIndex: number) {
@@ -41,6 +51,7 @@ function cellStyle(rowIndex: number) {
 		border: border.value,
 		background:
 			props.striped && rowIndex % 2 === 1 ? "rgba(0,0,0,0.03)" : undefined,
+		...resolveTableTypographyStyle(typoProps.value, false),
 	};
 }
 </script>

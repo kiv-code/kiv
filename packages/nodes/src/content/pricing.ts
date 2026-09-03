@@ -5,7 +5,8 @@ import {
 	resolveSolidColor,
 } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
-import { RADIUS } from "../scales";
+import { linkAttrs, linkFields, resolveLink } from "../link-field";
+import { fromScale, RADIUS } from "../scales";
 
 export interface PricingTier {
 	period: string;
@@ -110,6 +111,7 @@ function renderCardsVariant(
 	radius: string,
 	ctaLabel: string,
 	featured: boolean,
+	ctaLink: string,
 ): string {
 	const gridStyle = styleToString({
 		display: "grid",
@@ -149,8 +151,25 @@ function renderCardsVariant(
 					return `<div style="${rowStyle}"><span style="${labelStyle}">${escapeHtml(row.label)}</span><span style="font-weight:800;">${escapeHtml(row.values[ti] ?? "")}</span></div>`;
 				})
 				.join("");
+			// The CTA was a plain <div>: it looked like a button but could never
+			// be clicked. It is a real anchor whenever a destination is set,
+			// and falls back to the inert styling when it isn't.
+			const ctaStyle = styleToString({
+				display: "block",
+				marginTop: "6px",
+				textAlign: "center",
+				padding: "10px",
+				borderRadius: RADIUS.sm,
+				fontWeight: "700",
+				fontSize: "0.85rem",
+				textDecoration: "none",
+				background: isAccent ? "#ffffff" : "#0f172a",
+				color: isAccent ? "#4b22d6" : "#ffffff",
+			});
 			const cta = ctaLabel
-				? `<div style="${styleToString({ marginTop: "6px", textAlign: "center", padding: "10px", borderRadius: RADIUS.sm, fontWeight: "700", fontSize: "0.85rem", background: isAccent ? "#ffffff" : "#0f172a", color: isAccent ? "#4b22d6" : "#ffffff" })}">${escapeHtml(ctaLabel)}</div>`
+				? ctaLink
+					? `<a${ctaLink} style="${ctaStyle}">${escapeHtml(ctaLabel)}</a>`
+					: `<div style="${ctaStyle}">${escapeHtml(ctaLabel)}</div>`
 				: "";
 			const badge =
 				featured && isAccent
@@ -170,18 +189,33 @@ export const pricingNode = defineNode({
 	description: "Pricing table with tiers and rows — table or card styles.",
 	toHtml(props) {
 		const data = parsePricingData(props.data);
-		const radius = RADIUS[String(props.borderRadius ?? "lg")] ?? "16px";
+		const radius = fromScale(RADIUS, props.borderRadius ?? "lg", "16px");
 		const variant = String(props.variant ?? "table");
 		const headerBg = resolveSolidColor(props.headerColor, "#14162b");
 		const highlightBg = resolveBackgroundPaint(props.highlightColor, "#ff1d96");
 		const highlightSolid = resolveSolidColor(props.highlightColor, "#ff1d96");
 		const ctaLabel = props.ctaLabel !== undefined ? String(props.ctaLabel) : "";
+		const ctaLink = linkAttrs(resolveLink(props), escapeHtml);
 
 		let inner: string;
 		if (variant === "cards") {
-			inner = renderCardsVariant(data, highlightSolid, radius, ctaLabel, false);
+			inner = renderCardsVariant(
+				data,
+				highlightSolid,
+				radius,
+				ctaLabel,
+				false,
+				ctaLink,
+			);
 		} else if (variant === "cards-featured") {
-			inner = renderCardsVariant(data, highlightSolid, radius, ctaLabel, true);
+			inner = renderCardsVariant(
+				data,
+				highlightSolid,
+				radius,
+				ctaLabel,
+				true,
+				ctaLink,
+			);
 		} else {
 			inner = renderTableVariant(data, headerBg, highlightBg, radius);
 		}
@@ -223,5 +257,6 @@ export const pricingNode = defineNode({
 			group: "Content",
 			hint: 'Shown as a button in Cards styles. Empty hides the button, e.g. "Inscreva-se".',
 		}),
+		...linkFields({ hrefLabel: "CTA destination" }),
 	},
 });

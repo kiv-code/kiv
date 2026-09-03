@@ -17,12 +17,14 @@ const DEFAULT_UNITS = [
 	{ unit: "px", min: 0, max: 1200, step: 1 },
 ];
 
+const NUMERIC = /^(-?\d*\.?\d+)\s*([a-z%]*)$/i;
+
 function parse(
 	value: string | undefined,
 	units: ReadonlyArray<{ unit: string }>,
 ): { amount: number; unit: string } {
 	const raw = (value ?? "").trim();
-	const match = raw.match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
+	const match = raw.match(NUMERIC);
 	const fallbackUnit = units[0]?.unit ?? "px";
 	if (!match) return { amount: 0, unit: fallbackUnit };
 	const amount = Number(match[1]);
@@ -40,6 +42,8 @@ export function SizeSliderControl({
 	const { start, end } = useContinuousEdit(store);
 
 	const units = descriptor?.sliderUnits ?? DEFAULT_UNITS;
+	const allowAuto = descriptor?.allowAuto === true;
+	const autoLabel = descriptor?.autoLabel ?? "auto";
 
 	// A node instance may not have this prop set at all yet (created before the
 	// field existed, or simply never touched) — falling back to the
@@ -61,6 +65,23 @@ export function SizeSliderControl({
 	const amount = parse(displayValue, units).amount;
 	const unitConfig = units.find((u) => u.unit === activeUnit) ?? units[0];
 
+	const raw = (displayValue ?? "").trim();
+	/** Unset — the field contributes no declaration at all. */
+	const isAuto = raw === "";
+	/**
+	 * A value the slider cannot represent: `calc(...)`, `clamp(...)`, or a unit
+	 * the field wasn't configured with. Showing it as editable text is the
+	 * honest option — the old control rendered it as `0`, and the first drag
+	 * destroyed it.
+	 */
+	// A parseable number in a unit this field wasn't configured with would be
+	// driven by the wrong slider range — dragging a `3rem` value on a 0–500px
+	// range writes `250rem`. Editing it as text keeps it intact.
+	const isCustom =
+		!isAuto &&
+		(!NUMERIC.test(raw) ||
+			!units.some((u) => u.unit === parse(raw, units).unit));
+
 	function commit(nextAmount: number, unit: string) {
 		onChange(`${nextAmount}${unit}`);
 	}
@@ -75,53 +96,81 @@ export function SizeSliderControl({
 	}
 	function switchUnit(unit: string) {
 		setActiveUnit(unit);
-		commit(amount, unit);
+		// Coming back from auto/custom there is no number yet — seed from the
+		// unit's own minimum rather than writing NaN.
+		const next = isAuto || isCustom ? (unitConfig?.min ?? 0) : amount;
+		commit(next, unit);
 	}
 
 	return (
 		<div className="kiv-size-slider">
-			{units.length > 1 && (
+			{(units.length > 1 || allowAuto) && (
 				<div className="kiv-size-slider__units">
 					{units.map((u) => (
 						<button
 							key={u.unit}
 							type="button"
-							className={`kiv-size-slider__unit${u.unit === activeUnit ? " kiv-size-slider__unit--active" : ""}`}
+							className={`kiv-size-slider__unit${!isAuto && !isCustom && u.unit === activeUnit ? " kiv-size-slider__unit--active" : ""}`}
 							onClick={() => switchUnit(u.unit)}
 						>
 							{u.unit}
 						</button>
 					))}
+					{allowAuto && (
+						<button
+							type="button"
+							className={`kiv-size-slider__unit${isAuto ? " kiv-size-slider__unit--active" : ""}`}
+							onClick={() => onChange("")}
+						>
+							{autoLabel}
+						</button>
+					)}
 				</div>
 			)}
-			<div className="kiv-size-slider__row">
+
+			{/* Unset: nothing to drag, and saying so beats showing a fake 0. */}
+			{isAuto ? (
+				<p className="kiv-size-slider__auto">
+					Not set — inherits from the layout.
+				</p>
+			) : isCustom ? (
+				/* calc(), clamp(), or a unit this field wasn't configured with. */
 				<input
-					type="range"
-					className="kiv-size-slider__range"
-					min={unitConfig?.min ?? 0}
-					max={unitConfig?.max ?? 100}
-					step={unitConfig?.step ?? 1}
-					value={amount}
-					onChange={onSlider}
-					// React's onChange for a range input fires on every drag tick
-					// (mapped from the native 'input' event) — there's no separate
-					// native 'change' event exposed the way Vue's template
-					// `@change="end"` listens for on release, so use pointerup/blur
-					// as the drag-end signal that collapses the gesture into one
-					// undo step.
-					onPointerUp={end}
-					onBlur={end}
+					type="text"
+					className="kiv-input"
+					value={raw}
+					onChange={(e) => onChange(e.target.value)}
 				/>
-				<div className="kiv-size-slider__value">
+			) : (
+				<div className="kiv-size-slider__row">
 					<input
-						type="number"
-						className="kiv-size-slider__number"
+						type="range"
+						className="kiv-size-slider__range"
+						min={unitConfig?.min ?? 0}
+						max={unitConfig?.max ?? 100}
+						step={unitConfig?.step ?? 1}
 						value={amount}
-						onChange={onNumber}
+						onChange={onSlider}
+						// React's onChange for a range input fires on every drag tick
+						// (mapped from the native 'input' event) — there's no separate
+						// native 'change' event exposed the way Vue's template
+						// `@change="end"` listens for on release, so use pointerup/blur
+						// as the drag-end signal that collapses the gesture into one
+						// undo step.
+						onPointerUp={end}
+						onBlur={end}
 					/>
-					<span className="kiv-size-slider__unit-label">{activeUnit}</span>
+					<div className="kiv-size-slider__value">
+						<input
+							type="number"
+							className="kiv-size-slider__number"
+							value={amount}
+							onChange={onNumber}
+						/>
+						<span className="kiv-size-slider__unit-label">{activeUnit}</span>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }

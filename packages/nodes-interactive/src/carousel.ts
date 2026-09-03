@@ -1,5 +1,5 @@
 import { defineNode, f } from "@kivcode/engine";
-import { RADIUS, styleToString } from "@kivcode/nodes";
+import { fromScale, RADIUS, styleToString } from "@kivcode/nodes";
 
 export const carouselNode = defineNode({
 	type: "carousel",
@@ -16,7 +16,7 @@ export const carouselNode = defineNode({
 		const viewportStyle = styleToString({
 			position: "relative",
 			overflow: "hidden",
-			borderRadius: RADIUS[String(props.borderRadius ?? "lg")] ?? "16px",
+			borderRadius: fromScale(RADIUS, props.borderRadius ?? "lg", "16px"),
 			aspectRatio: aspect,
 		});
 		const trackStyle = styleToString({

@@ -26,7 +26,10 @@ export function heroTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "xl", align: "center" },
+		{
+			padding: { top: "xl", right: "", bottom: "xl", left: "" },
+			align: "center",
+		},
 		{
 			default: [
 				node("heading", { level: "1", text: "Build Something Amazing" }),
@@ -69,7 +72,7 @@ export function featureGridTemplate(): KivNode {
 
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", { level: "2", text: "Why Choose Us", align: "center" }),
@@ -108,7 +111,10 @@ export function ctaBannerTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg", background: "#6366f1" },
+		{
+			padding: { top: "lg", right: "", bottom: "lg", left: "" },
+			background: "#6366f1",
+		},
 		{
 			default: [
 				node("heading", {
@@ -141,7 +147,7 @@ export function testimonialTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", {
@@ -202,7 +208,7 @@ export function faqTemplate(): KivNode {
 
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", {
@@ -237,7 +243,7 @@ export function pricingTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", {
@@ -283,7 +289,10 @@ export function footerTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg", background: "#0f172a" },
+		{
+			padding: { top: "lg", right: "", bottom: "lg", left: "" },
+			background: "#0f172a",
+		},
 		{
 			default: [
 				node(
@@ -353,7 +362,7 @@ export function agendaScheduleTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", {
@@ -412,7 +421,7 @@ export function teamGridTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", { level: "2", text: "Meet the Team", align: "center" }),
@@ -540,7 +549,7 @@ export function logoCloudTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("text", {
@@ -575,7 +584,7 @@ export function contactTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", { level: "2", text: "Get in Touch", align: "center" }),
@@ -621,7 +630,10 @@ export function newsletterTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg", background: "#f8fafc" },
+		{
+			padding: { top: "lg", right: "", bottom: "lg", left: "" },
+			background: "#f8fafc",
+		},
 		{
 			default: [
 				node("heading", {
@@ -659,7 +671,7 @@ export function galleryTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", { level: "2", text: "Gallery", align: "center" }),
@@ -696,7 +708,10 @@ export function statsTemplate(): KivNode {
 	];
 	return node(
 		"section",
-		{ paddingY: "lg", background: "#0f172a" },
+		{
+			padding: { top: "lg", right: "", bottom: "lg", left: "" },
+			background: "#0f172a",
+		},
 		{
 			default: [
 				node(
@@ -739,7 +754,7 @@ export function cardsTemplate(): KivNode {
 	];
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", { level: "2", text: "Resources", align: "center" }),
@@ -773,7 +788,7 @@ export function comparisonTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", {
@@ -834,7 +849,10 @@ export function bannerTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "sm", background: "#111827" },
+		{
+			padding: { top: "sm", right: "", bottom: "sm", left: "" },
+			background: "#111827",
+		},
 		{
 			default: [
 				node(
@@ -871,7 +889,7 @@ export function headerTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "sm" },
+		{ padding: { top: "sm", right: "", bottom: "sm", left: "" } },
 		{
 			default: [
 				node(
@@ -917,7 +935,7 @@ export function timelineTemplate(): KivNode {
 	const node = createNodeBuilder();
 	return node(
 		"section",
-		{ paddingY: "lg" },
+		{ padding: { top: "lg", right: "", bottom: "lg", left: "" } },
 		{
 			default: [
 				node("heading", { level: "2", text: "Our Journey", align: "center" }),

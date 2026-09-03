@@ -1,4 +1,7 @@
-import { parseSelectOptions } from "@kivcode/nodes";
+import {
+	parseSelectOptions,
+	resolveFormFieldTypographyStyle,
+} from "@kivcode/nodes";
 import { type ReactNode, useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
 
@@ -9,6 +12,10 @@ export interface FormFieldNodeProps extends KivNodeComponentProps {
 	placeholder?: string;
 	required?: boolean;
 	options?: string;
+	fontFamily?: string;
+	size?: number;
+	weight?: string;
+	color?: string;
 }
 
 export function FormFieldNode({
@@ -18,10 +25,18 @@ export function FormFieldNode({
 	placeholder,
 	required,
 	options,
+	fontFamily,
+	size,
+	weight,
+	color,
 	id,
 	style,
 	...rest
 }: FormFieldNodeProps) {
+	const labelStyle = useMemo(
+		() => resolveFormFieldTypographyStyle({ fontFamily, size, weight, color }),
+		[fontFamily, size, weight, color],
+	);
 	const selectOptions = useMemo(() => parseSelectOptions(options), [options]);
 	const fieldName = name ?? "field";
 
@@ -74,7 +89,11 @@ export function FormFieldNode({
 			data-kiv-type="form-field"
 			{...rest}
 		>
-			{label && <label htmlFor={fieldName}>{label}</label>}
+			{label && (
+				<label htmlFor={fieldName} style={labelStyle}>
+					{label}
+				</label>
+			)}
 			{control}
 		</div>
 	);

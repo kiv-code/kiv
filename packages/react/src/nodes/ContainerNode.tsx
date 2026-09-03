@@ -1,49 +1,31 @@
-import { MAX_WIDTH, resolveSpacingStyle, SPACING } from "@kivcode/nodes";
+import { containerStyle } from "@kivcode/nodes";
 import { useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
 
 export interface ContainerNodeProps extends KivNodeComponentProps {
 	maxWidth?: string;
-	paddingX?: string;
-	paddingY?: string;
-	paddingBox?: unknown;
+	padding?: unknown;
 	centered?: boolean;
 }
 
 export function ContainerNode({
 	maxWidth,
-	paddingX,
-	paddingY,
-	paddingBox,
+	padding,
 	centered = true,
 	slots,
 	id,
 	style,
 	...rest
 }: ContainerNodeProps) {
-	const containerStyle = useMemo(() => {
-		const px = SPACING[paddingX ?? "md"] ?? "16px";
-		const py = SPACING[paddingY ?? "none"] ?? "0";
-		return {
-			maxWidth: MAX_WIDTH[maxWidth ?? "lg"] ?? "1024px",
-			marginLeft: centered ? "auto" : undefined,
-			marginRight: centered ? "auto" : undefined,
-			width: "100%",
-			// Per-side override, shared with every other node that needs this
-			// escape hatch (see packages/nodes/src/spacing-field.ts). Empty side
-			// falls back to the Padding X/Y shorthand above.
-			...resolveSpacingStyle("padding", paddingBox, {
-				top: py,
-				right: px,
-				bottom: py,
-				left: px,
-			}),
-			...style,
-		};
-	}, [maxWidth, paddingX, paddingY, paddingBox, centered, style]);
+	// Style comes from the node definition, so this component and the static
+	// HTML export can never drift apart.
+	const resolved = useMemo(
+		() => ({ ...containerStyle({ maxWidth, padding, centered }), ...style }),
+		[maxWidth, padding, centered, style],
+	);
 
 	return (
-		<div id={id} style={containerStyle} data-kiv-type="container" {...rest}>
+		<div id={id} style={resolved} data-kiv-type="container" {...rest}>
 			{slots?.default}
 		</div>
 	);

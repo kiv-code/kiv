@@ -10,7 +10,10 @@ import { useResizablePanel } from "../composables/useResizablePanel";
 import FieldControl from "../inspector/FieldControl.vue";
 import { EDITOR_EXTENSIONS_KEY, EDITOR_STORE_KEY } from "../store/context";
 import { getNodeLabel } from "../utils/node-labels";
-import { mergeResponsiveValue } from "../utils/responsive-value";
+import {
+	mergeResponsiveValue,
+	readResponsiveValue,
+} from "../utils/responsive-value";
 import { isHiddenAtBreakpoint } from "../utils/visibility";
 
 const props = defineProps<{ registry: Registry }>();
@@ -27,6 +30,21 @@ const { width, startResize } = useResizablePanel({
 
 const pluginTabNames = ref<string[]>([]);
 const activePluginTab = ref<string | null>(null);
+const pageChecksRef = ref<HTMLDetailsElement | null>(null);
+
+// Plugins register with a raw key ("seo", "a11y") — shown to users as a real
+// label instead of the internal id.
+const PLUGIN_TAB_LABELS: Record<string, string> = {
+	seo: "SEO",
+	a11y: "Accessibility",
+};
+function pluginTabLabel(tabName: string): string {
+	return PLUGIN_TAB_LABELS[tabName] ?? tabName;
+}
+function selectPluginTab(tabName: string) {
+	activePluginTab.value = activePluginTab.value === tabName ? null : tabName;
+	if (pageChecksRef.value) pageChecksRef.value.open = false;
+}
 
 // Keep the list of plugin tab names in sync as plugins register (typically
 // from onEditorReady, which fires after this component's first render) —
@@ -86,6 +104,7 @@ function resetIdDraft() {
 // Uses the same breakpoint as the canvas — changing it here also changes the canvas preview
 const BP_OPTIONS: { value: Breakpoint; label: string }[] = [
 	{ value: "base", label: "MB" },
+	{ value: "sm", label: "SM" },
 	{ value: "md", label: "MD" },
 	{ value: "lg", label: "LG" },
 	{ value: "xl", label: "XL" },
@@ -240,21 +259,7 @@ function getFieldValue(fieldKey: string, descriptor: FieldDescriptor): unknown {
 		raw = fieldLocale.value in t ? t[fieldLocale.value] : Object.values(t)[0];
 	}
 	if (!descriptor.responsive) return raw;
-	// If already a responsive object, extract the value for the active breakpoint
-	if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-		const obj = raw as Record<string, unknown>;
-		const bp = fieldBreakpoint.value;
-		// Mobile-first cascade: walk down from requested breakpoint to base
-		const ORDER = ["base", "sm", "md", "lg", "xl"] as const;
-		const target = ORDER.indexOf(bp as (typeof ORDER)[number]);
-		for (let i = target; i >= 0; i--) {
-			const key = ORDER[i];
-			if (key && key in obj && obj[key] !== undefined) return obj[key];
-		}
-		return undefined;
-	}
-	// Flat value — return as-is (only set on base)
-	return raw;
+	return readResponsiveValue(raw, fieldBreakpoint.value);
 }
 
 function updateFieldValue(
@@ -400,9 +405,10 @@ function toggleVisible() {
 						<div class="kiv-inspector__group-fields">
 							<FieldControl
 								v-for="field in group.fields"
-								:key="`${field.key}-${fieldBreakpoint}-${fieldLocale}`"
+								:key="`${activeNode?.id ?? ''}-${field.key}-${fieldBreakpoint}-${fieldLocale}`"
 								:field-key="field.key"
 								:descriptor="field.descriptor"
+								:node-props="activeNode?.props"
 								:model-value="getFieldValue(field.key, field.descriptor)"
 								:breakpoint="field.descriptor.responsive ? fieldBreakpoint : undefined"
 								:locale="field.descriptor.localizable && localesCount > 1 ? fieldLocale : undefined"
@@ -476,23 +482,50 @@ function toggleVisible() {
 				</div>
 			</div>
 
-			<!-- Plugin inspector tabs -->
-			<div v-if="pluginTabNames.length > 0" class="kiv-inspector__tabs">
-				<button
-					v-for="tabName in pluginTabNames"
-					:key="tabName"
-					type="button"
-					class="kiv-inspector__tab"
-					:class="{ 'kiv-inspector__tab--active': activePluginTab === tabName }"
-					@click="activePluginTab = activePluginTab === tabName ? null : tabName"
-				>{{ tabName }}</button>
-			</div>
+			<!-- Plugin inspector tabs: page-level checks (SEO, a11y…), collapsed into
+			     one popover trigger instead of a permanently-visible button row —
+			     they apply to the whole document, not the selected node. -->
+			<details
+				v-if="pluginTabNames.length > 0"
+				ref="pageChecksRef"
+				class="kiv-inspector__page-checks"
+			>
+				<summary class="kiv-inspector__page-checks-trigger">
+					<svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+						<path d="M2 3.5h9M2 6.5h9M2 9.5h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+					</svg>
+					<span>Page checks</span>
+					<span v-if="activePluginTab" class="kiv-inspector__page-checks-badge">{{ pluginTabLabel(activePluginTab) }}</span>
+					<svg class="kiv-inspector__page-checks-chevron" width="9" height="9" viewBox="0 0 9 9" fill="none">
+						<path d="M2 3.2 4.5 5.7 7 3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</summary>
+				<div class="kiv-inspector__page-checks-menu">
+					<button
+						v-for="tabName in pluginTabNames"
+						:key="tabName"
+						type="button"
+						class="kiv-inspector__page-checks-item"
+						:class="{ 'kiv-inspector__page-checks-item--active': activePluginTab === tabName }"
+						@click="selectPluginTab(tabName)"
+					>{{ pluginTabLabel(tabName) }}</button>
+				</div>
+			</details>
 
 			<!-- Plugin tab content -->
 			<div
 				v-if="activePluginTab && extensions"
 				class="kiv-inspector__plugin-tab"
 			>
+				<div class="kiv-inspector__plugin-tab-header">
+					<span>{{ pluginTabLabel(activePluginTab) }}</span>
+					<button
+						type="button"
+						class="kiv-inspector__plugin-tab-close"
+						title="Back to node fields"
+						@click="activePluginTab = null"
+					>✕</button>
+				</div>
 				<component
 					:is="extensions.getInspectorTabs().get(activePluginTab)?.component"
 					:node="store?.selected.value"
@@ -555,9 +588,10 @@ function toggleVisible() {
 						<div class="kiv-inspector__group-fields">
 							<FieldControl
 								v-for="field in group.fields"
-								:key="`${field.key}-${fieldBreakpoint}-${fieldLocale}`"
+								:key="`${activeNode?.id ?? ''}-${field.key}-${fieldBreakpoint}-${fieldLocale}`"
 								:field-key="field.key"
 								:descriptor="field.descriptor"
+								:node-props="activeNode?.props"
 								:model-value="getFieldValue(field.key, field.descriptor)"
 								:breakpoint="field.descriptor.responsive ? fieldBreakpoint : undefined"
 								:locale="field.descriptor.localizable && localesCount > 1 ? fieldLocale : undefined"
@@ -654,6 +688,94 @@ function toggleVisible() {
 	gap: 2px;
 	flex-shrink: 0;
 	margin-left: auto;
+}
+
+/* Page-level plugin checks (SEO, a11y…) — a popover, not a permanent row */
+.kiv-inspector__page-checks {
+	border-bottom: 1px solid var(--color-border);
+	background: var(--color-surface-raised);
+}
+.kiv-inspector__page-checks-trigger {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 7px 10px;
+	font-size: 0.72rem;
+	font-weight: 600;
+	color: var(--color-text-secondary);
+	cursor: pointer;
+	list-style: none;
+	user-select: none;
+}
+.kiv-inspector__page-checks-trigger::-webkit-details-marker { display: none; }
+.kiv-inspector__page-checks-trigger:hover { color: var(--color-text-primary); }
+.kiv-inspector__page-checks-badge {
+	padding: 1px 6px;
+	border-radius: 3px;
+	background: var(--color-accent-muted);
+	color: var(--color-accent-light);
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+.kiv-inspector__page-checks-chevron {
+	margin-left: auto;
+	color: var(--color-text-muted);
+	transition: transform 0.12s;
+}
+.kiv-inspector__page-checks[open] .kiv-inspector__page-checks-chevron {
+	transform: rotate(180deg);
+}
+.kiv-inspector__page-checks-menu {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 0 8px 8px;
+}
+.kiv-inspector__page-checks-item {
+	text-align: left;
+	padding: 6px 8px;
+	border-radius: 5px;
+	border: none;
+	background: transparent;
+	color: var(--color-text-secondary);
+	font-size: 0.75rem;
+	cursor: pointer;
+}
+.kiv-inspector__page-checks-item:hover {
+	background: var(--color-surface-sunken);
+	color: var(--color-text-primary);
+}
+.kiv-inspector__page-checks-item--active {
+	background: var(--color-accent-muted);
+	color: var(--color-accent-light);
+	font-weight: 600;
+}
+.kiv-inspector__plugin-tab-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--color-border);
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--color-text-secondary);
+}
+.kiv-inspector__plugin-tab-close {
+	border: none;
+	background: transparent;
+	color: var(--color-text-muted);
+	cursor: pointer;
+	font-size: 0.75rem;
+	line-height: 1;
+	padding: 2px 4px;
+	border-radius: 4px;
+}
+.kiv-inspector__plugin-tab-close:hover {
+	background: var(--color-surface-sunken);
+	color: var(--color-text-primary);
 }
 
 /* Editable node ID */

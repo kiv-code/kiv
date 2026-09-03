@@ -7,15 +7,14 @@ import {
 	hoverEffectClass,
 	hoverGlowStyle,
 	resolveBackgroundPaint,
+	resolveButtonTypographyStyle,
 	resolveIcon,
 	resolveSolidColor,
 	resolveSpacingStyle,
 	resolveTextPaintStyle,
 } from "@kivcode/nodes";
-import { type MouseEvent, useContext, useMemo } from "react";
-import { KivBusContext } from "../bus";
-import { KivEditorModeContext } from "../editor-mode";
-import { KivLinkContext } from "../link";
+import { useMemo } from "react";
+import { useKivLink } from "../hooks/useKivLink";
 import type { KivNodeComponentProps } from "../node-props";
 
 const DEFAULT_SIZE: ButtonSizeStyle = { padding: "9px 20px", fontSize: "14px" };
@@ -32,13 +31,15 @@ export interface ButtonNodeProps extends KivNodeComponentProps {
 	iconColor?: string;
 	iconPosition?: string;
 	href?: string;
-	target?: string;
 	linkType?: string;
+	/** Pre-`linkType` documents; read by resolveLink for back-compat. */
+	target?: string;
 	variant?: string;
 	size?: string;
 	fullWidth?: boolean;
 	align?: string;
 	borderRadius?: string;
+	fontFamily?: string;
 	fontWeight?: string;
 	background?: unknown;
 	textColor?: unknown;
@@ -55,13 +56,14 @@ export function ButtonNode({
 	iconColor,
 	iconPosition,
 	href,
-	target,
 	linkType,
+	target,
 	variant,
 	size,
 	fullWidth,
 	align,
 	borderRadius,
+	fontFamily,
 	fontWeight,
 	background,
 	textColor,
@@ -73,23 +75,20 @@ export function ButtonNode({
 	style,
 	...rest
 }: ButtonNodeProps) {
-	const isEditorMode = useContext(KivEditorModeContext);
-	const bus = useContext(KivBusContext);
-	// Next.js consumers pass their `Link` via KivRenderer's `linkComponent`
-	// prop — that's what makes linkType="internal" a client-side navigation
-	// instead of a full page load. Everything else (external, anchor, or no
-	// router registered) renders a plain <a>.
-	const RouterLinkLike = useContext(KivLinkContext);
-	const useRouterLink =
-		!isEditorMode && linkType === "internal" && !!RouterLinkLike;
-
-	const resolvedHref = isEditorMode ? undefined : (href ?? "#");
-	const resolvedTarget = isEditorMode
-		? undefined
-		: linkType === "external"
-			? "_blank"
-			: (target ?? "_self");
-	const rel = resolvedTarget === "_blank" ? "noopener noreferrer" : undefined;
+	// Link behaviour (router selection, anchor scroll, bus emit, editor guard)
+	// lives in one shared hook so every clickable node behaves the same.
+	const {
+		tag: Tag,
+		attrs: linkAttrs,
+		onClick,
+		isEditorMode,
+	} = useKivLink(
+		{ href, linkType, target },
+		{
+			event: "button.clicked",
+			payload: () => ({ nodeId: id, label, href }),
+		},
+	);
 
 	const sizing = BUTTON_SIZE[size ?? "md"] ?? DEFAULT_SIZE;
 	const variantStyle = BUTTON_VARIANT[variant ?? "primary"] ?? DEFAULT_VARIANT;
@@ -147,8 +146,7 @@ export function ButtonNode({
 			width: fullWidth ? "100%" : undefined,
 			...paddingFinal,
 			fontSize: sizing.fontSize,
-			fontWeight: fontWeight ?? "600",
-			fontFamily: "inherit",
+			...resolveButtonTypographyStyle({ fontFamily, fontWeight }),
 			textAlign: (align ?? "center") as "left" | "center" | "right",
 			borderRadius: BUTTON_RADIUS[borderRadius ?? "md"] ?? "6px",
 			textDecoration: variantStyle.textDecoration ?? "none",
@@ -178,6 +176,7 @@ export function ButtonNode({
 			fullWidth,
 			paddingFinal,
 			sizing.fontSize,
+			fontFamily,
 			fontWeight,
 			align,
 			borderRadius,
@@ -190,29 +189,6 @@ export function ButtonNode({
 			style,
 		],
 	);
-
-	function onClick(e: MouseEvent) {
-		if (isEditorMode) {
-			e.preventDefault();
-			return;
-		}
-		// Runtime: emit through the engine bus if one was provided.
-		bus?.emit("button.clicked", { nodeId: id, label, href });
-
-		// Anchor navigation: smooth-scroll to the target node ourselves. The
-		// renderer stamps each node with id={id}, so href="#hero" finds
-		// the element and scrolls to it — works inside scroll containers,
-		// where the browser's native hash jump can be unreliable.
-		if (linkType === "anchor") {
-			const raw = href ?? "";
-			const targetId = raw.startsWith("#") ? raw.slice(1) : raw;
-			e.preventDefault();
-			if (targetId)
-				document
-					.getElementById(targetId)
-					?.scrollIntoView({ behavior: "smooth", block: "start" });
-		}
-	}
 
 	const iconEl = hasIcon ? (
 		iconIsSvg ? (
@@ -245,35 +221,17 @@ export function ButtonNode({
 		</>
 	);
 
-	if (useRouterLink && RouterLinkLike) {
-		return (
-			<RouterLinkLike
-				id={id}
-				href={href ?? "/"}
-				className={hoverClass}
-				style={buttonStyle}
-				data-kiv-type="button"
-				onClick={onClick}
-				{...rest}
-			>
-				{children}
-			</RouterLinkLike>
-		);
-	}
-
 	return (
-		<a
+		<Tag
 			id={id}
-			href={resolvedHref}
-			target={resolvedTarget}
-			rel={rel}
 			className={hoverClass}
 			style={buttonStyle}
 			data-kiv-type="button"
 			onClick={onClick}
+			{...linkAttrs}
 			{...rest}
 		>
 			{children}
-		</a>
+		</Tag>
 	);
 }

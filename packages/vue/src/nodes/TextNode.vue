@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { LETTER_SPACING, LINE_HEIGHT } from "@kivcode/nodes";
 import { computed } from "vue";
+import { useKivTypography } from "../composables/useKivTypography";
 
 const props = defineProps<{
 	content?: string;
@@ -10,17 +10,14 @@ const props = defineProps<{
 	align?: string;
 	lineHeight?: string;
 	letterSpacing?: string;
+	transform?: string;
+	fontStyle?: string;
+	fontFamily?: string;
 }>();
 
-const textStyle = computed(() => ({
-	fontSize: `${props.size ?? 16}px`,
-	fontWeight: props.weight ?? "400",
-	color: props.color ?? "inherit",
-	textAlign: (props.align ?? "left") as "left" | "center" | "right" | "justify",
-	lineHeight: LINE_HEIGHT[props.lineHeight ?? "relaxed"] ?? "1.6",
-	letterSpacing: LETTER_SPACING[props.letterSpacing ?? "normal"] ?? "0em",
-	margin: "0",
-}));
+// Style comes from the shared typography resolver, so this component, the
+// static HTML export and every other text node stay in agreement.
+const textStyle = useKivTypography(computed(() => ({ ...props })));
 </script>
 
 <template>

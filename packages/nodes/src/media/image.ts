@@ -3,7 +3,7 @@ import { borderVisualFields } from "../border-field";
 import { hoverEffectClass, hoverGlowStyle } from "../hover-effects";
 import { hoverFields } from "../hover-field";
 import { escapeHtml, styleToString } from "../html-utils";
-import { RADIUS, SHADOW } from "../scales";
+import { fromScale, RADIUS, SHADOW } from "../scales";
 import { sizeField } from "../size-field";
 
 const hover = hoverFields({
@@ -26,8 +26,8 @@ export const imageNode = defineNode({
 			width: String(props.width ?? "100%"),
 			maxWidth: "100%",
 			display: "block",
-			borderRadius: RADIUS[String(props.borderRadius ?? "none")] ?? "0",
-			boxShadow: SHADOW[String(props.shadow ?? "none")] ?? "none",
+			borderRadius: fromScale(RADIUS, props.borderRadius ?? "none", "0"),
+			boxShadow: fromScale(SHADOW, props.shadow ?? "none", "none"),
 			...hoverGlowStyle(props.hoverGlowColor),
 		});
 		const hoverClass = hoverEffectClass(props.hoverEffect);
@@ -41,11 +41,14 @@ export const imageNode = defineNode({
 			label: "Source URL",
 			group: "Content",
 			pluginControl: "media-picker",
+			responsive: true,
+			hint: "Art direction: pick a breakpoint above, then choose a different image for it. Empty = inherit the smaller breakpoint.",
 		}),
 		alt: f.text({ label: "Alt text", localizable: true, group: "Content" }),
 		fit: f.select(["cover", "contain", "fill", "none"], {
 			label: "Object fit",
 			default: "cover",
+			responsive: true,
 			group: "Style",
 		}),
 		aspectRatio: f.select(
@@ -53,6 +56,7 @@ export const imageNode = defineNode({
 			{
 				label: "Aspect ratio",
 				default: "auto",
+				responsive: true,
 				group: "Style",
 			},
 		),

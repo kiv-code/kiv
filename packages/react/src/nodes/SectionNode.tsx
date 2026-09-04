@@ -2,10 +2,10 @@ import {
 	BLUR,
 	RADIUS,
 	resolveBackgroundPaint,
+	resolveShadow,
 	resolveSolidColor,
 	resolveSpacingStyle,
 	SECTION_SPACING,
-	SHADOW,
 } from "@kivcode/nodes";
 import { useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
@@ -34,6 +34,7 @@ export interface SectionNodeProps extends KivNodeComponentProps {
 	borderColor?: string;
 	borderRadius?: string;
 	shadow?: string;
+	shadowColor?: string;
 	fullWidth?: boolean;
 	minHeight?: string;
 	alignItems?: string;
@@ -56,6 +57,7 @@ export function SectionNode({
 	borderColor,
 	borderRadius,
 	shadow,
+	shadowColor,
 	minHeight,
 	alignItems,
 	justifyContent,
@@ -106,7 +108,7 @@ export function SectionNode({
 			s.borderRadius = RADIUS[borderRadius] ?? borderRadius;
 		}
 		if (shadow && shadow !== "none") {
-			s.boxShadow = SHADOW[shadow] ?? shadow;
+			s.boxShadow = resolveShadow(shadow, shadowColor || undefined);
 		}
 		if (minHeight) {
 			s.minHeight = minHeight;
@@ -132,6 +134,7 @@ export function SectionNode({
 		borderColor,
 		borderRadius,
 		shadow,
+		shadowColor,
 		minHeight,
 		style,
 	]);
@@ -148,6 +151,9 @@ export function SectionNode({
 		};
 	}, [blur]);
 
+	// Always declared: a flex column's real browser default is `stretch`, not
+	// `flex-start` — omitting "flex-start" here silently stretched content
+	// full-width instead of pinning it to the start.
 	const contentStyle = useMemo(
 		() => ({
 			position: "relative" as const,
@@ -156,12 +162,8 @@ export function SectionNode({
 			flexDirection: "column" as const,
 			width: "100%",
 			flex: 1,
-			alignItems:
-				alignItems && alignItems !== "flex-start" ? alignItems : undefined,
-			justifyContent:
-				justifyContent && justifyContent !== "flex-start"
-					? justifyContent
-					: undefined,
+			alignItems: alignItems ?? "flex-start",
+			justifyContent: justifyContent ?? "flex-start",
 		}),
 		[alignItems, justifyContent],
 	);

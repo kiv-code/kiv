@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PricingData } from "@kivcode/nodes";
+import type { LinkType, PricingData } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{
@@ -10,6 +10,8 @@ const emit = defineEmits<{
 	"update:modelValue": [value: string];
 }>();
 
+const LINK_TYPES = ["none", "internal", "external", "anchor"] as const;
+
 function parse(v: string | undefined): PricingData {
 	if (!v)
 		return {
@@ -18,11 +20,20 @@ function parse(v: string | undefined): PricingData {
 		};
 	try {
 		const p = JSON.parse(v);
+		// `ctaLinkType`/`ctaHref` stay `undefined` when the tier never set its
+		// own link — not defaulted to "none" here, or re-saving any OTHER
+		// tier's edit would bake "none" into every tier that was never
+		// touched, permanently overriding the shared link's fallback for them.
 		const tiers = Array.isArray(p?.tiers)
 			? p.tiers.map((t: Record<string, unknown>) => ({
 					period: String(t?.period ?? ""),
 					tier: String(t?.tier ?? ""),
 					highlighted: Boolean(t?.highlighted),
+					ctaLinkType:
+						typeof t?.ctaLinkType === "string"
+							? (t.ctaLinkType as LinkType)
+							: undefined,
+					ctaHref: typeof t?.ctaHref === "string" ? t.ctaHref : undefined,
 				}))
 			: [{ period: "", tier: "", highlighted: false }];
 		const rows = Array.isArray(p?.rows)
@@ -71,6 +82,10 @@ function updateCell(rowIdx: number, tierIdx: number, value: string): void {
 		return { ...r, values };
 	});
 	emit("update:modelValue", serialize({ ...data.value, rows }));
+}
+
+function updateTierLinkType(index: number, value: string): void {
+	updateTier(index, { ctaLinkType: value as LinkType });
 }
 
 function addTier(): void {
@@ -153,6 +168,21 @@ function removeRow(index: number): void {
 								/>
 								Highlight
 							</label>
+							<select
+								class="kiv-pricing-editor__input kiv-pricing-editor__select"
+								:value="tier.ctaLinkType ?? 'none'"
+								title="This tier's own CTA link — overrides the shared one below when set"
+								@change="updateTierLinkType(ti, ($event.target as HTMLSelectElement).value)"
+							>
+								<option v-for="lt in LINK_TYPES" :key="lt" :value="lt">{{ lt }}</option>
+							</select>
+							<input
+								v-if="tier.ctaLinkType && tier.ctaLinkType !== 'none'"
+								:value="tier.ctaHref"
+								class="kiv-pricing-editor__input"
+								placeholder="/path, https://…, or #section-id"
+								@input="updateTier(ti, { ctaHref: ($event.target as HTMLInputElement).value })"
+							/>
 							<button
 								v-if="data.tiers.length > 1"
 								type="button"
@@ -258,6 +288,9 @@ function removeRow(index: number): void {
 }
 .kiv-pricing-editor__input--strong {
 	font-weight: 700;
+}
+.kiv-pricing-editor__select {
+	cursor: pointer;
 }
 .kiv-pricing-editor__input:focus {
 	background: var(--color-accent-muted);

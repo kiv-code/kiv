@@ -1,6 +1,7 @@
 import { defineNode, f } from "@kivcode/engine";
+import { gapField } from "../gap-field";
 import { styleToString } from "../html-utils";
-import { fromScale, MAX_WIDTH } from "../scales";
+import { fromScale, GAP, MAX_WIDTH } from "../scales";
 import { resolveSpacingStyle, spacingField } from "../spacing-field";
 
 /**
@@ -12,11 +13,22 @@ import { resolveSpacingStyle, spacingField } from "../spacing-field";
 export function containerStyle(
 	props: Record<string, unknown>,
 ): Record<string, string | undefined> {
+	// `gap` stays off (plain block flow, unchanged from before this field
+	// existed) unless a document opts in — several direct children of a
+	// Container otherwise sit flush against each other with zero space,
+	// since Container itself has no margin/gap of its own.
+	const gap =
+		props.gap && props.gap !== "none"
+			? fromScale(GAP, props.gap, "0")
+			: undefined;
 	return {
 		maxWidth: fromScale(MAX_WIDTH, props.maxWidth ?? "lg", "1024px"),
 		marginLeft: props.centered !== false ? "auto" : undefined,
 		marginRight: props.centered !== false ? "auto" : undefined,
 		width: "100%",
+		display: gap ? "flex" : undefined,
+		flexDirection: gap ? "column" : undefined,
+		gap,
 		// One spacing field covers both the uniform and the per-side case;
 		// each side holds a scale token or a raw CSS length.
 		...resolveSpacingStyle("padding", props.padding, {
@@ -51,5 +63,11 @@ export const containerNode = defineNode({
 			default: { right: "md", left: "md" },
 		}),
 		centered: f.boolean({ label: "Centered", default: true, group: "Layout" }),
+		gap: gapField({
+			label: "Gap between children",
+			default: "none",
+			scale: ["none", "xs", "sm", "md", "lg", "xl"],
+			responsive: false,
+		}),
 	},
 });

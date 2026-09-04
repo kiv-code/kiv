@@ -34,6 +34,7 @@ export {
 	HeadingNode,
 	IconNode,
 	ImageNode,
+	LayerNode,
 	LinkNode,
 	ModalNode,
 	PageNode,
@@ -50,6 +51,7 @@ export {
 	TestimonialNode,
 	TextNode,
 	VideoNode,
+	ZStackNode,
 } from "./nodes";
 export type { ReactRegistry } from "./registry";
 export { createReactRegistry } from "./registry";

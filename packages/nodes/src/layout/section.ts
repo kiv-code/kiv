@@ -6,7 +6,13 @@ import {
 	resolveSolidColor,
 } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
-import { BLUR, fromScale, RADIUS, SECTION_SPACING, SHADOW } from "../scales";
+import {
+	BLUR,
+	fromScale,
+	RADIUS,
+	resolveShadow,
+	SECTION_SPACING,
+} from "../scales";
 import { sizeField } from "../size-field";
 import { resolveSpacingStyle, spacingField } from "../spacing-field";
 
@@ -65,7 +71,10 @@ export const sectionNode = defineNode({
 				RADIUS[String(props.borderRadius)] ?? String(props.borderRadius);
 		}
 		if (props.shadow && props.shadow !== "none") {
-			s.boxShadow = SHADOW[String(props.shadow)] ?? String(props.shadow);
+			s.boxShadow = resolveShadow(
+				String(props.shadow),
+				props.shadowColor ? String(props.shadowColor) : undefined,
+			);
 		}
 		if (props.minHeight) s.minHeight = String(props.minHeight);
 
@@ -114,14 +123,11 @@ export const sectionNode = defineNode({
 			flexDirection: "column",
 			width: "100%",
 			flex: "1",
-			alignItems:
-				props.alignItems && props.alignItems !== "flex-start"
-					? String(props.alignItems)
-					: undefined,
-			justifyContent:
-				props.justifyContent && props.justifyContent !== "flex-start"
-					? String(props.justifyContent)
-					: undefined,
+			// Always declared: a flex column's real browser default is `stretch`,
+			// not `flex-start` — omitting "flex-start" here silently stretched
+			// content full-width instead of pinning it to the start.
+			alignItems: String(props.alignItems ?? "flex-start"),
+			justifyContent: String(props.justifyContent ?? "flex-start"),
 		});
 
 		return `<section style="${styleToString(s)}" data-kiv-type="section" class="kiv-section">${videoHtml}${blurHtml}${overlayHtml}<div class="kiv-section__content" style="${contentStyle}">${children.default ?? ""}</div></section>`;
@@ -135,6 +141,8 @@ export const sectionNode = defineNode({
 			label: "Background image URL",
 			group: "Background",
 			pluginControl: "media-picker",
+			responsive: true,
+			hint: "Art direction: pick a breakpoint above, then choose a different image for it.",
 		}),
 		backgroundVideo: f.text({
 			label: "Background video URL",
@@ -216,5 +224,6 @@ export const sectionNode = defineNode({
 		borderColor: borderColorField({ group: "Border" }),
 		borderRadius: border.borderRadius,
 		shadow: border.shadow,
+		shadowColor: border.shadowColor,
 	},
 });

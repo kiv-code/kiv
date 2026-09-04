@@ -4,7 +4,7 @@ export {
 	resolveAgendaTypographyStyle,
 } from "./agenda";
 export { buttonNode, resolveButtonTypographyStyle } from "./button";
-export { cardNode } from "./card";
+export { cardNode, cardStyle } from "./card";
 export {
 	computeCountdownParts,
 	countdownNode,
@@ -27,6 +27,7 @@ export {
 	type PricingTier,
 	parsePricingData,
 	pricingNode,
+	resolveTierLink,
 } from "./pricing";
 export { richTextNode } from "./rich-text";
 export {

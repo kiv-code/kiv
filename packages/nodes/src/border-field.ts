@@ -3,6 +3,10 @@ import { type FieldDescriptor, f } from "@kivcode/engine";
 export interface BorderVisualFields {
 	borderRadius: FieldDescriptor<string>;
 	shadow: FieldDescriptor<string>;
+	/** Empty = the preset's own neutral black, at its usual opacity — set a
+	 * color to recolor the whole shadow (e.g. a brand-tinted glow) via the
+	 * shared `resolveShadow(shadow, shadowColor)`. */
+	shadowColor: FieldDescriptor<string>;
 }
 
 export interface BorderVisualFieldOptions {
@@ -33,6 +37,12 @@ export function borderVisualFields(
 			label: "Shadow",
 			default: opts.shadowDefault ?? "none",
 			group: g,
+		}),
+		shadowColor: f.color({
+			label: "Shadow color",
+			default: "",
+			group: g,
+			hint: "Empty = the default neutral black shadow.",
 		}),
 	};
 }

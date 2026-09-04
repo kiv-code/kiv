@@ -7,6 +7,7 @@ import {
 	resolveSolidColor,
 } from "@kivcode/nodes";
 import { computed } from "vue";
+import PricingCardCta from "./PricingCardCta.vue";
 
 const props = defineProps<{
 	data?: string;
@@ -15,6 +16,8 @@ const props = defineProps<{
 	highlightColor?: unknown;
 	borderRadius?: string;
 	ctaLabel?: string;
+	linkType?: string;
+	href?: string;
 }>();
 
 const parsed = computed<PricingData>(() => parsePricingData(props.data));
@@ -79,12 +82,14 @@ function rowLabelStyle(highlighted: boolean) {
 }
 function ctaStyle(highlighted: boolean) {
 	return {
+		display: "block",
 		marginTop: "6px",
 		textAlign: "center" as const,
 		padding: "10px",
 		borderRadius: RADIUS.sm,
 		fontWeight: "700",
 		fontSize: "0.85rem",
+		textDecoration: "none",
 		background: highlighted ? "#ffffff" : "#0f172a",
 		color: highlighted ? "#4b22d6" : "#ffffff",
 	};
@@ -149,7 +154,14 @@ const gridStyle = computed(() => ({
 						<span style="font-weight: 800;">{{ row.values[ti] ?? "" }}</span>
 					</div>
 				</div>
-				<div v-if="ctaLabel" :style="ctaStyle(t.highlighted)">{{ ctaLabel }}</div>
+				<PricingCardCta
+					v-if="ctaLabel"
+					:tier="t"
+					:fallback-link-type="linkType"
+					:fallback-href="href"
+					:label="ctaLabel"
+					:style="ctaStyle(t.highlighted)"
+				/>
 			</div>
 		</div>
 	</div>

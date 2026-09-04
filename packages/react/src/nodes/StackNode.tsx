@@ -13,6 +13,7 @@ export interface StackNodeProps extends KivNodeComponentProps {
 	background?: string;
 	borderRadius?: string;
 	shadow?: string;
+	shadowColor?: string;
 	borderTopWidth?: number;
 	borderRightWidth?: number;
 	borderBottomWidth?: number;
@@ -32,6 +33,7 @@ export function StackNode({
 	background,
 	borderRadius,
 	shadow,
+	shadowColor,
 	borderTopWidth,
 	borderRightWidth,
 	borderBottomWidth,
@@ -58,6 +60,7 @@ export function StackNode({
 				background,
 				borderRadius,
 				shadow,
+				shadowColor,
 				borderTopWidth,
 				borderRightWidth,
 				borderBottomWidth,
@@ -78,6 +81,7 @@ export function StackNode({
 			background,
 			borderRadius,
 			shadow,
+			shadowColor,
 			borderTopWidth,
 			borderRightWidth,
 			borderBottomWidth,

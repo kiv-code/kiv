@@ -6,6 +6,7 @@ import {
 	GAP,
 	gapField,
 	RADIUS,
+	resolveShadow,
 	SPACING,
 	styleToString,
 } from "@kivcode/nodes";
@@ -15,12 +16,28 @@ const accordionRadius = borderVisualFields({
 	radiusOptions: ["none", "sm", "md", "lg"],
 	radiusDefault: "md",
 });
-const itemRadius = borderVisualFields({
-	radiusLabel: "Item Border Radius",
-	radiusHint: "Border radius for each individual accordion item.",
+const itemVisual = borderVisualFields({
 	radiusOptions: ["none", "sm", "md", "lg"],
 	radiusDefault: "sm",
+	shadowOptions: ["none", "sm", "md", "lg"],
+	shadowDefault: "none",
 });
+
+/**
+ * The separator line lives here, not inline, because it must apply to
+ * whichever accordion-item children are rendered — a static inline style
+ * can only ever target the accordion wrapper itself. Injected globally by
+ * each live renderer (mirrors HOVER_EFFECTS_CSS); the static `toHtml` export
+ * doesn't include either, which is an existing, pre-existing limitation.
+ * The `--kiv-accordion-sep` custom property is set per-instance on the
+ * accordion wrapper in `toHtml` below, so two accordions on the same page
+ * can each have their own separator color without colliding.
+ */
+export const ACCORDION_CSS = `
+[data-kiv-type="accordion"] > [data-kiv-type="accordion-item"]:not(:last-child) {
+	border-bottom: var(--kiv-accordion-sep, none);
+}
+`;
 
 export const accordionNode = defineNode({
 	type: "accordion",
@@ -34,6 +51,10 @@ export const accordionNode = defineNode({
 			display: "flex",
 			flexDirection: "column",
 			gap: fromScale(GAP, props.gap ?? "sm", "8px"),
+			borderRadius: fromScale(RADIUS, props.borderRadius ?? "md", "8px"),
+			"--kiv-accordion-sep": props.showSeparator
+				? `1px solid ${String(props.separatorColor ?? "#e2e8f0")}`
+				: undefined,
 		});
 		return `<div data-kiv-type="accordion" style="${style}">${children.default ?? ""}</div>`;
 	},
@@ -86,7 +107,6 @@ export const accordionNode = defineNode({
 			group: "Layout",
 		}),
 		borderRadius: accordionRadius.borderRadius,
-		itemBorderRadius: itemRadius.borderRadius,
 		showSeparator: f.boolean({
 			label: "Show Separator Line",
 			default: false,
@@ -115,7 +135,11 @@ export const accordionItemNode = defineNode({
 				: undefined;
 		const wrapStyle = styleToString({
 			background,
-			borderRadius: RADIUS.sm ?? "4px",
+			borderRadius: fromScale(RADIUS, props.borderRadius ?? "sm", "4px"),
+			boxShadow: resolveShadow(
+				String(props.shadow ?? "none"),
+				props.shadowColor ? String(props.shadowColor) : undefined,
+			),
 			overflow: "hidden",
 		});
 		const summaryStyle = styleToString({
@@ -163,6 +187,9 @@ export const accordionItemNode = defineNode({
 			group: "Style",
 		}),
 		titleColor: f.color({ label: "Title Color", default: "", group: "Style" }),
+		borderRadius: itemVisual.borderRadius,
+		shadow: itemVisual.shadow,
+		shadowColor: itemVisual.shadowColor,
 		titleFontSize: f.number({
 			label: "Title Font Size (px)",
 			default: 0,

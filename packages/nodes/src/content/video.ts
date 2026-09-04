@@ -1,7 +1,7 @@
 import { defineNode, f } from "@kivcode/engine";
 import { borderVisualFields } from "../border-field";
 import { escapeHtml, styleToString } from "../html-utils";
-import { fromScale, RADIUS, SHADOW } from "../scales";
+import { fromScale, RADIUS, resolveShadow, SHADOW } from "../scales";
 
 const border = borderVisualFields({
 	group: "Style",
@@ -46,7 +46,10 @@ export const videoNode = defineNode({
 			height: "0",
 			overflow: "hidden",
 			borderRadius: fromScale(RADIUS, props.borderRadius ?? "none", "0"),
-			boxShadow: fromScale(SHADOW, props.shadow ?? "none", "none"),
+			boxShadow: resolveShadow(
+				String(props.shadow ?? "none"),
+				props.shadowColor ? String(props.shadowColor) : undefined,
+			),
 		});
 
 		const mediaStyle = styleToString({
@@ -146,6 +149,7 @@ export const videoNode = defineNode({
 		}),
 		borderRadius: border.borderRadius,
 		shadow: border.shadow,
+		shadowColor: border.shadowColor,
 		autoplay: f.boolean({
 			label: "Autoplay",
 			default: false,

@@ -7,6 +7,7 @@ const props = withDefaults(
 		maxWidth?: string;
 		padding?: unknown;
 		centered?: boolean;
+		gap?: string;
 	}>(),
 	{ centered: true },
 );

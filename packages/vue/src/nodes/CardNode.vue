@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import {
-	hoverEffectClass,
-	hoverGlowStyle,
-	RADIUS,
-	resolveBackgroundPaint,
-	resolveSpacingStyle,
-	SHADOW,
-} from "@kivcode/nodes";
+import { cardStyle, hoverEffectClass } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{
 	background?: unknown;
 	borderRadius?: string;
 	padding?: unknown;
+	margin?: unknown;
+	width?: string;
+	height?: string;
+	alignItems?: string;
+	justifyContent?: string;
 	shadow?: string;
+	shadowColor?: string;
 	borderWidth?: number;
 	borderColor?: string;
 	highlighted?: boolean;
@@ -21,25 +20,14 @@ const props = defineProps<{
 	hoverGlowColor?: string;
 }>();
 
-const cardStyle = computed(() => ({
-	background: resolveBackgroundPaint(props.background, "#ffffff"),
-	borderRadius: RADIUS[props.borderRadius ?? "lg"] ?? "16px",
-	// A legacy string value ("lg") normalizes to a uniform box, so old
-	// documents keep rendering without a migration step.
-	...resolveSpacingStyle("padding", props.padding, "32px"),
-	boxShadow: SHADOW[props.shadow ?? "md"] ?? "none",
-	borderWidth: props.borderWidth ? `${props.borderWidth}px` : undefined,
-	borderStyle: props.borderWidth ? ("solid" as const) : undefined,
-	borderColor: props.borderWidth ? (props.borderColor ?? "#e2e8f0") : undefined,
-	outline: props.highlighted ? "2px solid #6366f1" : undefined,
-	outlineOffset: props.highlighted ? "2px" : undefined,
-	...hoverGlowStyle(props.hoverGlowColor),
-}));
+// Style comes from the node definition, so this component and the static HTML
+// export can never drift apart.
+const style = computed(() => cardStyle({ ...props }));
 const hoverClass = computed(() => hoverEffectClass(props.hoverEffect));
 </script>
 
 <template>
-	<div :style="cardStyle" :class="hoverClass" data-kiv-type="card">
+	<div :style="style" :class="hoverClass" data-kiv-type="card">
 		<slot />
 	</div>
 </template>

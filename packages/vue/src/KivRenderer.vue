@@ -8,6 +8,7 @@ import type {
 	ServicesContainer,
 } from "@kivcode/engine";
 import { HOVER_EFFECTS_CSS } from "@kivcode/nodes";
+import { ACCORDION_CSS } from "@kivcode/nodes-interactive";
 import { computed, provide } from "vue";
 import { KIV_BUS_KEY } from "./bus";
 import { KIV_CONTEXT_KEY } from "./context";
@@ -73,6 +74,17 @@ if (typeof document !== "undefined" && !document.getElementById(HOVER_CSS_ID)) {
 	const styleEl = document.createElement("style");
 	styleEl.id = HOVER_CSS_ID;
 	styleEl.textContent = HOVER_EFFECTS_CSS;
+	document.head.appendChild(styleEl);
+}
+
+const ACCORDION_CSS_ID = "kiv-accordion-css";
+if (
+	typeof document !== "undefined" &&
+	!document.getElementById(ACCORDION_CSS_ID)
+) {
+	const styleEl = document.createElement("style");
+	styleEl.id = ACCORDION_CSS_ID;
+	styleEl.textContent = ACCORDION_CSS;
 	document.head.appendChild(styleEl);
 }
 </script>

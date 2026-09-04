@@ -3052,6 +3052,9 @@ details[open] .kiv-inspector__chevron {
 .kiv-pricing-editor__input--strong {
 	font-weight: 700;
 }
+.kiv-pricing-editor__select {
+	cursor: pointer;
+}
 .kiv-pricing-editor__input:focus {
 	background: var(--color-accent-muted);
 	border-radius: 3px;

@@ -4,7 +4,7 @@ import {
 	hoverGlowStyle,
 	IMAGE_SRCSET_WIDTHS,
 	RADIUS,
-	SHADOW,
+	resolveShadow,
 } from "@kivcode/nodes";
 import { computed, inject } from "vue";
 import { KIV_MEDIA_KEY } from "../media";
@@ -15,8 +15,11 @@ const props = defineProps<{
 	fit?: string;
 	aspectRatio?: string;
 	width?: string;
+	height?: string;
 	borderRadius?: string;
 	shadow?: string;
+	shadowColor?: string;
+	clipPath?: string;
 	hoverEffect?: string;
 	hoverGlowColor?: string;
 }>();
@@ -40,10 +43,15 @@ const imageStyle = computed(() => ({
 	objectFit: (props.fit ?? "cover") as "cover" | "contain" | "fill" | "none",
 	aspectRatio: props.aspectRatio !== "auto" ? props.aspectRatio : undefined,
 	width: props.width ?? "100%",
+	height: props.height || undefined,
 	maxWidth: "100%",
 	display: "block",
 	borderRadius: RADIUS[props.borderRadius ?? "none"] ?? "0",
-	boxShadow: SHADOW[props.shadow ?? "none"] ?? "none",
+	boxShadow: resolveShadow(
+		props.shadow ?? "none",
+		props.shadowColor || undefined,
+	),
+	clipPath: props.clipPath || undefined,
 	...hoverGlowStyle(props.hoverGlowColor),
 }));
 const hoverClass = computed(() => hoverEffectClass(props.hoverEffect));

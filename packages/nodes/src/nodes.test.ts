@@ -43,13 +43,13 @@ import {
 const ctx = { locale: "en", breakpoint: "base" as const };
 
 describe("ALL_NODES", () => {
-	it("contains 28 nodes", () => {
-		expect(ALL_NODES).toHaveLength(28);
+	it("contains 30 nodes", () => {
+		expect(ALL_NODES).toHaveLength(30);
 	});
 
 	it("all nodes have unique types", () => {
 		const types = ALL_NODES.map((n) => n.type);
-		expect(new Set(types).size).toBe(28);
+		expect(new Set(types).size).toBe(30);
 	});
 
 	it("registers without errors into a Registry", () => {

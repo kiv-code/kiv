@@ -1,5 +1,5 @@
 import type { FieldDescriptor } from "@kivcode/engine";
-import type { PricingData } from "@kivcode/nodes";
+import type { LinkType, PricingData } from "@kivcode/nodes";
 import { useMemo } from "react";
 
 export interface PricingEditorProps {
@@ -10,6 +10,8 @@ export interface PricingEditorProps {
 	onChange: (value: string) => void;
 }
 
+const LINK_TYPES: LinkType[] = ["none", "internal", "external", "anchor"];
+
 function parse(v: string | undefined): PricingData {
 	if (!v)
 		return {
@@ -18,11 +20,20 @@ function parse(v: string | undefined): PricingData {
 		};
 	try {
 		const p = JSON.parse(v);
+		// `ctaLinkType`/`ctaHref` stay `undefined` when the tier never set its
+		// own link — not defaulted to "none" here, or re-saving any OTHER
+		// tier's edit would bake "none" into every tier that was never
+		// touched, permanently overriding the shared link's fallback for them.
 		const tiers = Array.isArray(p?.tiers)
 			? p.tiers.map((t: Record<string, unknown>) => ({
 					period: String(t?.period ?? ""),
 					tier: String(t?.tier ?? ""),
 					highlighted: Boolean(t?.highlighted),
+					ctaLinkType:
+						typeof t?.ctaLinkType === "string"
+							? (t.ctaLinkType as LinkType)
+							: undefined,
+					ctaHref: typeof t?.ctaHref === "string" ? t.ctaHref : undefined,
 				}))
 			: [{ period: "", tier: "", highlighted: false }];
 		const rows = Array.isArray(p?.rows)
@@ -79,6 +90,10 @@ export function PricingEditor({
 			return { ...r, values };
 		});
 		onChange(serialize({ ...data, rows }));
+	}
+
+	function updateTierLinkType(index: number, value: string): void {
+		updateTier(index, { ctaLinkType: value as LinkType });
 	}
 
 	function addTier(): void {
@@ -168,6 +183,28 @@ export function PricingEditor({
 										/>
 										Highlight
 									</label>
+									<select
+										className="kiv-pricing-editor__input kiv-pricing-editor__select"
+										value={tier.ctaLinkType ?? "none"}
+										title="This tier's own CTA link — overrides the shared one below when set"
+										onChange={(e) => updateTierLinkType(ti, e.target.value)}
+									>
+										{LINK_TYPES.map((lt) => (
+											<option key={lt} value={lt}>
+												{lt}
+											</option>
+										))}
+									</select>
+									{tier.ctaLinkType && tier.ctaLinkType !== "none" && (
+										<input
+											value={tier.ctaHref ?? ""}
+											className="kiv-pricing-editor__input"
+											placeholder="/path, https://…, or #section-id"
+											onChange={(e) =>
+												updateTier(ti, { ctaHref: e.target.value })
+											}
+										/>
+									)}
 									{data.tiers.length > 1 && (
 										<button
 											type="button"

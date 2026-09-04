@@ -28,9 +28,6 @@ export interface AccordionNodeProps extends KivNodeComponentProps {
 	iconSize?: number;
 	gap?: string;
 	borderRadius?: string;
-	// Declared on the schema for parity with the Vue original, which never
-	// reads them either (no separator is actually rendered there).
-	itemBorderRadius?: string;
 	showSeparator?: boolean;
 	separatorColor?: string;
 }
@@ -46,9 +43,8 @@ export function AccordionNode({
 	iconSize,
 	gap,
 	borderRadius,
-	itemBorderRadius: _itemBorderRadius,
-	showSeparator: _showSeparator,
-	separatorColor: _separatorColor,
+	showSeparator,
+	separatorColor,
 	slots,
 	id,
 	style,
@@ -156,9 +152,12 @@ export function AccordionNode({
 			flexDirection: "column" as const,
 			gap: GAP[gap ?? "sm"] ?? "8px",
 			borderRadius: RADIUS[borderRadius ?? "md"] ?? "8px",
+			["--kiv-accordion-sep" as string]: showSeparator
+				? `1px solid ${separatorColor ?? "#e2e8f0"}`
+				: undefined,
 			...style,
 		}),
-		[gap, borderRadius, style],
+		[gap, borderRadius, showSeparator, separatorColor, style],
 	);
 
 	return (

@@ -7,6 +7,7 @@ import type {
 	ServicesContainer,
 } from "@kivcode/engine";
 import { HOVER_EFFECTS_CSS } from "@kivcode/nodes";
+import { ACCORDION_CSS } from "@kivcode/nodes-interactive";
 import { type ComponentType, useEffect, useMemo } from "react";
 import { KivBusContext } from "./bus";
 import { KivContext } from "./context";
@@ -38,6 +39,7 @@ export interface KivRendererProps {
 }
 
 const HOVER_CSS_ID = "kiv-hover-effects-css";
+const ACCORDION_CSS_ID = "kiv-accordion-css";
 const FONT_CSS_ID = "kiv-fonts-css";
 
 export function KivRenderer({
@@ -74,6 +76,14 @@ export function KivRenderer({
 		const styleEl = document.createElement("style");
 		styleEl.id = HOVER_CSS_ID;
 		styleEl.textContent = HOVER_EFFECTS_CSS;
+		document.head.appendChild(styleEl);
+	}, []);
+
+	useEffect(() => {
+		if (document.getElementById(ACCORDION_CSS_ID)) return;
+		const styleEl = document.createElement("style");
+		styleEl.id = ACCORDION_CSS_ID;
+		styleEl.textContent = ACCORDION_CSS;
 		document.head.appendChild(styleEl);
 	}, []);
 

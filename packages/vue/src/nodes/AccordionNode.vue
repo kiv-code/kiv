@@ -29,7 +29,6 @@ const props = defineProps<{
 	iconSize?: number;
 	gap?: string;
 	borderRadius?: string;
-	itemBorderRadius?: string;
 	showSeparator?: boolean;
 	separatorColor?: string;
 }>();
@@ -110,6 +109,9 @@ const accordionStyle = computed(() => ({
 	flexDirection: "column" as const,
 	gap: GAP[props.gap ?? "sm"] ?? "8px",
 	borderRadius: RADIUS[props.borderRadius ?? "md"] ?? "8px",
+	"--kiv-accordion-sep": props.showSeparator
+		? `1px solid ${props.separatorColor ?? "#e2e8f0"}`
+		: undefined,
 }));
 </script>
 

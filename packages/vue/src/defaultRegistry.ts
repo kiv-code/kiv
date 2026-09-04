@@ -17,6 +17,7 @@ import {
 	HeadingNode,
 	IconNode,
 	ImageNode,
+	LayerNode,
 	LinkNode,
 	ModalNode,
 	PageNode,
@@ -33,6 +34,7 @@ import {
 	TestimonialNode,
 	TextNode,
 	VideoNode,
+	ZStackNode,
 } from "./nodes";
 import { createVueRegistry } from "./registry";
 
@@ -77,5 +79,7 @@ export function createDefaultVueRegistry() {
 	registry.register("agenda", AgendaNode);
 	registry.register("agenda-item", AgendaItemNode);
 	registry.register("pricing", PricingNode);
+	registry.register("z-stack", ZStackNode);
+	registry.register("layer", LayerNode);
 	return registry;
 }

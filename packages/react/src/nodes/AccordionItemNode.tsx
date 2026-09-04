@@ -1,4 +1,4 @@
-import { RADIUS, SPACING } from "@kivcode/nodes";
+import { RADIUS, resolveShadow, SPACING } from "@kivcode/nodes";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { KivEditorModeContext } from "../editor-mode";
 import type { KivNodeComponentProps } from "../node-props";
@@ -11,6 +11,9 @@ export interface AccordionItemNodeProps extends KivNodeComponentProps {
 	icon?: string;
 	background?: string;
 	titleColor?: string;
+	borderRadius?: string;
+	shadow?: string;
+	shadowColor?: string;
 	titleFontSize?: number;
 	titleFontWeight?: string;
 	padding?: string;
@@ -27,6 +30,9 @@ export function AccordionItemNode({
 	icon: _icon,
 	background,
 	titleColor,
+	borderRadius,
+	shadow,
+	shadowColor,
 	titleFontSize = 0,
 	titleFontWeight,
 	padding,
@@ -116,11 +122,12 @@ export function AccordionItemNode({
 		() => ({
 			background:
 				background && background !== "transparent" ? background : undefined,
-			borderRadius: RADIUS.sm ?? "4px",
+			borderRadius: RADIUS[borderRadius ?? "sm"] ?? "4px",
+			boxShadow: resolveShadow(shadow ?? "none", shadowColor || undefined),
 			overflow: "hidden" as const,
 			...style,
 		}),
-		[background, style],
+		[background, borderRadius, shadow, shadowColor, style],
 	);
 
 	const iconPosition = ctx?.iconPosition ?? "right";

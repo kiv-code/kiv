@@ -7,6 +7,7 @@ import {
 } from "@kivcode/nodes";
 import { type CSSProperties, useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
+import { PricingCardCta } from "./PricingCardCta";
 
 export interface PricingNodeProps extends KivNodeComponentProps {
 	data?: string;
@@ -15,6 +16,8 @@ export interface PricingNodeProps extends KivNodeComponentProps {
 	highlightColor?: unknown;
 	borderRadius?: string;
 	ctaLabel?: string;
+	linkType?: string;
+	href?: string;
 }
 
 function thStyle(
@@ -80,12 +83,14 @@ function rowLabelStyle(highlighted: boolean): CSSProperties {
 }
 function ctaStyle(highlighted: boolean): CSSProperties {
 	return {
+		display: "block",
 		marginTop: "6px",
 		textAlign: "center",
 		padding: "10px",
 		borderRadius: RADIUS.sm,
 		fontWeight: 700,
 		fontSize: "0.85rem",
+		textDecoration: "none",
 		background: highlighted ? "#ffffff" : "#0f172a",
 		color: highlighted ? "#4b22d6" : "#ffffff",
 	};
@@ -98,6 +103,8 @@ export function PricingNode({
 	highlightColor,
 	borderRadius,
 	ctaLabel,
+	linkType,
+	href,
 	id,
 	style,
 	...rest
@@ -257,7 +264,13 @@ export function PricingNode({
 								))}
 							</div>
 							{ctaLabel && (
-								<div style={ctaStyle(t.highlighted)}>{ctaLabel}</div>
+								<PricingCardCta
+									tier={t}
+									fallbackLinkType={linkType}
+									fallbackHref={href}
+									label={ctaLabel}
+									style={ctaStyle(t.highlighted)}
+								/>
 							)}
 						</div>
 					))}

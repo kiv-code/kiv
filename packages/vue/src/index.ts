@@ -26,6 +26,7 @@ export {
 	HeadingNode,
 	IconNode,
 	ImageNode,
+	LayerNode,
 	LinkNode,
 	ModalNode,
 	PageNode,
@@ -42,6 +43,7 @@ export {
 	TestimonialNode,
 	TextNode,
 	VideoNode,
+	ZStackNode,
 } from "./nodes";
 export { createVueRegistry, type VueRegistry } from "./registry";
 export { KIV_SERVICES_KEY } from "./services";

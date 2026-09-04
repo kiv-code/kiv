@@ -12,9 +12,9 @@ describe("ColumnNode", () => {
 		expect(wrapper.html()).toContain("<p>child</p>");
 	});
 
-	it("produces no layout styles for default (auto) props", () => {
+	it("is a grid so its single child stretches to fill the row height", () => {
 		const wrapper = mount(ColumnNode, {});
-		expect(wrapper.attributes("style")).toBeUndefined();
+		expect(wrapper.attributes("style")).toBe("display: grid;");
 	});
 
 	it("maps span and offset to grid-column styles", () => {

@@ -6,6 +6,7 @@ export {
 	agendaNode,
 	buttonNode,
 	cardNode,
+	cardStyle,
 	computeCountdownParts,
 	countdownNode,
 	dividerNode,
@@ -34,6 +35,7 @@ export {
 	resolveSocialLinkDisplay,
 	resolveStatTypographyStyle,
 	resolveTableTypographyStyle,
+	resolveTierLink,
 	richTextNode,
 	type SocialLink,
 	socialIconsNode,
@@ -55,11 +57,15 @@ export {
 	containerStyle,
 	gridNode,
 	gridStyle,
+	layerNode,
+	layerStyle,
 	pageNode,
 	sectionNode,
 	spacerNode,
 	stackNode,
 	stackStyle,
+	zStackNode,
+	zStackStyle,
 } from "./layout";
 export * from "./link-field";
 export { imageNode } from "./media";
@@ -91,10 +97,12 @@ import { videoNode } from "./content/video";
 import { columnNode } from "./layout/column";
 import { containerNode } from "./layout/container";
 import { gridNode } from "./layout/grid";
+import { layerNode } from "./layout/layer";
 import { pageNode } from "./layout/page";
 import { sectionNode } from "./layout/section";
 import { spacerNode } from "./layout/spacer";
 import { stackNode } from "./layout/stack";
+import { zStackNode } from "./layout/z-stack";
 import { imageNode } from "./media/image";
 
 /** All 28 base nodes — pass to registry.registerMany(ALL_NODES). */
@@ -127,4 +135,6 @@ export const ALL_NODES = [
 	agendaNode,
 	agendaItemNode,
 	pricingNode,
+	zStackNode,
+	layerNode,
 ] as const;

@@ -13,6 +13,7 @@ const props = defineProps<{
 	background?: string;
 	borderRadius?: string;
 	shadow?: string;
+	shadowColor?: string;
 	borderTopWidth?: number;
 	borderRightWidth?: number;
 	borderBottomWidth?: number;

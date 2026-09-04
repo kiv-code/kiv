@@ -3,7 +3,7 @@ import { borderVisualFields } from "../border-field";
 import { hoverEffectClass, hoverGlowStyle } from "../hover-effects";
 import { hoverFields } from "../hover-field";
 import { escapeHtml, styleToString } from "../html-utils";
-import { fromScale, RADIUS, SHADOW } from "../scales";
+import { fromScale, RADIUS, resolveShadow, SHADOW } from "../scales";
 import { sizeField } from "../size-field";
 
 const hover = hoverFields({
@@ -24,10 +24,15 @@ export const imageNode = defineNode({
 			aspectRatio:
 				props.aspectRatio !== "auto" ? String(props.aspectRatio) : undefined,
 			width: String(props.width ?? "100%"),
+			height: props.height ? String(props.height) : undefined,
 			maxWidth: "100%",
 			display: "block",
 			borderRadius: fromScale(RADIUS, props.borderRadius ?? "none", "0"),
-			boxShadow: fromScale(SHADOW, props.shadow ?? "none", "none"),
+			boxShadow: resolveShadow(
+				String(props.shadow ?? "none"),
+				props.shadowColor ? String(props.shadowColor) : undefined,
+			),
+			clipPath: props.clipPath ? String(props.clipPath) : undefined,
 			...hoverGlowStyle(props.hoverGlowColor),
 		});
 		const hoverClass = hoverEffectClass(props.hoverEffect);
@@ -66,8 +71,22 @@ export const imageNode = defineNode({
 			group: "Style",
 			hint: "Any percentage or pixel value — drag the slider or type an exact size.",
 		}),
+		height: sizeField({
+			label: "Height",
+			default: "",
+			allowAuto: true,
+			group: "Style",
+			hint: "Empty = auto (driven by aspect ratio). Set to 100% inside a Layered Stack.",
+		}),
 		borderRadius: border.borderRadius,
 		shadow: border.shadow,
+		shadowColor: border.shadowColor,
+		clipPath: f.text({
+			label: "Clip path",
+			default: "",
+			group: "Style",
+			hint: "Raw CSS clip-path, e.g. polygon(0 0, 100% 0, 80% 100%, 0 100%) or path('M0,0 ...').",
+		}),
 		hoverEffect: hover.hoverEffect,
 		hoverGlowColor: hover.hoverGlowColor,
 	},

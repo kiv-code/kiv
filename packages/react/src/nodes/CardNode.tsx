@@ -1,10 +1,6 @@
 import {
 	hoverEffectClass,
-	hoverGlowStyle,
-	RADIUS,
-	resolveBackgroundPaint,
-	resolveSpacingStyle,
-	SHADOW,
+	cardStyle as resolveCardStyle,
 } from "@kivcode/nodes";
 import { useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
@@ -13,7 +9,13 @@ export interface CardNodeProps extends KivNodeComponentProps {
 	background?: unknown;
 	borderRadius?: string;
 	padding?: unknown;
+	margin?: unknown;
+	width?: string;
+	height?: string;
+	alignItems?: string;
+	justifyContent?: string;
 	shadow?: string;
+	shadowColor?: string;
 	borderWidth?: number;
 	borderColor?: string;
 	highlighted?: boolean;
@@ -25,7 +27,13 @@ export function CardNode({
 	background,
 	borderRadius,
 	padding,
+	margin,
+	width,
+	height,
+	alignItems,
+	justifyContent,
 	shadow,
+	shadowColor,
 	borderWidth,
 	borderColor,
 	highlighted,
@@ -36,27 +44,39 @@ export function CardNode({
 	style,
 	...rest
 }: CardNodeProps) {
+	// Style comes from the node definition, so this component and the static
+	// HTML export can never drift apart.
 	const cardStyle = useMemo(
 		() => ({
-			background: resolveBackgroundPaint(background, "#ffffff"),
-			borderRadius: RADIUS[borderRadius ?? "lg"] ?? "16px",
-			// A legacy string value ("lg") normalizes to a uniform box, so old
-			// documents keep rendering without a migration step.
-			...resolveSpacingStyle("padding", padding, "32px"),
-			boxShadow: SHADOW[shadow ?? "md"] ?? "none",
-			borderWidth: borderWidth ? `${borderWidth}px` : undefined,
-			borderStyle: borderWidth ? ("solid" as const) : undefined,
-			borderColor: borderWidth ? (borderColor ?? "#e2e8f0") : undefined,
-			outline: highlighted ? "2px solid #6366f1" : undefined,
-			outlineOffset: highlighted ? "2px" : undefined,
-			...hoverGlowStyle(hoverGlowColor),
+			...resolveCardStyle({
+				background,
+				borderRadius,
+				padding,
+				margin,
+				width,
+				height,
+				alignItems,
+				justifyContent,
+				shadow,
+				shadowColor,
+				borderWidth,
+				borderColor,
+				highlighted,
+				hoverGlowColor,
+			}),
 			...style,
 		}),
 		[
 			background,
 			borderRadius,
 			padding,
+			margin,
+			width,
+			height,
+			alignItems,
+			justifyContent,
 			shadow,
+			shadowColor,
 			borderWidth,
 			borderColor,
 			highlighted,

@@ -5,13 +5,23 @@ import {
 	resolveSolidColor,
 } from "../color-gradient";
 import { escapeHtml, styleToString } from "../html-utils";
-import { linkAttrs, linkFields, resolveLink } from "../link-field";
+import {
+	type LinkType,
+	linkAttrs,
+	linkFields,
+	resolveLink,
+} from "../link-field";
 import { fromScale, RADIUS } from "../scales";
 
 export interface PricingTier {
 	period: string;
 	tier: string;
 	highlighted: boolean;
+	/** Overrides the node-level CTA link for just this tier — a "Sold out" or
+	 * differently-priced plan often needs its own destination. Falls back to
+	 * the shared `linkType`/`href` fields when unset. */
+	ctaLinkType?: LinkType;
+	ctaHref?: string;
 }
 
 export interface PricingRow {
@@ -36,6 +46,9 @@ export function parsePricingData(raw: unknown): PricingData {
 						period: String(tier?.period ?? ""),
 						tier: String(tier?.tier ?? ""),
 						highlighted: Boolean(tier?.highlighted),
+						ctaLinkType: tier?.ctaLinkType as LinkType | undefined,
+						ctaHref:
+							typeof tier?.ctaHref === "string" ? tier.ctaHref : undefined,
 					};
 				})
 			: [];
@@ -105,13 +118,24 @@ function renderTableVariant(
 	return `<div style="${wrapStyle}"><table style="width:100%;border-collapse:collapse;font-size:0.9rem;"><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
 }
 
+/** A tier's own link if it set one, else the pricing node's shared link. */
+export function resolveTierLink(
+	tier: PricingTier,
+	fallback: Record<string, unknown>,
+) {
+	if (tier.ctaLinkType || tier.ctaHref) {
+		return resolveLink({ linkType: tier.ctaLinkType, href: tier.ctaHref });
+	}
+	return resolveLink(fallback);
+}
+
 function renderCardsVariant(
 	data: PricingData,
 	accentBg: string,
 	radius: string,
 	ctaLabel: string,
 	featured: boolean,
-	ctaLink: string,
+	ctaLinks: string[],
 ): string {
 	const gridStyle = styleToString({
 		display: "grid",
@@ -166,6 +190,7 @@ function renderCardsVariant(
 				background: isAccent ? "#ffffff" : "#0f172a",
 				color: isAccent ? "#4b22d6" : "#ffffff",
 			});
+			const ctaLink = ctaLinks[ti] ?? "";
 			const cta = ctaLabel
 				? ctaLink
 					? `<a${ctaLink} style="${ctaStyle}">${escapeHtml(ctaLabel)}</a>`
@@ -195,7 +220,9 @@ export const pricingNode = defineNode({
 		const highlightBg = resolveBackgroundPaint(props.highlightColor, "#ff1d96");
 		const highlightSolid = resolveSolidColor(props.highlightColor, "#ff1d96");
 		const ctaLabel = props.ctaLabel !== undefined ? String(props.ctaLabel) : "";
-		const ctaLink = linkAttrs(resolveLink(props), escapeHtml);
+		const ctaLinks = data.tiers.map((t) =>
+			linkAttrs(resolveTierLink(t, props), escapeHtml),
+		);
 
 		let inner: string;
 		if (variant === "cards") {
@@ -205,7 +232,7 @@ export const pricingNode = defineNode({
 				radius,
 				ctaLabel,
 				false,
-				ctaLink,
+				ctaLinks,
 			);
 		} else if (variant === "cards-featured") {
 			inner = renderCardsVariant(
@@ -214,7 +241,7 @@ export const pricingNode = defineNode({
 				radius,
 				ctaLabel,
 				true,
-				ctaLink,
+				ctaLinks,
 			);
 		} else {
 			inner = renderTableVariant(data, headerBg, highlightBg, radius);

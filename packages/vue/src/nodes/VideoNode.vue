@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RADIUS, SHADOW } from "@kivcode/nodes";
+import { RADIUS, resolveShadow } from "@kivcode/nodes";
 import { computed } from "vue";
 
 const props = defineProps<{
@@ -12,6 +12,7 @@ const props = defineProps<{
 	aspectRatio?: string;
 	borderRadius?: string;
 	shadow?: string;
+	shadowColor?: string;
 	autoplay?: boolean;
 	controls?: boolean;
 	loop?: boolean;
@@ -61,7 +62,10 @@ const containerStyle = computed(() => ({
 	height: 0,
 	overflow: "hidden" as const,
 	borderRadius: RADIUS[props.borderRadius ?? "none"] ?? "0",
-	boxShadow: SHADOW[props.shadow ?? "none"] ?? "none",
+	boxShadow: resolveShadow(
+		props.shadow ?? "none",
+		props.shadowColor || undefined,
+	),
 }));
 </script>
 

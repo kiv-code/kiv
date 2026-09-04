@@ -1,3 +1,5 @@
+import { withAlpha } from "./color-gradient";
+
 /**
  * Shared, framework-agnostic style scales.
  *
@@ -75,6 +77,46 @@ export const SHADOW: Record<string, string> = {
 	lg: "0 10px 40px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.12)",
 	xl: "0 20px 60px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.15)",
 };
+
+/** Same offsets/blur/opacity as `SHADOW`, structured so `resolveShadow` can
+ * recolor a preset instead of always rendering it black. */
+const SHADOW_LAYERS: Record<
+	string,
+	ReadonlyArray<{ x: number; y: number; blur: number; alpha: number }>
+> = {
+	none: [],
+	sm: [
+		{ x: 0, y: 1, blur: 3, alpha: 0.12 },
+		{ x: 0, y: 1, blur: 2, alpha: 0.08 },
+	],
+	md: [
+		{ x: 0, y: 4, blur: 16, alpha: 0.15 },
+		{ x: 0, y: 2, blur: 6, alpha: 0.1 },
+	],
+	lg: [
+		{ x: 0, y: 10, blur: 40, alpha: 0.2 },
+		{ x: 0, y: 4, blur: 12, alpha: 0.12 },
+	],
+	xl: [
+		{ x: 0, y: 20, blur: 60, alpha: 0.25 },
+		{ x: 0, y: 8, blur: 20, alpha: 0.15 },
+	],
+};
+
+/**
+ * The same visual weight as `SHADOW[preset]`, but tinted with a custom color
+ * instead of always black — shared by every node with a `shadowColor` field
+ * (via `borderVisualFields`) so "colored shadow" is one implementation, not
+ * a copy per node.
+ */
+export function resolveShadow(preset: string, color?: string): string {
+	const layers = SHADOW_LAYERS[preset];
+	if (!layers || layers.length === 0) return "none";
+	if (!color) return SHADOW[preset] ?? "none";
+	return layers
+		.map((l) => `${l.x}px ${l.y}px ${l.blur}px ${withAlpha(color, l.alpha)}`)
+		.join(", ");
+}
 
 /** Blur scale (Section backdrop). */
 export const BLUR: Record<string, string> = {

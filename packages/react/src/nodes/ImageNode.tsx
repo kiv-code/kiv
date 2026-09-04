@@ -3,7 +3,7 @@ import {
 	hoverGlowStyle,
 	IMAGE_SRCSET_WIDTHS,
 	RADIUS,
-	SHADOW,
+	resolveShadow,
 } from "@kivcode/nodes";
 import { useContext, useMemo } from "react";
 import { KivMediaContext } from "../media";
@@ -15,8 +15,11 @@ export interface ImageNodeProps extends KivNodeComponentProps {
 	fit?: string;
 	aspectRatio?: string;
 	width?: string;
+	height?: string;
 	borderRadius?: string;
 	shadow?: string;
+	shadowColor?: string;
+	clipPath?: string;
 	hoverEffect?: string;
 	hoverGlowColor?: string;
 }
@@ -27,8 +30,11 @@ export function ImageNode({
 	fit,
 	aspectRatio,
 	width,
+	height,
 	borderRadius,
 	shadow,
+	shadowColor,
+	clipPath,
 	hoverEffect,
 	hoverGlowColor,
 	id,
@@ -53,14 +59,27 @@ export function ImageNode({
 			objectFit: (fit ?? "cover") as "cover" | "contain" | "fill" | "none",
 			aspectRatio: aspectRatio !== "auto" ? aspectRatio : undefined,
 			width: width ?? "100%",
+			height: height || undefined,
 			maxWidth: "100%",
 			display: "block",
 			borderRadius: RADIUS[borderRadius ?? "none"] ?? "0",
-			boxShadow: SHADOW[shadow ?? "none"] ?? "none",
+			boxShadow: resolveShadow(shadow ?? "none", shadowColor || undefined),
+			clipPath: clipPath || undefined,
 			...hoverGlowStyle(hoverGlowColor),
 			...style,
 		}),
-		[fit, aspectRatio, width, borderRadius, shadow, hoverGlowColor, style],
+		[
+			fit,
+			aspectRatio,
+			width,
+			height,
+			borderRadius,
+			shadow,
+			shadowColor,
+			clipPath,
+			hoverGlowColor,
+			style,
+		],
 	);
 	const hoverClass = hoverEffectClass(hoverEffect);
 

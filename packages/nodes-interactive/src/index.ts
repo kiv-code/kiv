@@ -1,4 +1,4 @@
-export { accordionItemNode, accordionNode } from "./accordion";
+export { ACCORDION_CSS, accordionItemNode, accordionNode } from "./accordion";
 export { carouselNode } from "./carousel";
 export { modalNode } from "./modal";
 export { tabPanelNode, tabsNode } from "./tabs";

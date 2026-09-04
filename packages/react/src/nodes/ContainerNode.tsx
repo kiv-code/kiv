@@ -6,12 +6,14 @@ export interface ContainerNodeProps extends KivNodeComponentProps {
 	maxWidth?: string;
 	padding?: unknown;
 	centered?: boolean;
+	gap?: string;
 }
 
 export function ContainerNode({
 	maxWidth,
 	padding,
 	centered = true,
+	gap,
 	slots,
 	id,
 	style,
@@ -20,8 +22,11 @@ export function ContainerNode({
 	// Style comes from the node definition, so this component and the static
 	// HTML export can never drift apart.
 	const resolved = useMemo(
-		() => ({ ...containerStyle({ maxWidth, padding, centered }), ...style }),
-		[maxWidth, padding, centered, style],
+		() => ({
+			...containerStyle({ maxWidth, padding, centered, gap }),
+			...style,
+		}),
+		[maxWidth, padding, centered, gap, style],
 	);
 
 	return (

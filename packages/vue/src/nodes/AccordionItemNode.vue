@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RADIUS, SPACING } from "@kivcode/nodes";
+import { RADIUS, resolveShadow, SPACING } from "@kivcode/nodes";
 import { computed, inject, onBeforeUnmount, onMounted } from "vue";
 import { KIV_EDITOR_MODE_KEY } from "../editor-mode";
 import { ACCORDION_CONTEXT_KEY } from "./accordion-context";
@@ -15,6 +15,9 @@ const props = withDefaults(
 		icon?: string;
 		background?: string;
 		titleColor?: string;
+		borderRadius?: string;
+		shadow?: string;
+		shadowColor?: string;
 		titleFontSize?: number;
 		titleFontWeight?: string;
 		padding?: string;
@@ -49,7 +52,11 @@ const wrapStyle = computed(() => ({
 		props.background && props.background !== "transparent"
 			? props.background
 			: undefined,
-	borderRadius: RADIUS.sm ?? "4px",
+	borderRadius: RADIUS[props.borderRadius ?? "sm"] ?? "4px",
+	boxShadow: resolveShadow(
+		props.shadow ?? "none",
+		props.shadowColor || undefined,
+	),
 	overflow: "hidden" as const,
 }));
 

@@ -3,10 +3,10 @@ import {
 	BLUR,
 	RADIUS,
 	resolveBackgroundPaint,
+	resolveShadow,
 	resolveSolidColor,
 	resolveSpacingStyle,
 	SECTION_SPACING,
-	SHADOW,
 } from "@kivcode/nodes";
 import { computed } from "vue";
 
@@ -34,6 +34,7 @@ const props = defineProps<{
 	borderColor?: string;
 	borderRadius?: string;
 	shadow?: string;
+	shadowColor?: string;
 	fullWidth?: boolean;
 	minHeight?: string;
 	alignItems?: string;
@@ -78,7 +79,7 @@ const sectionStyle = computed(() => {
 		s.borderRadius = RADIUS[props.borderRadius] ?? props.borderRadius;
 	}
 	if (props.shadow && props.shadow !== "none") {
-		s.boxShadow = SHADOW[props.shadow] ?? props.shadow;
+		s.boxShadow = resolveShadow(props.shadow, props.shadowColor || undefined);
 	}
 	if (props.minHeight) {
 		s.minHeight = props.minHeight;
@@ -99,15 +100,12 @@ const bgBlurStyle = computed(() => {
 	};
 });
 
+// Always declared: a flex column's real browser default is `stretch`, not
+// `flex-start` — omitting "flex-start" here silently stretched content
+// full-width instead of pinning it to the start.
 const contentStyle = computed(() => ({
-	alignItems:
-		props.alignItems && props.alignItems !== "flex-start"
-			? props.alignItems
-			: undefined,
-	justifyContent:
-		props.justifyContent && props.justifyContent !== "flex-start"
-			? props.justifyContent
-			: undefined,
+	alignItems: props.alignItems ?? "flex-start",
+	justifyContent: props.justifyContent ?? "flex-start",
 }));
 </script>
 

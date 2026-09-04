@@ -1,4 +1,4 @@
-import { RADIUS, SHADOW } from "@kivcode/nodes";
+import { RADIUS, resolveShadow } from "@kivcode/nodes";
 import { type ReactNode, useMemo } from "react";
 import type { KivNodeComponentProps } from "../node-props";
 
@@ -12,6 +12,7 @@ export interface VideoNodeProps extends KivNodeComponentProps {
 	aspectRatio?: string;
 	borderRadius?: string;
 	shadow?: string;
+	shadowColor?: string;
 	autoplay?: boolean;
 	controls?: boolean;
 	loop?: boolean;
@@ -41,6 +42,7 @@ export function VideoNode({
 	aspectRatio,
 	borderRadius,
 	shadow,
+	shadowColor,
 	autoplay,
 	controls,
 	loop,
@@ -79,9 +81,9 @@ export function VideoNode({
 			height: 0,
 			overflow: "hidden" as const,
 			borderRadius: RADIUS[borderRadius ?? "none"] ?? "0",
-			boxShadow: SHADOW[shadow ?? "none"] ?? "none",
+			boxShadow: resolveShadow(shadow ?? "none", shadowColor || undefined),
 		}),
-		[aspectRatio, borderRadius, shadow],
+		[aspectRatio, borderRadius, shadow, shadowColor],
 	);
 
 	const mediaStyle = {

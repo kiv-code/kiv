@@ -31,6 +31,8 @@ const PALETTE_ORDER: ReadonlyArray<{ type: string; hasDefaultSlot: boolean }> =
 		{ type: "stack", hasDefaultSlot: true },
 		{ type: "grid", hasDefaultSlot: true },
 		{ type: "column", hasDefaultSlot: true },
+		{ type: "z-stack", hasDefaultSlot: true },
+		{ type: "layer", hasDefaultSlot: true },
 		{ type: "spacer", hasDefaultSlot: false },
 		{ type: "heading", hasDefaultSlot: false },
 		{ type: "rich-text", hasDefaultSlot: false },

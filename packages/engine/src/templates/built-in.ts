@@ -1,4 +1,6 @@
 import type { I18nConfig, KivDocument } from "../types";
+import { conferenceLandingDocument } from "./conference-landing";
+import { tradeFairLandingDocument } from "./trade-fair-landing";
 import type { PageTemplate } from "./types";
 
 const I18N: I18nConfig = { default: "en", supported: ["en"] };
@@ -721,5 +723,21 @@ export const BUILT_IN_TEMPLATES: PageTemplate[] = [
 		description: "Header with cover image, content column, and a sidebar.",
 		category: "Content",
 		document: blogPostDocument,
+	},
+	{
+		id: "trade-fair-landing",
+		name: "Trade fair landing",
+		description:
+			"A full event landing modeled after a real client delivery — header, responsive art-direction hero, steps, about, allies, gallery, audience grid, and FAQ accordion. Requires @kivcode/nodes-interactive for the FAQ.",
+		category: "Marketing",
+		document: tradeFairLandingDocument,
+	},
+	{
+		id: "conference-landing",
+		name: "Conference landing",
+		description:
+			"A multi-track conference landing modeled after a real client delivery — hero, why-attend, tiered pricing table, keynote speakers, a featured session, location, sponsors, and an agenda teaser.",
+		category: "Marketing",
+		document: conferenceLandingDocument,
 	},
 ];

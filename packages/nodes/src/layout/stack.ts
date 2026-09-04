@@ -3,7 +3,7 @@ import { borderSidesFields, borderVisualFields } from "../border-field";
 import { resolveBackgroundPaint } from "../color-gradient";
 import { gapField } from "../gap-field";
 import { styleToString } from "../html-utils";
-import { fromScale, GAP, RADIUS, SHADOW } from "../scales";
+import { fromScale, GAP, RADIUS, resolveShadow, SHADOW } from "../scales";
 import { resolveSpacingStyle, spacingField } from "../spacing-field";
 
 const border = borderVisualFields({
@@ -41,7 +41,10 @@ export function stackStyle(
 				? resolveBackgroundPaint(props.background)
 				: undefined,
 		borderRadius: fromScale(RADIUS, props.borderRadius ?? "none", "0"),
-		boxShadow: fromScale(SHADOW, props.shadow ?? "none", "none"),
+		boxShadow: resolveShadow(
+			String(props.shadow ?? "none"),
+			props.shadowColor ? String(props.shadowColor) : undefined,
+		),
 		borderTop: borderWidths.top
 			? `${borderWidths.top}px ${borderStyle} ${borderColor}`
 			: undefined,
@@ -114,6 +117,7 @@ export const stackNode = defineNode({
 		}),
 		borderRadius: border.borderRadius,
 		shadow: border.shadow,
+		shadowColor: border.shadowColor,
 		...borderSides,
 	},
 });

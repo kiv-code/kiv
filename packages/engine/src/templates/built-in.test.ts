@@ -6,11 +6,12 @@ import { defineNode } from "../schema";
 import type { KivDocument, KivNode } from "../types";
 import { BUILT_IN_TEMPLATES } from "./built-in";
 
-// The real node types @kivcode/nodes registers (see packages/nodes/src/index.ts).
+// The real node types @kivcode/nodes and @kivcode/nodes-interactive register
+// (see packages/nodes/src/index.ts and packages/nodes-interactive/src/index.ts).
 // Hardcoded here rather than imported — @kivcode/engine must never depend on
-// @kivcode/nodes (nodes depends on engine, not the other way around) — so this
+// either package (they depend on engine, not the other way around) — so this
 // list is the guardrail that built-in templates only use types that actually
-// exist in the first-party node package, without creating that dependency.
+// exist in a first-party node package, without creating that dependency.
 const REAL_NODE_TYPES = new Set([
 	"page",
 	"section",
@@ -27,6 +28,14 @@ const REAL_NODE_TYPES = new Set([
 	"video",
 	"icon",
 	"divider",
+	"card",
+	"pricing",
+	"z-stack",
+	"layer",
+	// From @kivcode/nodes-interactive — a template using these needs that
+	// package registered alongside @kivcode/nodes to render as intended.
+	"accordion",
+	"accordion-item",
 ]);
 
 function collectTypes(node: KivNode, types: Set<string>): void {
@@ -63,9 +72,17 @@ function stubRegistryFor(doc: KivDocument) {
 }
 
 describe("BUILT_IN_TEMPLATES", () => {
-	it("has a Blank/Landing/About/Contact/Blog-post template", () => {
+	it("has a Blank/Landing/About/Contact/Blog-post/Trade-fair-landing/Conference-landing template", () => {
 		expect(BUILT_IN_TEMPLATES.map((t) => t.id).sort()).toEqual(
-			["about", "blank", "blog-post", "contact", "landing"].sort(),
+			[
+				"about",
+				"blank",
+				"blog-post",
+				"contact",
+				"conference-landing",
+				"landing",
+				"trade-fair-landing",
+			].sort(),
 		);
 	});
 

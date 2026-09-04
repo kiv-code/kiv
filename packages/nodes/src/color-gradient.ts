@@ -98,7 +98,7 @@ function normalize(value: unknown): ColorOrGradientValue {
 }
 
 /** Converts `#rgb`/`#rrggbb` + an alpha (0–1) into an `rgba(...)` string. Returns the hex unchanged if it can't be parsed or alpha is effectively opaque. */
-function withAlpha(hex: string, alpha: number): string {
+export function withAlpha(hex: string, alpha: number): string {
 	if (alpha >= 1) return hex;
 	const clean = hex.trim().replace(/^#/, "");
 	const isShort = clean.length === 3;

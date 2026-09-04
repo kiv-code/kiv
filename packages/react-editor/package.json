@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/react-editor",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"description": "The Kiv visual page-builder editor UI for React — canvas, structure tree, inspector, drag & drop, undo/redo, node palette, and content-block library.",
 	"license": "MIT",
 	"type": "module",

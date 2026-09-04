@@ -1,6 +1,6 @@
 {
 	"name": "@kivcode/plugin-a11y",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"description": "Accessibility auditing plugin for Kiv — flags missing alt text, heading-level skips, and other a11y issues on a KivDocument.",
 	"license": "MIT",
 	"type": "module",

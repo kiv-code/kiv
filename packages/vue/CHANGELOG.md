@@ -1,5 +1,29 @@
 # @kivcode/vue
 
+## 0.4.0
+
+### Minor Changes
+
+- 0121248: Add `z-stack`/`layer` nodes for stacked-layer compositions, a reusable
+  `resolveShadow(preset, color)` for colorable shadows (now available on
+  `card`, `stack`, `image`, `video`, and `section` via `borderVisualFields()`'s
+  new `shadowColor` field), and `card.width`/`height`/`margin`/`alignItems`/
+  `justifyContent` for building fixed-size badges and responsive panels.
+
+  Fix `column` not stretching a single child to the row's full height in a
+  grid (unequal card heights in the same row), register `column`/`z-stack`/
+  `layer`/`spacer` in both editors' "Add node" palettes, wire up per-tier
+  pricing CTA links that were previously inert, and fix accordion items'
+  `Border Radius`/`Shadow`/`Shadow color`/separator-line fields, which were
+  declared in the inspector but never actually applied to the rendered output.
+
+### Patch Changes
+
+- Updated dependencies [d501343]
+- Updated dependencies [0121248]
+  - @kivcode/engine@0.4.0
+  - @kivcode/nodes@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
